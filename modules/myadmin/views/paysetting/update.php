@@ -5,12 +5,13 @@
 /* @var $model app\models\Artikel */
 
 ?>
-<div class="pricesetting-create">
+<div class="paysetting-update">
 
     <?= $this->render('_form', [
         'model' => $model,
-        'listDataharga' => $listDataharga,
-        'listDatatype' => $listDatatype
+        'id' => $id,
+        'listDatametode' => $listDatametode,
+        'listDatajenis' => $listDatajenis
     ]) ?>
 
 </div>

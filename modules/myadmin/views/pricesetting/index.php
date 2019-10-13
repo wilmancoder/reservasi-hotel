@@ -117,13 +117,13 @@ function price_preview()
 
 function addpricesetting() {
      var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/create']);?>";
-     var title = "Form Tambah Harga";
+     var title = "Form Tambah Setting Harga";
      showModal(url, title);
 }
 
 function updatepricesetting(id) {
      var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/update']);?>?id="+id;
-     var title = "Form Update Harga";
+     var title = "Form Update Setting Harga";
      showModal(url, title);
 }
 
@@ -144,7 +144,7 @@ function savesetharga() {
     {
         swal({
             title: "Konfirmasi",
-            text: "Anda yakin akan menambahkan kategori harga?",
+            text: "Anda yakin akan menambahkan Setting Harga?",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -161,7 +161,7 @@ function savesetharga() {
                     beforeSend: function () {
                         swal({
                             title: 'Harap Tunggu',
-                            text: "Sedang memproses ...",
+                            text: "Sedang proses ...",
                             icon: 'info',
                             buttons: {
                                 cancel: false,
@@ -186,7 +186,7 @@ function savesetharga() {
                         }
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
-                        swal("Error!", "Terdapat Kesalahan saat menambahkan kategori harga!", "error");
+                        swal("Error!", "Terdapat Kesalahan saat menambahkan Setting Harga!", "error");
                     }
                 });
             } else {
@@ -206,18 +206,18 @@ function updatesetharga(id) {
              dangerMode: true,
          }).then((ya) => {
              if (ya) {
-                 var _data = new FormData($("#form-detartikel")[0]);
+                 var _data = new FormData($("#form-pricesetting")[0]);
                  $.ajax({
                      type: "POST",
                      data: _data,
                      dataType: "json",
                      contentType: false,
                      processData: false,
-                     url: "<?=\Yii::$app->getUrlManager()->createUrl(['adm/updatedet'])?>?id=" + id,
+                     url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/update'])?>?id=" + id,
                      beforeSend: function () {
                          swal({
                              title: 'Harap Tunggu',
-                             text: "Mengubah Detail Artikel Baru",
+                             text: "Sedang proses ...",
                              icon: 'info',
                              buttons: {
                                  cancel: false,
@@ -238,12 +238,11 @@ function updatesetharga(id) {
                          swal(result.header, result.message, result.status);
 
                          if (result.status == "success") {
-                             $('#modalDetArtikel').modal('hide');
-                             reloadTbl(idartikel);
+                             window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/index'])?>";
                          }
                      },
                      error: function (xhr, ajaxOptions, thrownError) {
-                         swal("Error!", "Terdapat Kesalahan saat memasukan Menu!", "error");
+                         swal("Error!", "Terdapat Kesalahan saat mengubah Setting Harga!", "error");
                      }
                  });
              } else {
@@ -252,6 +251,62 @@ function updatesetharga(id) {
          });
      }
     }
+
+function deletepricesetting(id) {
+ {
+     swal({
+         title: "Konfirmasi",
+         text: "Hapus Kategori Harga ini?",
+         icon: "warning",
+         buttons: true,
+         dangerMode: true,
+     }).then((ya) => {
+         if (ya) {
+             $.ajax({
+                 type: "GET",
+                 // data: {id:id},
+                 dataType: "json",
+                 contentType: false,
+                 processData: false,
+                 url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/delete'])?>?id=" + id,
+                 beforeSend: function () {
+                     swal({
+                         title: 'Harap Tunggu',
+                         text: "Sedang Menghapus Kategori Harga",
+                         icon: 'info',
+                         buttons: {
+                             cancel: false,
+                             confirm: false,
+                         },
+                         closeOnClickOutside: false,
+                         onOpen: function () {
+                             swal.showLoading()
+                         },
+                         closeOnEsc: false,
+                     });
+                 },
+                 complete: function () {
+                     swal.close()
+                 },
+                 success: function (result) {
+
+                     swal(result.header, result.message, result.status);
+
+                     if (result.status == "success") {
+                         window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/index'])?>";
+                     }
+                 },
+                 error: function (xhr, ajaxOptions, thrownError) {
+                     swal("Error!", "Terdapat Kesalahan saat menghapus Kategori Harga!", "error");
+                 }
+             });
+         } else {
+
+         }
+     });
+ }
+
+}
 
 
 </script>

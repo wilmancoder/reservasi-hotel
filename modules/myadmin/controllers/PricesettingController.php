@@ -47,7 +47,7 @@ class PricesettingController extends \yii\web\Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['GET'],
                 ],
             ],
         ];
@@ -73,15 +73,20 @@ class PricesettingController extends \yii\web\Controller
                 $hasil = array(
                     'status' => "success",
                     'header' => "Berhasil",
-                    'message' => "Kategori Harga Berhasil Di input !",
+                    'message' => "Setting Harga Berhasil Di input !",
                 );
                 echo json_encode($hasil);
                 die();
             }
         }
-
+        $kategoriharga=MKategoriHarga::find()->all();
+        $listDataharga=ArrayHelper::map($kategoriharga,'id','kategori_harga');
+        $typekamar=MType::find()->all();
+        $listDatatype=ArrayHelper::map($typekamar,'id','type');
         return $this->renderPartial('create', [
             'model' => $model,
+            'listDataharga' => $listDataharga,
+            'listDatatype' => $listDatatype
         ]);
     }
 
@@ -113,6 +118,19 @@ class PricesettingController extends \yii\web\Controller
             'listDataharga' => $listDataharga,
             'listDatatype' => $listDatatype
         ]);
+    }
+
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+        $hasil = array(
+            'status' => "success",
+            'header' => "Berhasil",
+            'message' => "Kategori Harga Berhasil Di Hapus !",
+        );
+        echo json_encode($hasil);
+        die();
+        // return $this->redirect(['adm/artikel']);
     }
 
     public function actionGetdatapricesetting()

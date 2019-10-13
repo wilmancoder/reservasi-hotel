@@ -24,7 +24,7 @@ use yii\helpers\Html;
                     ],
                 ],
                 "options" => [
-                    "id" => "form-pricesetting",
+                    "id" => "form-paysetting",
                     "class" => "",
                     'onsubmit'=>'return false;',
                     // "data-parsley-validate" => "",
@@ -38,17 +38,12 @@ use yii\helpers\Html;
                         <div class="col-md-4">
 
                             <div class="form-group required">
-                                <?= $form->field($model, 'id_type')->dropDownList($listDatatype, ['class' => 'form-control select validate[required]', 'prompt' => 'Pilih Type Kamar ...']); ?>
+                                <?= $form->field($model, 'id_metode_pembayaran')->dropDownList($listDatametode, ['class' => 'form-control select validate[required]', 'prompt' => 'Pilih Metode Pembayaran...']); ?>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group required">
-                                <?= $form->field($model, 'id_kategori_harga')->dropDownList($listDataharga, ['class' => 'form-control select validate[required]', 'prompt' => 'Pilih Kategori Harga ...']); ?>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group required">
-                                <?= $form->field($model, 'harga')->textInput(['maxlength' => true, 'class' => 'form-control hargakamar', 'placeholder' => 'Masukkan harga kamar ...']); ?>
+                                <?= $form->field($model, 'id_jenis_pembayaran')->dropDownList($listDatajenis, ['class' => 'form-control select validate[required]', 'prompt' => 'Pilih Jenis Pembayaran ...']); ?>
                             </div>
                         </div>
                     </div>
@@ -60,7 +55,7 @@ use yii\helpers\Html;
 <div class="row">
     <div class="col-md-12">
         <!-- <?//=Html::a('<i class="fa fa-floppy-o" aria-hidden="true"></i> Simpan', 'javascript:savesetharga()', ['class' => 'btn btn-success pull-right mr_tombol', 'id'=>'saveaddpengeluaran']) ?> -->
-        <?= Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Create' : '<i class="fa fa-pencil" aria-hidden="true"></i> Update', $model->isNewRecord ? 'javascript:savesetharga()' : 'javascript:updatesetharga("' . $id . '")', ['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-success pull-right']) ?>
+        <?= Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Create' : '<i class="fa fa-pencil" aria-hidden="true"></i> Update', $model->isNewRecord ? 'javascript:savesetpembayaran()' : 'javascript:updatesetpembayaran("' . $id . '")', ['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-success pull-right']) ?>
         <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
     </div>
 </div>
@@ -68,7 +63,6 @@ use yii\helpers\Html;
 
 <script type="text/javascript">
 $(document).ready(function () {
-    $('.hargakamar').number( true );
     $(".select").select2();
 
 });
