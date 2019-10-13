@@ -115,7 +115,13 @@ function pay_preview()
 
 function addpay() {
      var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/paysetting/create']);?>";
-     var title = "Form Tambah Pembayaran";
+     var title = "Form Tambah Setting Pembayaran";
+     showModal(url, title);
+}
+
+function updatepaysetting(id) {
+     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/paysetting/update']);?>?id="+id;
+     var title = "Form Update Setting Pembayaran";
      showModal(url, title);
 }
 
@@ -130,6 +136,173 @@ function showModal(url, title) {
      $('#modalDetailId').modal({backdrop: 'static', keyboard: false});
      $("#modalDetailId").modal("show");
      return false;
+}
+
+function savesetpembayaran() {
+    {
+        swal({
+            title: "Konfirmasi",
+            text: "Anda yakin akan menambahkan Setting Pembayaran?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((ya) => {
+            if (ya) {
+                var _data = new FormData($("#form-paysetting")[0]);
+                $.ajax({
+                    type: "POST",
+                    data: _data,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/paysetting/create'])?>",
+                    beforeSend: function () {
+                        swal({
+                            title: 'Harap Tunggu',
+                            text: "Sedang proses ...",
+                            icon: 'info',
+                            buttons: {
+                                cancel: false,
+                                confirm: false,
+                            },
+                            closeOnClickOutside: false,
+                            onOpen: function () {
+                                swal.showLoading()
+                            },
+                            closeOnEsc: false,
+                        });
+                    },
+                    complete: function () {
+                        swal.close()
+                    },
+                    success: function (result) {
+
+                        swal(result.header, result.message, result.status);
+
+                        if (result.status == "success") {
+                            window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/paysetting/index'])?>";
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        swal("Error!", "Terdapat Kesalahan saat menambahkan Setting Pembayaran!", "error");
+                    }
+                });
+            } else {
+                return false;
+            }
+        });
+    }
+}
+
+function updatesetpembayaran(id) {
+    {
+     swal({
+         title: "Konfirmasi",
+         text: "Ubah Setting Pembayaran ini?",
+         icon: "warning",
+         buttons: true,
+         dangerMode: true,
+     }).then((ya) => {
+         if (ya) {
+             var _data = new FormData($("#form-paysetting")[0]);
+             $.ajax({
+                 type: "POST",
+                 data: _data,
+                 dataType: "json",
+                 contentType: false,
+                 processData: false,
+                 url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/paysetting/update'])?>?id=" + id,
+                 beforeSend: function () {
+                     swal({
+                         title: 'Harap Tunggu',
+                         text: "Sedang Mengubah Setting Pembayaran",
+                         icon: 'info',
+                         buttons: {
+                             cancel: false,
+                             confirm: false,
+                         },
+                         closeOnClickOutside: false,
+                         onOpen: function () {
+                             swal.showLoading()
+                         },
+                         closeOnEsc: false,
+                     });
+                 },
+                 complete: function () {
+                     swal.close()
+                 },
+                 success: function (result) {
+
+                     swal(result.header, result.message, result.status);
+
+                     if (result.status == "success") {
+                         window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/paysetting/index'])?>";
+                     }
+                 },
+                 error: function (xhr, ajaxOptions, thrownError) {
+                     swal("Error!", "Terdapat Kesalahan saat mengubah Setting Pembayaran!", "error");
+                 }
+             });
+         } else {
+             // swal("Informasi", "Dokumen Tidak Dihapus", "info");
+         }
+     });
+    }
+}
+
+function deletepaysetting(id) {
+ {
+     swal({
+         title: "Konfirmasi",
+         text: "Hapus Setting Pembayaran ini?",
+         icon: "warning",
+         buttons: true,
+         dangerMode: true,
+     }).then((ya) => {
+         if (ya) {
+             $.ajax({
+                 type: "GET",
+                 // data: {id:id},
+                 dataType: "json",
+                 contentType: false,
+                 processData: false,
+                 url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/paysetting/delete'])?>?id=" + id,
+                 beforeSend: function () {
+                     swal({
+                         title: 'Harap Tunggu',
+                         text: "Sedang Menghapus ...",
+                         icon: 'info',
+                         buttons: {
+                             cancel: false,
+                             confirm: false,
+                         },
+                         closeOnClickOutside: false,
+                         onOpen: function () {
+                             swal.showLoading()
+                         },
+                         closeOnEsc: false,
+                     });
+                 },
+                 complete: function () {
+                     swal.close()
+                 },
+                 success: function (result) {
+
+                     swal(result.header, result.message, result.status);
+
+                     if (result.status == "success") {
+                         window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/paysetting/index'])?>";
+                     }
+                 },
+                 error: function (xhr, ajaxOptions, thrownError) {
+                     swal("Error!", "Terdapat Kesalahan saat menghapus Setting Pembayaran!", "error");
+                 }
+             });
+         } else {
+
+         }
+     });
+ }
 }
 
 

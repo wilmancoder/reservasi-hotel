@@ -9,6 +9,10 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use app\components\Logic;
+use yii\helpers\ArrayHelper;
+use app\models\MMappingPembayaran;
+use app\models\MMetodePembayaran;
+use app\models\MjenisPembayaran;
 
 class PaysettingController extends \yii\web\Controller
 {
@@ -43,7 +47,7 @@ class PaysettingController extends \yii\web\Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['GET'],
                 ],
             ],
         ];
@@ -52,6 +56,78 @@ class PaysettingController extends \yii\web\Controller
     public function actionIndex()
     {
         return $this->render('index');
+    }
+
+    public function actionCreate()
+    {
+        $model = new MMappingPembayaran();
+        if ($model->load(Yii::$app->request->post())) {
+            $model->id_metode_pembayaran = $_POST['MMappingPembayaran']['id_metode_pembayaran'];
+            $model->id_jenis_pembayaran = $_POST['MMappingPembayaran']['id_jenis_pembayaran'];
+            $model->created_date = date('Y-m-d H:i:s');
+            $model->created_by = Yii::$app->user->identity->nama;
+            if ($model->save()) {
+                $hasil = array(
+                    'status' => "success",
+                    'header' => "Berhasil",
+                    'message' => "Setting Pembayaran Berhasil Di input !",
+                );
+                echo json_encode($hasil);
+                die();
+            }
+        }
+        $metode=MMetodePembayaran::find()->all();
+        $listDatametode=ArrayHelper::map($metode,'id','metode');
+        $jenis=MJenisPembayaran::find()->all();
+        $listDatajenis=ArrayHelper::map($jenis,'id','jenis');
+        return $this->renderPartial('create', [
+            'model' => $model,
+            'listDatametode' => $listDatametode,
+            'listDatajenis' => $listDatajenis
+        ]);
+    }
+
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->id_metode_pembayaran = $_POST['MMappingPembayaran']['id_metode_pembayaran'];
+            $model->id_jenis_pembayaran = $_POST['MMappingPembayaran']['id_jenis_pembayaran'];
+            $model->created_date = date('Y-m-d H:i:s');
+            $model->created_by = Yii::$app->user->identity->nama;
+            if ($model->save()) {
+                $hasil = array(
+                    'status' => "success",
+                    'header' => "Berhasil",
+                    'message' => "Setting Pembayaran Berhasil Di Update !",
+                );
+                echo json_encode($hasil);
+                die();
+            }
+        }
+        $metode=MMetodePembayaran::find()->all();
+        $listDatametode=ArrayHelper::map($metode,'id','metode');
+        $jenis=MJenisPembayaran::find()->all();
+        $listDatajenis=ArrayHelper::map($jenis,'id','jenis');
+        return $this->renderPartial('update', [
+            'model' => $model,
+            'id' => $id,
+            'listDatametode' => $listDatametode,
+            'listDatajenis' => $listDatajenis
+        ]);
+    }
+
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+        $hasil = array(
+            'status' => "success",
+            'header' => "Berhasil",
+            'message' => "Setting Pembayaran Berhasil Di Hapus !",
+        );
+        echo json_encode($hasil);
+        die();
+        // return $this->redirect(['adm/artikel']);
     }
 
     public function actionGetdatapaysetting()
@@ -85,6 +161,14 @@ class PaysettingController extends \yii\web\Controller
         $hasil['data'] = $row;
             // var_dump($hasil);exit();
         return $hasil;
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = MMappingPembayaran::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
 }
