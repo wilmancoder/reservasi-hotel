@@ -1,0 +1,14 @@
+Options -Indexes
+# use mod_rewrite for pretty URL support
+RewriteEngine on
+
+# if a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# otherwise forward it to index.php
+RewriteRule . index.php
+
+php_value max_input_vars 10000
+php_value max_execution_time 3600000
+php_value memory_limit -1
