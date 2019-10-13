@@ -238,8 +238,20 @@ use yii\helpers\Html;
                             <div class="row fit" id="kolomrole0">
                                 <div class="col-md-3">
                                     <div class="form-group required">
-                                        <label class="control-label">List Kamar</label>
-                                        <?= $form->field($model, 'list_kamar')->dropDownList(Yii::$app->Logic->arrKamar($id), ['class' => 'form-control select validate[required]', 'id' => 'ttamu-list_kamar0'])->label(false); ?>
+                                        <label class="control-label" required>List Kamar </label>
+                                        <select class="form-control select validate[required] pilih_kamar" urutan='0' name="TTamu[list_kamar]">
+                                        <option>Pilih Kamar ...</option>
+                                        <?php
+                                        foreach ($listkamar as $idx => $value) {
+                                            $selected = '';
+                                            if($value['id'] == $id){
+                                                $selected = 'selected';
+                                            }
+                                        ?>
+                                            <option value="<?php echo $value['id'];?>" harga="<?= $value['harga'] ?>" <?= $selected ?>>Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>
+                                        <?php } ?>
+
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -249,7 +261,7 @@ use yii\helpers\Html;
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'checkout')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal', 'id' =>'secondDate0', 'placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                        <?= $form->field($model, 'checkout')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal secondDate', 'id' =>'secondDate0', 'urutan'=> '0','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                                 <div class="col-md-1">
@@ -387,89 +399,23 @@ use yii\helpers\Html;
         manageMetodePembayaran();
     });
 
-    $('#secondDate0').on('change', function(event){
-        event.preventDefault();
-        var hasil = hitungDurasi();
-        var hargakamar = $('#ttamu-hargaperkamar0').val();
-        var jmlkamar = $('#ttamu-list_kamar0').val();
-        var subtotal = hargakamar * hasil;
-
-        $('#ttamu-subtotalkamar0').val(subtotal);
-        $('#ttamu-durasi0').val(hasil);
-
-
-        prosesharga(hasil, jmlkamar);
-    });
-
-    $('#kolomrole').on('change','.itemappend', function(event){
-        event.preventDefault();
-        var count = $('.itemappend').length;
-        // console.log(count);
-        var hasil = hitungDurasi(count);
-        var sethargadefault = setHarga(count);
-        // console.log(sethargadefault);
-        var hargakamar = $('#ttamu-hargaperkamar'+count).val();
-        var jmlkamar = $('#ttamu-list_kamar'+count).val();
-        var subtotal = hargakamar * hasil;
-
-        $('#ttamu-subtotalkamar'+count).val(subtotal);
-        $('#ttamu-durasi'+count).val(hasil);
-
-
-        prosesharga(hasil, jmlkamar);
-    });
-
-
-    $('.select').on('change', function(event){
-        event.preventDefault();
-        var hasil = hitungDurasi();
-        var jmlkamar = $('#ttamu-list_kamar0').val();
-        var idterpilihresult = $('#terpilih').val();
-        if( $('#ttamu-durasi').val() == 0 ) {
-            return false;
-        } else {
-
-            prosesharga(hasil, jmlkamar);
-        }
-    });
-
-    function setHarga(id=null) {
-        var idkamar = $('#ttamu-list_kamar'+id).val();
-
-        return idkamar;
-    }
 
     function delRec(valueT){
         vv--;
         $('#garis'+valueT).remove();
         $('#kolomrole'+valueT).remove();
         $('#remove_role'+valueT).remove();
+        total();
     }
 
     function hitungDurasi(id=null)
     {
         const hasil = 0;
-        if(id == null) {
-
-            const start= new Date($("#firstDate0").val());
-            const end= new Date($("#secondDate0").val());
-            const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays;
-        } else {
-            const start= new Date($("#firstDate"+id).val());
-            const end= new Date($("#secondDate"+id).val());
-            const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays;
-        }
-
-        // var days = (end- start) / (1000 * 60 * 60 * 24);
-        // const diffTime = Math.abs(end - start);
-        // const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        // // var hasil = Math.round(days);
-        //
-        // return diffDays;
+        const start= new Date($("#firstDate"+id).val());
+        const end= new Date($("#secondDate"+id).val());
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
     }
 
     function setDefault()
@@ -480,151 +426,91 @@ use yii\helpers\Html;
         $('#summaryttamu-total_bayar').number( true );
         $('#ttamu-subtotalkamar"'+valueT+'"').val(setdefault);
         $('#ttamu-durasi"'+valueT+'"').val(setdefault);
-        // $('#ttamu-harga').val(gethargaawal);
-        // $('#ttamu-harga').number( true );
         $('#summaryttamu-sisa').val(setdefault);
         $('#summaryttamu-total_harga').val(gethargaawal);
         $('#summaryttamu-total_harga').number( true );
     }
 
-    function manageMetodePembayaran()
-    {
-        // Start check radio button
-        var val = $("input[name='radionm']:checked").val();
-        console.log(val);
-        $('.radioid').on('click', function() {
-            // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-            if( $(this).is(":checked") ){
-                var val = $(this).val();
-                console.log(val);
-                if(val == "cash") {
-                    $('#idcarddebit').hide();
-                    $('#idcarddebit').val("");
-                    $('#ttamu-no_kartu_debit').prop('placeholder', 'Masukkan Nomor Kartu Debit ...');
-                } else if (val == "debit") {
-                    $('#idcarddebit').show();
-                    $('#ttamu-no_kartu_debit').prop('placeholder', 'Masukkan Nomor Kartu Debit ...');
-                }
-            }
-        });
-        // End check radio button
-    }
+    function addForm() {
+        var valueT = document.getElementById("comcounter").innerHTML;
+        valueT = Number(valueT) + 1;
+        var divid = 'kolomrole'+valueT;
+        document.getElementById("comcounter").innerHTML = valueT;
+        // vv = Number(valueT);
+        vv++;
+        $('#kolomrole').append(
+            '<div id=garis'+valueT+' class="textColor borderColor itemappend">'+
+                '<div class="row" id=remove_role'+valueT+'>'+
+                    '<div class="col-md-12">'+
+                        '<button style="float:right;" id="btnbatal" name="button" type="button" class="btnbatal btn btn-sm btn-danger" id="remove_role'+valueT+'" onClick="delRec('+valueT+')"><span class="fa fa-times"></span></button>'+
+                    '</div>'+
+                    '<div class="col-md-12">' +
+                        '<div class="row fitappend">' +
+                            '<div class="col-md-3">' +
+                                '<div class="form-group required">' +
+                                    '<label class="control-label" required>List Kamar </label>' +
+                                    '<select id="ttamu-list_kamar'+valueT+'" class="form-control pilih_kamar" urutan="'+valueT+'" validate[required] name="kamar['+valueT+'][list_kamar]">' +
+                                    '<option>Pilih Kamar ...</option>' +
+                                        <?php
+                                        foreach ($listkamar as $idx => $value) {
+                                        ?>
 
-    function manageSelect()
-    {
-        // Start check radio button
-        var val = $("input[name='radio']:checked").val();
-        console.log(val);
-        $('.idradio').on('click', function() {
-            // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-            if( $(this).is(":checked") ){
-                var val = $(this).val();
-                console.log(val);
-                if(val == "lunas") {
-                    $('#idbayar').show();
-                    $('#iddp').hide();
-                    $('#summarysummaryttamu-dp').val("");
-                    $('#summaryttamu-sisa').val(0);
-                    // $('#tdokreferensi-judul_referensi').val("");
-                    // $('#tdokreferensi-vendor_referensi').val("");
-                    // $('#tdokreferensi-tgl_referensi').val("");
-                    // $('#tdokreferensi-deskripsi').val("");
-                    // $('#id_ref_type').val('').trigger("change");
-                    //
-                    // $('#tdokreferensi-nomor_referensi').prop('placeholder', 'Click Here ...');
-                    // $('#tdokreferensi-judul_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-judul_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-vendor_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-vendor_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-deskripsi').prop('readonly', true);
-                    // $('#tdokreferensi-deskripsi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-tgl_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-tgl_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#data_source_reference').prop('disabled', true);
-                    // $($('.uhuy').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-                    //
-                    // $('#tdokreferensi-nomor_referensi').on('click', function() {
-                    //     var url = "<?//=\Yii::$app->getUrlManager()->createUrl(['kategoriaset/price/cekdokreferensi']);?>";
-                    //     var title = "List Dokumen Referensi";
-                    //     showModalPrice(url,title);
-                    // });
-                } else if (val == "sebagian") {
-                    // $('#summaryttamu-total_bayar').val('');
-                    $('#idbayar').hide();
-                    $('#iddp').show();
-                    $('#summarysummaryttamu-dp').val("");
-                    $('#summarysummaryttamu-dp').focus();
-                    $('#summarysummaryttamu-dp').number( true );
-                    // $('#summaryttamu-total_bayar').removeAttr('readonly');
+                                            '<option value="<?php echo $value['id'];?>" harga="<?php echo $value['harga'];?>">Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>' +
+
+                                        <?php } ?>
+
+                                    '</select>' +
+                                '</div>' +
+                            '</div>'+
+                            '<div class="col-md-2">' +
+                                '<div class="form-group required">' +
+                                    '<label class="control-label" required>Checkin </label>' +
+                                    '<input type="text" id="firstDate'+valueT+'" class="form-control form-tanggal" name="kamar['+valueT+'][checkin]" placeholder="Klik disini ..." autocomplete="off">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col-md-2">' +
+                                '<div class="form-group required">' +
+                                    '<label class="control-label" required>Checkout </label>' +
+                                    '<input type="text" id="secondDate'+valueT+'" class="form-control form-tanggal secondDate"  urutan="'+valueT+'" name="kamar['+valueT+'][checkout]" placeholder="Klik disini ..." autocomplete="off">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col-md-1">' +
+                                '<div class="form-group">' +
+                                    '<label class="control-label">Durasi </label>' +
+                                    '<input type="text" value="0" id="ttamu-durasi'+valueT+'" class="form-control cl_durasi" name="kamar['+valueT+'][durasi]" readonly="true">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col-md-2">' +
+                                '<div class="form-group">' +
+                                    '<label class="control-label">Harga Kamar </label>' +
+                                    '<input type="text" value="0" id="ttamu-hargaperkamar'+valueT+'" class="form-control cl_hargaperkamar" name="kamar['+valueT+'][hargaperkamar]" readonly="true">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col-md-2">' +
+                                '<div class="form-group">' +
+                                    '<label class="control-label">SubTotal</label>' +
+                                    '<input type="text" value="0" id="ttamu-subtotalkamar'+valueT+'" class="form-control cl_subtotalkamar" name="kamar['+valueT+'][subtotalkamar]" readonly="true">' +
+                                '</div>' +
+                            '</div>' +
 
 
-                    // $('#data_source_reference').removeAttr('disabled', true);
-                    // $('#tdokreferensi-nomor_referensi').removeAttr('readonly');
-                    // $('#tdokreferensi-nomor_referensi').prop('placeholder', 'Typed Here ...');
-                    // $('#tdokreferensi-nomor_referensi').prop("onclick", null).off("click");
-                    // $('#tdokreferensi-nomor_referensi').val("");
-                    // $('#tdokreferensi-id_referensi').val("");
-                    // $('#tdokreferensi-judul_referensi').removeAttr('readonly');
-                    // $('#tdokreferensi-judul_referensi').val("");
-                    // $('#tdokreferensi-vendor_referensi').removeAttr('readonly');
-                    // $('#tdokreferensi-vendor_referensi').val("");
-                    // $($('.uhuy').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-default btn-file').addClass('btn btn-primary btn-file');
-                    // $('#tdokreferensi-tgl_referensi').removeAttr('readonly');
-                    // $('#tdokreferensi-tgl_referensi').val("");
-                    // $('#tdokreferensi-deskripsi').removeAttr('readonly');
-                    // $('#tdokreferensi-deskripsi').val("");
-                    //
-                    // $('#tdokreferensi-judul_referensi').prop('placeholder', 'Typed Here ...');
-                    // $('#tdokreferensi-vendor_referensi').prop('placeholder', 'Typed Here ...');
-                    // $('#tdokreferensi-deskripsi').prop('placeholder', 'Typed Here ...');
-                    // $('#tdokreferensi-tgl_referensi').prop('placeholder', 'Choose Date ...');
-                }
-            }
-        });
-        // End check radio button
-    }
+                        '</div>' +
+                    '</div>' +
+                    '<div class="waw" id="'+divid+'"></div>'+
+                '</div>'+
+            '</div>'
+        );
+        $(document).ready(function(){
+            $(".select").select2();
 
-
-    $("#summarysummaryttamu-dp").keyup(function(){
-        var total = $("#summaryttamu-total_harga").val();
-        var dp = $("#summarysummaryttamu-dp").val();
-        var hasil = total - dp;
-        $("#summaryttamu-sisa").val(hasil);
-        $('#summaryttamu-sisa').number( true );
-    });
-
-    function prosesharga(hasil, jmlkamar) {
-        $.ajax({
-            type: "GET",
-            // data: {hasil:hasil},
-            dataType: "json",
-            contentType: false,
-            processData: false,
-            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/hitungharga'])?>?hasil="+hasil+'&jmlkamar='+jmlkamar,
-
-            success: function(result) {
-                // $('#ttamu-harga').val(result.sumharga);
-                // $('#ttamu-harga').number( true );
-                $('#hargaterpilih').val(result.hargaperkamar);
-                $('#summaryttamu-total_harga').val(result.sumharga);
-                $('#summaryttamu-total_bayar').val(result.sumharga);
-                $('#kamarterpilih').val(result.expjmlkamar);
-                $('#ttamu_sisa').val("0");
-                // alert(result);
-                return false;
-            },
-            error: function(xhr, ajaxOptions, thrownError) {
-                swal("Error submiting!", "Please try again", "error");
-            }
+            $('.form-tanggal').datepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true
+            });
         });
     }
 
-    function pilihkamar(id) {
-        var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/listkamar']);?>?id="+id;
-        var title = "Pilih Kamar";
-        showModalPilihkamar(url,title);
-    }
-
+    
     function savecekin(id) {
         {
             swal({
@@ -680,124 +566,97 @@ use yii\helpers\Html;
             });
         }
     }
+    
 
-    function addForm() {
-        var valueT = document.getElementById("comcounter").innerHTML;
-        valueT = Number(valueT) + 1;
-        var divid = 'kolomrole'+valueT;
-        document.getElementById("comcounter").innerHTML = valueT;
-        // vv = Number(valueT);
-        vv++;
-        $('#kolomrole').append(
-            '<div id=garis'+valueT+' class="textColor borderColor itemappend">'+
-                '<div class="row" id=remove_role'+valueT+'>'+
-                    '<div class="col-md-12">'+
-                        '<button style="float:right;" id="btnbatal" name="button" type="button" class="btnbatal btn btn-sm btn-danger" id="remove_role'+valueT+'" onClick="delRec('+valueT+')"><span class="fa fa-times"></span></button>'+
-                    '</div>'+
-                    '<div class="col-md-12">' +
-                        '<div class="row fitappend">' +
-                            '<div class="col-md-3">' +
-                                '<div class="form-group required">' +
-                                    '<label class="control-label" required>List Kamar </label>' +
-                                    '<select id="ttamu-list_kamar'+valueT+'" class="form-control select validate[required] name="TTamu[list_kamar]">' +
-                                    '<option>Pilih Kamar ...</option>' +
-                                        <?php
-                                        foreach ($listkamar as $idx => $value) {
-                                        ?>
+    // js hadi
+    $(document).on('change','.pilih_kamar',function(){
+        var harga = $('option:selected', this).attr('harga');
+        var urutan = $(this).attr('urutan');
+        $('#ttamu-hargaperkamar'+urutan).val(harga);
+        if($('#secondDate'+urutan).val() != ''){
+            field_kamar(urutan);
+        }
+    });
 
-                                            '<option value="<?php echo $value['id'];?>">Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>' +
+    $(document).on('change','.secondDate',function(event){
+        event.preventDefault();
+        var urutan = $(this).attr('urutan');
+        
+        field_kamar(urutan);
 
-                                        <?php } ?>
+        // prosesharga(hasil, jmlkamar);
+    });
 
-                                    '</select>' +
-                                '</div>' +
-                            '</div>'+
-                            '<div class="col-md-2">' +
-                                '<div class="form-group required">' +
-                                    '<label class="control-label" required>Checkin </label>' +
-                                    '<input type="text" id="firstDate'+valueT+'" class="form-control form-tanggal" name="TTamu[checkin]" placeholder="Klik disini ..." autocomplete="off">' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="col-md-2">' +
-                                '<div class="form-group required">' +
-                                    '<label class="control-label" required>Checkout </label>' +
-                                    '<input type="text" id="secondDate'+valueT+'" class="form-control form-tanggal" name="TTamu[checkout]" placeholder="Klik disini ..." autocomplete="off">' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="col-md-1">' +
-                                '<div class="form-group">' +
-                                    '<label class="control-label">Durasi </label>' +
-                                    '<input type="text" value="0" id="ttamu-durasi'+valueT+'" class="form-control cl_durasi" name="TTamu[durasi]" readonly="true">' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="col-md-2">' +
-                                '<div class="form-group">' +
-                                    '<label class="control-label">Harga Kamar </label>' +
-                                    '<input type="text" value="0" id="ttamu-hargaperkamar'+valueT+'" class="form-control cl_hargaperkamar" name="TTamu[hargaperkamar]" readonly="true">' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="col-md-2">' +
-                                '<div class="form-group">' +
-                                    '<label class="control-label">SubTotal</label>' +
-                                    '<input type="text" value="0" id="ttamu-subtotalkamar'+valueT+'" class="form-control cl_subtotalkamar" name="TTamu[subtotalkamar]" readonly="true">' +
-                                '</div>' +
-                            '</div>' +
+    function field_kamar(urutan){
+        var hasil = hitungDurasi(urutan);
+        // alert(hasil);
+        var hargakamar = $('#ttamu-hargaperkamar'+urutan).val();
+        var jmlkamar = $('#ttamu-list_kamar'+urutan).val();
+        var subtotal = hargakamar * hasil;
 
-
-                        '</div>' +
-                    '</div>' +
-                    '<div class="waw" id="'+divid+'"></div>'+
-                '</div>'+
-            '</div>'
-        );
-        $(document).ready(function(){
-            $(".select").select2();
-
-            $('.form-tanggal').datepicker({
-                format: 'yyyy-mm-dd',
-                autoclose: true
-            });
-
-            // $('#secondDate').on('change', function(event){
-            //     event.preventDefault();
-            //     var hasil = hitungDurasi();
-            //     var hargakamar = $('#ttamu-hargaperkamar"'+valueT+'"').val();
-            //     // var_dump(hargakamar);exit;
-            //     var subtotal = hargakamar * hasil;
-            //
-            //     $('.cl_subtotalkamar').val(subtotal);
-            //     $('#ttamu-durasi').val(hasil);
-            //
-            //     prosesharga(hasil, jmlkamar);
-            // });
-            //
-            //
-            // $('.select').on('change', function(event){
-            //     event.preventDefault();
-            //     var hasil = hitungDurasi();
-            //     var jmlkamar = $('.select').val();
-            //     var idterpilihresult = $('#terpilih').val();
-            //     if( $('#ttamu-durasi').val() == 0 ) {
-            //         return false;
-            //     } else {
-            //
-            //         prosesharga(hasil, jmlkamar);
-            //     }
-            // });
-
-            // $('.select2-selection__choice__remove').on('change', function(event){
-            //     event.preventDefault();
-            //     var hasil = hitungDurasi();
-            //     var jmlkamar = $('.select').val();
-            //
-            //     var idterpilihresult = $('#terpilih').val();
-            //     prosesharga(hasil, jmlkamar);
-            // });
-
-
-
-            // setDefault();
-        });
+        $('#ttamu-subtotalkamar'+urutan).val(subtotal);
+        $('#ttamu-durasi'+urutan).val(hasil);
+        total();
     }
+
+    function total(){
+        var total = 0;
+        $( ".cl_subtotalkamar" ).each(function( index ) {
+           total = parseInt(total) + parseInt($(this).val());
+        });
+        
+        $('#summaryttamu-total_harga').val(total);
+        $('#summaryttamu-total_harga').number( true );
+        $('#summaryttamu-total_bayar').val(total);
+        $('#summaryttamu-total_bayar').number( true );
+    }
+
+
+
+    $('.radioid').on('click', function() {
+            // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
+            if( $(this).is(":checked") ){
+                var val = $(this).val();
+                console.log(val);
+                if(val == "debit") {
+                    $('#idcarddebit').show();
+                }
+                else{
+                    $('#ttamu-no_kartu_debit').val('');
+                    $('#idcarddebit').hide();                    
+                }
+            }   
+    });
+
+    $('.idradio').on('click', function() {
+            // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
+            if( $(this).is(":checked") ){
+                var val = $(this).val();
+                console.log(val);
+                if(val == "lunas") {
+                    $('#summaryttamu-dp').val($('#summaryttamu-total_harga').val());
+                    $('#iddp').hide();
+                    $('.field-summaryttamu-total_harga').show();
+                    $('#summaryttamu-sisa').val(0);
+                    total();
+                }
+                else{
+                    $('.field-summaryttamu-total_harga').hide();
+                    $('#summaryttamu-dp').val("");
+                    $('#summaryttamu-dp').focus();
+                    $('#summaryttamu-dp').number( true );
+                    $('#iddp').show();                    
+                }
+            }   
+    });
+
+    $(document).on('keyup','#summaryttamu-dp',function(){
+        var val = $(this).val();
+        var total = $('#summaryttamu-total_harga').val();
+        var hasil = parseInt(total) - parseInt(val) ;
+        $('#summaryttamu-sisa').val(hasil);
+        $('#summaryttamu-sisa').number( true );
+
+    });
 </script>
 <div id="comcounter" hidden>0</div>

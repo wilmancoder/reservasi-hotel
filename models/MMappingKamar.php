@@ -30,9 +30,9 @@ class MMappingKamar extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nomor_kamar', 'id_mapping_harga', 'status'], 'integer'],
+            [['nomor_kamar', 'id_mapping_harga'], 'integer'],
             [['created_date'], 'safe'],
-            [['created_by'], 'string', 'max' => 50],
+            [['created_by', 'status'], 'string', 'max' => 50],
         ];
     }
 
