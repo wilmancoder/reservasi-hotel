@@ -24,7 +24,7 @@ use Yii;
  */
 class TTamu extends \yii\db\ActiveRecord
 {
-    public $namatamu, $identitas,$alamat,$list_kamar,$nomor_identitas, $nomor_kontak, $hargaperkamar, $subtotalkamar;
+    public $namatamu, $identitas,$alamat,$list_kamar,$nomor_identitas, $nomor_kontak, $hargaperkamar, $subtotalkamar, $startdate, $enddate;
     /**
      * {@inheritdoc}
      */
