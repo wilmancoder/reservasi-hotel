@@ -150,6 +150,7 @@ class PricesettingController extends \yii\web\Controller
 
             $row[$i]['kategoriharga'] = $value['kategori_harga'];
             $row[$i]['type'] = $value['type'];
+            $row[$i]['harga'] = "Rp. " . \app\components\Logic::formatNumber($value['harga'], 0);
             $row[$i]['created_date'] = $value['created_date'];
             $row[$i]['created_by'] = $value['created_by'];
 

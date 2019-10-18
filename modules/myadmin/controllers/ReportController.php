@@ -13,6 +13,7 @@ use app\models\TPetugas;
 use app\models\MShift;
 use app\models\TPengeluaranPetugas;
 use app\models\SummaryTtamu;
+use app\models\TTamu;
 
 class ReportController extends \yii\web\Controller
 {
@@ -74,6 +75,22 @@ class ReportController extends \yii\web\Controller
             'resultGrandtotal' => $resultGrandtotal,
             'user' => $user
         ]);
+    }
+
+    public function actionIndexall()
+    {
+        $model = new TTamu();
+        return $this->render('indexAll', [
+            'model' => $model
+        ]);
+    }
+
+    public function actionListreportall()
+    {
+        if(Yii::$app->request->isAjax)
+        {
+        var_dump($_POST);exit;
+        }
     }
 
     public function actionGetdatapendapatan($idpetugas) {

@@ -108,7 +108,7 @@ use yii\helpers\Html;
                     <ul class="nav navbar-nav">
                         <li class="active"><a href="<?= Url::to(['/myadmin/rooms']); ?>">Rooms</a></li>
                         <li><a href="<?= Url::to(['/myadmin/booking']); ?>">Booking</a></li>
-                        <li><a href="<?= Url::to(['/myadmin/report']); ?>">Report All</a></li>
+                        <li><a href="<?= Url::to(['/myadmin/report/indexall']); ?>">Report All</a></li>
 
 
                         <li class="dropdown messages-menu">

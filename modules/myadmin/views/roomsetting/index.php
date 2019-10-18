@@ -7,7 +7,12 @@ $this->title = 'Manajemen Kamar';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <style type="text/css">
-
+    #modalHargaId {
+        z-index: 1060;
+    }
+    #modalDetailId{
+        overflow-y: hidden;
+    }
 </style>
 <div class="roomsetting-index">
     <h1 class="title"><i class="fa fa-calendar" aria-hidden="true"></i> <?= Html::encode($this->title) ?></h1><br>
@@ -60,6 +65,31 @@ $this->params['breadcrumbs'][] = $this->title;
             <!-- <div class="modal-footer">
               <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div> -->
+
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="modalHargaId">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title" id="modalHargaTitle"></h4>
+              <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body" id="modalHargaBody">
+              Loading ...
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
 
         </div>
     </div>
@@ -134,6 +164,187 @@ function showModal(url, title) {
      $('#modalDetailId').modal({backdrop: 'static', keyboard: false});
      $("#modalDetailId").modal("show");
      return false;
+}
+
+function showModalharga(url, title) {
+     $("#modalHargaTitle").empty();
+     $("#modalHargaTitle").html(title);
+
+     $("#modalHargaBody").empty();
+     $("#modalHargaBody").html("Loading ...");
+     $("#modalHargaBody").load(url);
+
+     $('#modalHargaId').modal({backdrop: 'static', keyboard: false});
+     $("#modalHargaId").modal("show");
+     return false;
+}
+
+function savesetroom() {
+    {
+        swal({
+            title: "Konfirmasi",
+            text: "Anda yakin akan menambahkan Setting Kamar?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((ya) => {
+            if (ya) {
+                var _data = new FormData($("#form-roomsetting")[0]);
+                $.ajax({
+                    type: "POST",
+                    data: _data,
+                    dataType: "json",
+                    contentType: false,
+                    processData: false,
+                    url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/roomsetting/create'])?>",
+                    beforeSend: function () {
+                        swal({
+                            title: 'Harap Tunggu',
+                            text: "Sedang proses ...",
+                            icon: 'info',
+                            buttons: {
+                                cancel: false,
+                                confirm: false,
+                            },
+                            closeOnClickOutside: false,
+                            onOpen: function () {
+                                swal.showLoading()
+                            },
+                            closeOnEsc: false,
+                        });
+                    },
+                    complete: function () {
+                        swal.close()
+                    },
+                    success: function (result) {
+
+                        swal(result.header, result.message, result.status);
+
+                        if (result.status == "success") {
+                            window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/roomsetting/index'])?>";
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        swal("Error!", "Terdapat Kesalahan saat menambahkan Setting Kamar!", "error");
+                    }
+                });
+            } else {
+                return false;
+            }
+        });
+    }
+}
+
+function updatesetharga(id) {
+     {
+         swal({
+             title: "Konfirmasi",
+             text: "Ubah Setting Harga ini?",
+             icon: "warning",
+             buttons: true,
+             dangerMode: true,
+         }).then((ya) => {
+             if (ya) {
+                 var _data = new FormData($("#form-pricesetting")[0]);
+                 $.ajax({
+                     type: "POST",
+                     data: _data,
+                     dataType: "json",
+                     contentType: false,
+                     processData: false,
+                     url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/update'])?>?id=" + id,
+                     beforeSend: function () {
+                         swal({
+                             title: 'Harap Tunggu',
+                             text: "Sedang proses ...",
+                             icon: 'info',
+                             buttons: {
+                                 cancel: false,
+                                 confirm: false,
+                             },
+                             closeOnClickOutside: false,
+                             onOpen: function () {
+                                 swal.showLoading()
+                             },
+                             closeOnEsc: false,
+                         });
+                     },
+                     complete: function () {
+                         swal.close()
+                     },
+                     success: function (result) {
+
+                         swal(result.header, result.message, result.status);
+
+                         if (result.status == "success") {
+                             window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/index'])?>";
+                         }
+                     },
+                     error: function (xhr, ajaxOptions, thrownError) {
+                         swal("Error!", "Terdapat Kesalahan saat mengubah Setting Harga!", "error");
+                     }
+                 });
+             } else {
+                 // swal("Informasi", "Dokumen Tidak Dihapus", "info");
+             }
+         });
+     }
+    }
+
+function deletepricesetting(id) {
+ {
+     swal({
+         title: "Konfirmasi",
+         text: "Hapus Kategori Harga ini?",
+         icon: "warning",
+         buttons: true,
+         dangerMode: true,
+     }).then((ya) => {
+         if (ya) {
+             $.ajax({
+                 type: "GET",
+                 // data: {id:id},
+                 dataType: "json",
+                 contentType: false,
+                 processData: false,
+                 url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/delete'])?>?id=" + id,
+                 beforeSend: function () {
+                     swal({
+                         title: 'Harap Tunggu',
+                         text: "Sedang Menghapus Kategori Harga",
+                         icon: 'info',
+                         buttons: {
+                             cancel: false,
+                             confirm: false,
+                         },
+                         closeOnClickOutside: false,
+                         onOpen: function () {
+                             swal.showLoading()
+                         },
+                         closeOnEsc: false,
+                     });
+                 },
+                 complete: function () {
+                     swal.close()
+                 },
+                 success: function (result) {
+
+                     swal(result.header, result.message, result.status);
+
+                     if (result.status == "success") {
+                         window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/index'])?>";
+                     }
+                 },
+                 error: function (xhr, ajaxOptions, thrownError) {
+                     swal("Error!", "Terdapat Kesalahan saat menghapus Kategori Harga!", "error");
+                 }
+             });
+         } else {
+
+         }
+     });
+ }
+
 }
 
 
