@@ -248,10 +248,11 @@ use yii\helpers\Html;
                                                 $selected = 'selected';
                                             }
                                         ?>
-                                            <option value="<?php echo $value['id'];?>" harga="<?= $value['harga'] ?>" <?= $selected ?>>Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>
+                                            <option value="<?php echo $value['id'];?>" harga="<?= $value['harga'] ?>" nomor_kamar="<?= $value['nomor_kamar'] ?>" <?= $selected ?>>Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>
                                         <?php } ?>
 
                                         </select>
+                                        <input type="hidden" id="nomor_kamar0" name='TTamu[nomor_kamar]' value="<?= $nomorkamar ?>">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -336,7 +337,7 @@ use yii\helpers\Html;
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group required" id="idcarddebit" style="display:none">
-                                        <?= $form->field($model, 'no_kartu_debit')->textInput(['maxlength' => true, 'class' => 'form-control'])->label(false); ?>
+                                            <?= $form->field($model, 'no_kartu_debit')->textInput(['maxlength' => true, 'class' => 'form-control']); ?>
                                     </div>
                                 </div>
                             </div>
@@ -455,11 +456,12 @@ use yii\helpers\Html;
                                         foreach ($listkamar as $idx => $value) {
                                         ?>
 
-                                            '<option value="<?php echo $value['id'];?>" harga="<?php echo $value['harga'];?>">Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>' +
+                                            '<option value="<?php echo $value['id'];?>" harga="<?php echo $value['harga'];?>" nomor_kamar="<?php echo $value['nomor_kamar'];?>">Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>' +
 
                                         <?php } ?>
 
                                     '</select>' +
+                                    '<input type="hidden" id="nomor_kamar'+valueT+'" name="kamar['+valueT+'][nomor_kamar]">'+
                                 '</div>' +
                             '</div>'+
                             '<div class="col-md-2">' +
@@ -571,8 +573,10 @@ use yii\helpers\Html;
     // js hadi
     $(document).on('change','.pilih_kamar',function(){
         var harga = $('option:selected', this).attr('harga');
+        var nomor_kamar = $('option:selected', this).attr('nomor_kamar');
         var urutan = $(this).attr('urutan');
         $('#ttamu-hargaperkamar'+urutan).val(harga);
+        $('#nomor_kamar'+urutan).val(nomor_kamar);
         if($('#secondDate'+urutan).val() != ''){
             field_kamar(urutan);
         }

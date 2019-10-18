@@ -138,36 +138,44 @@ use yii\helpers\Html;
                     <?php
                     $grandtotal = 0;
                     foreach ($ambilDatatamu as $key => $value) {
-                        echo"
+                        if($value['status'] == 1){
+                            $ck = "<input type='checkbox' name='nomor_kamar[]' class='cek_kamar' urutan='".$value['id']."' value='".$value['nomor_kamar']."'>
+                            <input type='checkbox' style='display:none' name='id_tamu[]' value='".$value['id']."' id='id-".$value['id']."'>";
+                        }
+                        else{
+                            $ck = "Telah Checkout";
+                        }
+                        echo $ck."
+                            <input type='hidden' name='id_biodata_tamu' value='".$value['id_biodata_tamu']."'>
                             <div class='row'>
                                 <div class='col-md-2'>
                                     <div class='form-group required'>
-                                        <input type='text' class='form-control' name='kamar' value='Kamar ".$value['nomor_kamar']."' readonly='true'>
+                                        <input type='text' class='form-control' name='kamar' value='".$value['nomor_kamar']."' disabled='true'>
                                     </div>
                                 </div>
                                 <div class='col-md-2'>
                                     <div class='form-group required'>
-                                        <input type='text' class='form-control' name='checkin' value='".$value['checkin']."' readonly='true'>
+                                        <input type='text' class='form-control' name='checkin' value='".$value['checkin']."' disabled='true'>
                                     </div>
                                 </div>
                                 <div class='col-md-2'>
                                     <div class='form-group required'>
-                                        <input type='text' class='form-control' name='checkout' value='".$value['checkout']."' readonly='true'>
+                                        <input type='text' class='form-control' name='checkout' value='".$value['checkout']."' disabled='true'>
                                     </div>
                                 </div>
                                 <div class='col-md-2'>
                                     <div class='form-group required'>
-                                        <input type='text' class='form-control' name='harga' value='"."Rp. " . \app\components\Logic::formatNumber($value['harga'], 0)."' readonly='true'>
+                                        <input type='text' class='form-control' name='harga' value='"."Rp. " . \app\components\Logic::formatNumber($value['harga'], 0)."' disabled='true'>
                                     </div>
                                 </div>
                                 <div class='col-md-2'>
                                     <div class='form-group required'>
-                                        <input type='text' class='form-control' name='durasi' value='".$value['durasi']." Hari' readonly='true'>
+                                        <input type='text' class='form-control' name='durasi' value='".$value['durasi']." Hari' disabled='true'>
                                     </div>
                                 </div>
                                 <div class='col-md-2'>
                                     <div class='form-group required'>
-                                        <input type='text' class='form-control' name='subtotal' value='"."Rp. " . \app\components\Logic::formatNumber($value['subtotal'], 0)."' readonly='true'>
+                                        <input type='text' class='form-control' name='subtotal' value='"."Rp. " . \app\components\Logic::formatNumber($value['subtotal'], 0)."' disabled='true'>
                                     </div>
                                 </div>
                             </div>
@@ -221,7 +229,7 @@ use yii\helpers\Html;
             <div class="box box-warning">
                 <div class="box-body">
                     <div class='row'>
-                        <?php if($jenisPembayaran == "lunas") { ?>
+                        <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
                             <div class='col-md-4'>
                                 <label class="control-label">Bayar</label>
                             </div>
@@ -238,7 +246,7 @@ use yii\helpers\Html;
                         </div>
                     </div>
                     <div class="row">
-                        <?php if($jenisPembayaran == "lunas") { ?>
+                        <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
                             <div class="col-md-4">
                                 <div class="form-group required">
                                     <input type="text" class="form-control" name="bayar" value="Rp. <?= \app\components\Logic::formatNumber($totalbayarsummary, 0)?>" readonly='true'>
@@ -262,7 +270,7 @@ use yii\helpers\Html;
                             </div>
                         </div>
                     </div>
-                    <?php if($jenisPembayaran == "lunas") { ?>
+                    <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
                         <div class="row" style="display:none">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -290,7 +298,7 @@ use yii\helpers\Html;
 
             <div class="row">
                 <div class="col-md-12">
-                    <?php if($jenisPembayaran == "lunas") { ?>
+                    <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
                         <?=Html::button('<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkout',['class' => 'btn btn-success pull-right', 'onclick' => 'savecekout('.$idbiodata.')', 'id' => 'idcekout']) ?>
                     <?php } else {?>
                         <?=Html::button('<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkout',['class' => 'btn btn-success pull-right', 'onclick' => 'savecekout('.$idbiodata.')', 'id' => 'idcekout', 'disabled' => 'disabled']) ?>
@@ -304,6 +312,29 @@ use yii\helpers\Html;
 </div>
 <script type="text/javascript">
     $(document).ready(function () {
+
+    $(document).on('change','.idpelunasan',function(){
+        var urutan = $(this).attr('urutan');
+        if ($(this).is(':checked')) {
+            $('#idcekout').prop('disabled', false);
+            $('#bayarpelunasan').prop('disabled', false);
+        }
+        else{
+            $('#idcekout').prop('disabled', true);
+            $('#bayarpelunasan').prop('disabled', true);
+        }
+    });
+
+    
+    $(document).on('change','.cek_kamar',function(){
+        var urutan = $(this).attr('urutan');
+        if ($(this).is(':checked')) {
+            $('#id-'+urutan).trigger('click');
+        }
+        else{
+            $('#id-'+urutan).trigger('click');
+        }
+    });
 
 
     $(".select").select2({
@@ -405,56 +436,56 @@ use yii\helpers\Html;
         // End check radio button
     }
 
-    function manageSelect()
-    {
-        // Start checkbox
-        // var val = $("input[name='pelunasan']:checked").val();
-        // console.log(val); return false;
-        $( "input[type=checkbox]" ).on('click', function() {
-            // event.preventDefault();
-            // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-            if( $('.idpelunasan').is(":checked") ){
-                var val = $(this).val();
-                // console.log(val); return false;
-                if(val == "pelunasan") {
-                    $('#idcekout').prop('disabled', false);
-                    $('#bayarpelunasan').prop('disabled', false);
-                    // $('#idbayar').show();
-                    // $('#iddp').hide();
-                    // $('#ttamu-dp').val("");
-                    // $('#ttamu-sisa').val(0);
-                    // $('#tdokreferensi-judul_referensi').val("");
-                    // $('#tdokreferensi-vendor_referensi').val("");
-                    // $('#tdokreferensi-tgl_referensi').val("");
-                    // $('#tdokreferensi-deskripsi').val("");
-                    // $('#id_ref_type').val('').trigger("change");
-                    //
-                    // $('#tdokreferensi-nomor_referensi').prop('placeholder', 'Click Here ...');
-                    // $('#tdokreferensi-judul_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-judul_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-vendor_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-vendor_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-deskripsi').prop('readonly', true);
-                    // $('#tdokreferensi-deskripsi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-tgl_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-tgl_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#data_source_reference').prop('disabled', true);
-                    // $($('.uhuy').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-                    //
-                    // $('#tdokreferensi-nomor_referensi').on('click', function() {
-                    //     var url = "<?//=\Yii::$app->getUrlManager()->createUrl(['kategoriaset/price/cekdokreferensi']);?>";
-                    //     var title = "List Dokumen Referensi";
-                    //     showModalPrice(url,title);
-                    // });
-                }
-            } else {
-                $('#idcekout').prop('disabled', true);
-                $('#bayarpelunasan').prop('disabled', true);
-            }
+    // function manageSelect()
+    // {
+    //     // Start checkbox
+    //     // var val = $("input[name='pelunasan']:checked").val();
+    //     // console.log(val); return false;
+    //     $( "input[type=checkbox]" ).on('click', function() {
+    //         // event.preventDefault();
+    //         // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
+    //         if( $('.idpelunasan').is(":checked") ){
+    //             var val = $(this).val();
+    //             // console.log(val); return false;
+    //             if(val == "pelunasan") {
+    //                 $('#idcekout').prop('disabled', false);
+    //                 // $('#bayarpelunasan').prop('disabled', false);
+    //                 // $('#idbayar').show();
+    //                 // $('#iddp').hide();
+    //                 // $('#ttamu-dp').val("");
+    //                 // $('#ttamu-sisa').val(0);
+    //                 // $('#tdokreferensi-judul_referensi').val("");
+    //                 // $('#tdokreferensi-vendor_referensi').val("");
+    //                 // $('#tdokreferensi-tgl_referensi').val("");
+    //                 // $('#tdokreferensi-deskripsi').val("");
+    //                 // $('#id_ref_type').val('').trigger("change");
+    //                 //
+    //                 // $('#tdokreferensi-nomor_referensi').prop('placeholder', 'Click Here ...');
+    //                 // $('#tdokreferensi-judul_referensi').prop('readonly', true);
+    //                 // $('#tdokreferensi-judul_referensi').prop('placeholder', 'Automatically filled');
+    //                 // $('#tdokreferensi-vendor_referensi').prop('readonly', true);
+    //                 // $('#tdokreferensi-vendor_referensi').prop('placeholder', 'Automatically filled');
+    //                 // $('#tdokreferensi-deskripsi').prop('readonly', true);
+    //                 // $('#tdokreferensi-deskripsi').prop('placeholder', 'Automatically filled');
+    //                 // $('#tdokreferensi-tgl_referensi').prop('readonly', true);
+    //                 // $('#tdokreferensi-tgl_referensi').prop('placeholder', 'Automatically filled');
+    //                 // $('#data_source_reference').prop('disabled', true);
+    //                 // $($('.uhuy').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
+    //                 //
+    //                 // $('#tdokreferensi-nomor_referensi').on('click', function() {
+    //                 //     var url = "<?//=\Yii::$app->getUrlManager()->createUrl(['kategoriaset/price/cekdokreferensi']);?>";
+    //                 //     var title = "List Dokumen Referensi";
+    //                 //     showModalPrice(url,title);
+    //                 // });
+    //             }
+    //         } else {
+    //             $('#idcekout').prop('disabled', true);
+    //             // $('#bayarpelunasan').prop('disabled', true);
+    //         }
 
-        });
-        // End check radio button
-    }
+    //     });
+    //     // End check radio button
+    // }
 
 
     $("#ttamu-dp").keyup(function(){

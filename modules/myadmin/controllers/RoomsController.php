@@ -151,7 +151,7 @@ class RoomsController extends \yii\web\Controller
                     $modelSummaryttamu->total_harga = Logic::removeKoma($totalharga);
                     $modelSummaryttamu->save(false);
                 }
-                
+                // var_dump($_POST['TTamu']['no_kartu_debit']);exit;
                 $modelPengunjung = new TTamu();
                 $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
                 $modelPengunjung->id_mapping_kamar = $_POST['TTamu']['list_kamar'];
@@ -161,16 +161,12 @@ class RoomsController extends \yii\web\Controller
                 $modelPengunjung->harga = $_POST['TTamu']['subtotalkamar'];
                 $modelPengunjung->status = 1;
                 $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
-                $modelPengunjung->no_kartu_debit =$_POST['SummaryTtamu']['no_kartu_debit'];
+                $modelPengunjung->no_kartu_debit =$_POST['TTamu']['no_kartu_debit'];
                 $modelPengunjung->created_date_cekin = date('Y-m-d H:i:s');
                 $modelPengunjung->created_by_cekin = \Yii::$app->user->identity->nama;
 
                 if($modelPengunjung->save()){
-                    $modelStatuskamar =  MMappingKamar::find()->where(['id' => $_POST['TTamu']['list_kamar']])->one();
-                    $modelStatuskamar->status = "terisi";
-                    if(!$modelStatuskamar->save()){
-                        // var_dump($modelStatuskamar->getErrors());exit;
-                    }
+                    MMappingKamar::updateAll(['status' => 'terisi', ], ['nomor_kamar' => $_POST['TTamu']['nomor_kamar']]);
                 }
                 if(!empty($_POST['kamar'])){
                     foreach ($_POST['kamar'] as $key => $value) {
@@ -184,61 +180,16 @@ class RoomsController extends \yii\web\Controller
                         $modelPengunjung->harga = $value['subtotalkamar'];
                         $modelPengunjung->status = 1;
                         $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
-                        $modelPengunjung->no_kartu_debit =$_POST['SummaryTtamu']['no_kartu_debit'];
+                        $modelPengunjung->no_kartu_debit =$_POST['TTamu']['no_kartu_debit'];
                         $modelPengunjung->created_date_cekin = date('Y-m-d H:i:s');
                         $modelPengunjung->created_by_cekin = \Yii::$app->user->identity->nama;
 
                         if($modelPengunjung->save()){
-                            $modelStatuskamar =  MMappingKamar::find()->where(['id' => $value['list_kamar']])->one();
-                            // code...
-                            $modelStatuskamar->status = "terisi";
-                            $modelStatuskamar->save();
+                            MMappingKamar::updateAll(['status' => 'terisi', ], ['nomor_kamar' => $value['nomor_kamar']]);  
                         }
                     }
                 }
                 
-
-                // exit;
-                
-                // foreach ($res_idkamar as $key => $valueidkamar) {
-                //     $modelStatuskamar =  MMappingKamar::find()->where(['id' => $valueidkamar])->one();
-                //     // code...
-                //     $modelStatuskamar->status = "terisi";
-                //     $modelStatuskamar->save(false);
-                // }
-                // // simpan ke tabel mapping kamar
-                // foreach ($expPostkamar as $key => $value) {
-                //     $jumlahkamar = $value;
-                //     // var_dump($jumlahkamar);
-
-                //     // if($modelStatuskamar->save(false)) {
-                //         $modelPengunjung = new TTamu();
-                //         $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
-                //         $modelPengunjung->id_mapping_kamar = $value;
-                //         $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
-                //         $modelPengunjung->checkin = $_POST['TTamu']['checkin'];
-                //         $modelPengunjung->checkout = $_POST['TTamu']['checkout'];
-                //         $modelPengunjung->harga = $expPostharga[$key];
-                //         $modelPengunjung->status = 1;
-                //         $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
-                //         $modelPengunjung->no_kartu_debit = $nokartudebit;
-                //         $modelPengunjung->created_date_cekin = date('Y-m-d H:i:s');
-                //         $modelPengunjung->created_by_cekin = \Yii::$app->user->identity->nama;
-                //         // if($jenisPembayaran == "lunas") {
-                //         //     $modelPengunjung->bayar = Logic::removeKoma($bayar);
-                //         // } else {
-                //         //     $modelPengunjung->bayar = null;
-                //         // }
-
-                //         if($modelPengunjung->save(false)) {
-                //             $hasil = array(
-                //                 'status' => "success",
-                //                 'header' => "Berhasil",
-                //                 'message' => "Checkin Berhasil Diproses !",
-                //             );
-                //         }
-                //     // }
-                // }
                 $hasil = array(
                     'status' => "success",
                     'header' => "Berhasil",
@@ -394,7 +345,7 @@ class RoomsController extends \yii\web\Controller
             $que2 = MMappingKamar::find()->where(['nomor_kamar'=>$que1['nomor_kamar']])->andWhere(['<>', 'id', $idttamu])->andWhere(['status' => 'terisi'])->asArray()->one();
         }
         // var_dump($que2);exit;
-        $cekbiodatatamu = TTamu::find()->where(['id_mapping_kamar'=>$que2['id']])->asArray()->one();
+        $cekbiodatatamu = TTamu::find()->where(['id_mapping_kamar'=>$que2['id'],'status'=> 1])->asArray()->one();
         // $cekbiodatatamu = TTamu::find()->where(['id'=>$idttamu])->asArray()->one();
         $idbiodata = $cekbiodatatamu['id_biodata_tamu'];
         $ambilDatatamu = Logic::dataTamu($idbiodata);
@@ -410,31 +361,61 @@ class RoomsController extends \yii\web\Controller
          try {
              if (Yii::$app->request->post()) {
                  // $getid = $_GET;
-                 $post = $_POST['bayarpelunasan'];
-                 // var_dump($post);exit;
+                 $post = @$_POST['bayarpelunasan'];
+                //  var_dump($_POST);exit;
 
                  $cekbiodatatamu =  TTamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->all();
-
-                 foreach ($cekbiodatatamu as $key => $value) {
-                     $modelTransaksitamu =  TTamu::find()->where(['id' => $value['id']])->one();
-                     $modelTransaksitamu['status'] = "0";
-                     $modelTransaksitamu['created_date_cekout'] = date('Y-m-d H:i:s');
-                     if($modelTransaksitamu->save(false)) {
-                         $modelStatuskamar =  MMappingKamar::find()->where(['id' => $value['id_mapping_kamar']])->one();
-                         $modelStatuskamar['status'] = "tersedia";
-                         if($modelStatuskamar->save(false)) {
-                             $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $value['id_biodata_tamu']])->one();
-                             $modelSummaryttamu->total_bayar = $_POST['bayarpelunasan'];
-                            if($modelSummaryttamu->save(false)) {
-                                 $hasil = array(
-                                     'status' => "success",
-                                     'header' => "Berhasil",
-                                     'message' => "Checkout Berhasil Diproses !",
-                                 );
-                            }
-                         }
-                     }
+                //  var_dump($_POST);
+                 if(!(empty($_POST['id_tamu']))){
+                    foreach ($_POST['id_tamu'] as $key ) {
+                        // var_dump($key);
+                        $modelTransaksitamu =  TTamu::find()->where(['id' => $key])->one();
+                        $modelTransaksitamu['status'] = "0";
+                        $modelTransaksitamu['created_date_cekout'] = date('Y-m-d H:i:s');
+                        $modelTransaksitamu->save();
+                    }
                  }
+                 if(!(empty($_POST['nomor_kamar']))){
+                    foreach ($_POST['nomor_kamar'] as $key ) {
+                        // var_dump($key);
+                        $modelStatuskamar =  MMappingKamar::find()->where(['nomor_kamar' => $key])->one();
+                        $modelStatuskamar['status'] = "tersedia";
+                        $modelStatuskamar->save(false);
+                    }
+                 }
+                 if(!empty($_POST['bayarpelunasan'])){
+                     $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
+                     $modelSummaryttamu->total_bayar = $_POST['bayarpelunasan'];
+                     $modelSummaryttamu->sisa = 0;
+                     $modelSummaryttamu->save(false);
+                 }
+                //  foreach ($cekbiodatatamu as $key => $value) {
+                //      $modelTransaksitamu =  TTamu::find()->where(['id' => $value['id']])->one();
+                //      $modelTransaksitamu['status'] = "0";
+                //      $modelTransaksitamu['created_date_cekout'] = date('Y-m-d H:i:s');
+                //      if($modelTransaksitamu->save(false)) {
+                //          $modelStatuskamar =  MMappingKamar::find()->where(['id' => $value['id_mapping_kamar']])->one();
+                //          $modelStatuskamar['status'] = "tersedia";
+                //          if($modelStatuskamar->save(false)) {
+                //              $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $value['id_biodata_tamu']])->one();
+                //              $modelSummaryttamu->total_bayar = $_POST['bayarpelunasan'];
+                //             if($modelSummaryttamu->save(false)) {
+                //                  $hasil = array(
+                //                      'status' => "success",
+                //                      'header' => "Berhasil",
+                //                      'message' => "Checkout Berhasil Diproses !",
+                //                  );
+                //             }
+                //          }
+                //      }
+                //  }
+                 $hasil = array(
+                    'status' => "success",
+                    'header' => "Berhasil",
+                    'message' => "Checkout Berhasil Diproses !",
+                );
+                
+                //  var_dump($cekbiodatatamu);exit;
                  echo json_encode($hasil);
                  die();
 
