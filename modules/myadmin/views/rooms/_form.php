@@ -22,7 +22,7 @@ use yii\helpers\Html;
         text-align: center;
         padding-top: 10px;
     }
-    #summarysummaryttamu-dp {
+    #summaryttamu-dp {
         font-size: 20px;
         font-weight: bold;
         color: green;
@@ -182,7 +182,7 @@ use yii\helpers\Html;
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...']) ?>
+                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Handphone ...']) ?>
                                     </div>
                                 </div>
                             </div>
@@ -377,7 +377,8 @@ use yii\helpers\Html;
     var ambilhargaperkamar = <?= $ambilharga?>;
     var vv = 0;
     $(document).ready(function () {
-
+        formattingFirstDate();
+        formattingSecondDate();
         $(".pilih").select2();
 
         $(".select").select2();
@@ -390,22 +391,51 @@ use yii\helpers\Html;
             autoclose: true
         });
 
+        $('#summaryttamu-dp').val("");
         $('#ttamu-hargaperkamar0').val(ambilhargaperkamar);
-        $('#ttamu-durasi0').val(0);
-        $('#ttamu-subtotalkamar0').val(0);
+        $('#firstDate0').val(formattingFirstDate());
+        $('#secondDate0').val(formattingSecondDate());
+        $('#ttamu-durasi0').val(1);
+        $('#ttamu-subtotalkamar0').val(ambilhargaperkamar);
 
 
         setDefault();
-        manageSelect();
-        manageMetodePembayaran();
     });
 
+    function formattingFirstDate(){
+        var d = new Date();
+
+        var month = d.getMonth()+1;
+        var day = d.getDate();
+
+        var output = d.getFullYear() + '-' +
+            ((''+month).length<2 ? '0' : '') + month + '-' +
+            ((''+day).length<2 ? '0' : '') + day;
+
+        return output;
+    }
+
+    function formattingSecondDate(){
+        var d = new Date();
+
+        var month = d.getMonth()+1;
+        var day = d.getDate()+1;
+
+        var output = d.getFullYear() + '-' +
+            ((''+month).length<2 ? '0' : '') + month + '-' +
+            ((''+day).length<2 ? '0' : '') + day;
+
+        return output;
+    }
 
     function delRec(valueT){
         vv--;
         $('#garis'+valueT).remove();
         $('#kolomrole'+valueT).remove();
         $('#remove_role'+valueT).remove();
+        $('#summaryttamu-dp').val(0);
+        $('#summaryttamu-dp').number(true);
+        // $('#summaryttamu-sisa').val( $('#summaryttamu-dp').val() );
         total();
     }
 
@@ -425,11 +455,14 @@ use yii\helpers\Html;
         var gethargaawal = <?= $ambilharga?>;
         $('#summaryttamu-total_bayar').val(gethargaawal);
         $('#summaryttamu-total_bayar').number( true );
-        $('#ttamu-subtotalkamar"'+valueT+'"').val(setdefault);
-        $('#ttamu-durasi"'+valueT+'"').val(setdefault);
-        $('#summaryttamu-sisa').val(setdefault);
         $('#summaryttamu-total_harga').val(gethargaawal);
         $('#summaryttamu-total_harga').number( true );
+        $('#summaryttamu-sisa').val(setdefault);
+        $('#summaryttamu-sisa').number( true );
+        // $('#summaryttamu-dp').val("");
+
+        $('#ttamu-subtotalkamar"'+valueT+'"').val(setdefault);
+        $('#ttamu-durasi"'+valueT+'"').val(setdefault);
     }
 
     function addForm() {
@@ -450,7 +483,7 @@ use yii\helpers\Html;
                             '<div class="col-md-3">' +
                                 '<div class="form-group required">' +
                                     '<label class="control-label" required>List Kamar </label>' +
-                                    '<select id="ttamu-list_kamar'+valueT+'" class="form-control pilih_kamar" urutan="'+valueT+'" validate[required] name="kamar['+valueT+'][list_kamar]">' +
+                                    '<select id="ttamu-list_kamar'+valueT+'" class="form-control select pilih_kamar" urutan="'+valueT+'" validate[required] name="kamar['+valueT+'][list_kamar]">' +
                                     '<option>Pilih Kamar ...</option>' +
                                         <?php
                                         foreach ($listkamar as $idx => $value) {
@@ -512,9 +545,61 @@ use yii\helpers\Html;
         });
     }
 
-    
+
     function savecekin(id) {
         {
+            if($('#ttamu-namatamu').val()==''){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Nama Tamu Wajib Diisi.',
+                    icon: "info",
+                    dangerMode: true,
+                }).then((ya) => {
+                    $('#ttamu-namatamu').focus();
+                });
+                return false;
+            } else if($('#ttamu-nomor_kontak').val()==''){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Nomor Handphone Tamu Wajib Diisi.',
+                    icon: "info",
+                    dangerMode: true,
+                }).then((ya) => {
+                    $('#ttamu-nomor_kontak').focus();
+                });
+                return false;
+            } else if($('#ttamu-nomor_identitas').val()==''){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Nomor Identitas Tamu Wajib Diisi.',
+                    icon: "info",
+                    dangerMode: true,
+                }).then((ya) => {
+                    $('#ttamu-nomor_identitas').focus();
+                });
+                return false;
+            }
+            else
+            // if( $('.idradio').is(":checked") ){
+            //     var val = $(this).val();
+            //     if(val == "sebagian") {
+
+                    if($('#summaryttamu-dp').val()==0){
+                        swal({
+                            title: 'Perhatian !',
+                            text: 'DP Wajib Diisi.',
+                            icon: "info",
+                            dangerMode: true,
+                        }).then((ya) => {
+                            $('#summaryttamu-dp').focus();
+                        });
+                        return false;
+                    }
+                // }
+            //     else{
+            //         return false;
+            //     }
+            // }
             swal({
                 title: "Konfirmasi",
                 text: "Anda yakin akan memproses checkin?",
@@ -568,7 +653,7 @@ use yii\helpers\Html;
             });
         }
     }
-    
+
 
     // js hadi
     $(document).on('change','.pilih_kamar',function(){
@@ -585,7 +670,8 @@ use yii\helpers\Html;
     $(document).on('change','.secondDate',function(event){
         event.preventDefault();
         var urutan = $(this).attr('urutan');
-        
+        $('#summaryttamu-dp').val(0);
+        $('#summaryttamu-dp').number(true);
         field_kamar(urutan);
 
         // prosesharga(hasil, jmlkamar);
@@ -608,11 +694,12 @@ use yii\helpers\Html;
         $( ".cl_subtotalkamar" ).each(function( index ) {
            total = parseInt(total) + parseInt($(this).val());
         });
-        
+
         $('#summaryttamu-total_harga').val(total);
         $('#summaryttamu-total_harga').number( true );
         $('#summaryttamu-total_bayar').val(total);
         $('#summaryttamu-total_bayar').number( true );
+        $('#summaryttamu-sisa').val(0);
     }
 
 
@@ -627,9 +714,9 @@ use yii\helpers\Html;
                 }
                 else{
                     $('#ttamu-no_kartu_debit').val('');
-                    $('#idcarddebit').hide();                    
+                    $('#idcarddebit').hide();
                 }
-            }   
+            }
     });
 
     $('.idradio').on('click', function() {
@@ -646,12 +733,13 @@ use yii\helpers\Html;
                 }
                 else{
                     $('.field-summaryttamu-total_harga').hide();
-                    $('#summaryttamu-dp').val("");
-                    $('#summaryttamu-dp').focus();
+                    $('#summaryttamu-dp').val(0);
                     $('#summaryttamu-dp').number( true );
-                    $('#iddp').show();                    
+                    $('#summaryttamu-dp').focus();
+                    // $('#summaryttamu-sisa').val( $('#summaryttamu-total_bayar').val() )
+                    $('#iddp').show();
                 }
-            }   
+            }
     });
 
     $(document).on('keyup','#summaryttamu-dp',function(){

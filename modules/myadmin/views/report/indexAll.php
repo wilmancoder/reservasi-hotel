@@ -67,10 +67,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         <thead>
                             <tr>
                                  <th>No.</th>
-                                 <th>Nama Item</th>
-                                 <th>Quantity</th>
-                                 <th>Harga Per Item</th>
-                                 <th>Total Harga Item</th>
+                                 <th>Tanggal</th>
+                                 <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>

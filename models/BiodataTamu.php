@@ -50,7 +50,7 @@ class BiodataTamu extends \yii\db\ActiveRecord
             'nama' => 'Nama',
             'identitas' => 'Identitas',
             'nomor_identitas' => 'Nomor Identitas',
-            'nomor_kontak' => 'Nomor Kontak',
+            'nomor_kontak' => 'Nomor Handphone',
             'alamat' => 'Alamat',
             'created_date' => 'Created Date',
             'created_by' => 'Created By',

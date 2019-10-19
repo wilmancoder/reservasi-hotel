@@ -17,6 +17,7 @@ use app\models\MMetodePembayaran;
 use app\models\MJenisPembayaran;
 use app\models\MMappingPembayaran;
 use app\models\SummaryTtamu;
+use app\models\MMappingHarga;
 
 class RoomsController extends \yii\web\Controller
 {
@@ -80,14 +81,15 @@ class RoomsController extends \yii\web\Controller
     }
 
     public function actionCreate($id) {
-        // var_dump(Yii::$app->request->post());exit;
+        $exp = explode(",",$id);
+        // var_dump($exp[0]);exit;
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $harga = (new \yii\db\Query())
                 ->select(['a.id', 'a.nomor_kamar', 'a.status', 'b.harga'])
                 ->from('m_mapping_kamar a')
                 ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
-                ->where(['a.id' => $id])
+                ->where(['a.id' => $exp[0]])
                 ->one();
             $ambilharga = $harga['harga'];
             $nomorkamar = $harga['nomor_kamar'];
@@ -185,11 +187,11 @@ class RoomsController extends \yii\web\Controller
                         $modelPengunjung->created_by_cekin = \Yii::$app->user->identity->nama;
 
                         if($modelPengunjung->save()){
-                            MMappingKamar::updateAll(['status' => 'terisi', ], ['nomor_kamar' => $value['nomor_kamar']]);  
+                            MMappingKamar::updateAll(['status' => 'terisi', ], ['nomor_kamar' => $value['nomor_kamar']]);
                         }
                     }
                 }
-                
+
                 $hasil = array(
                     'status' => "success",
                     'header' => "Berhasil",
@@ -204,12 +206,21 @@ class RoomsController extends \yii\web\Controller
             echo 'Message: ' . $e->getMessage();
         }
 
+        $getkategorikamar = MMappingHarga::find()->where(['id_kategori_harga' => $exp[1]])->asArray()->all();
+        // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
+        foreach ($getkategorikamar as $key => $valueKategori) {
+            $resultKategori[] = $valueKategori['id'];
+        }
+        $imp = implode(",",$resultKategori);
+        // var_dump($imp);exit;
+
         $listkamar = (new \yii\db\Query())
             ->select(['a.id', 'a.nomor_kamar', 'a.status', 'c.type', 'd.kategori_harga', 'b.harga'])
             ->from('m_mapping_kamar a')
             ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
             ->join('INNER JOIN', 'm_type c', 'c.id = b.id_type')
             ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
+            ->where('a.id_mapping_harga IN('.$imp.')')
             ->andWhere(['<>', 'a.status', 'terisi'])
             ->groupBy('a.nomor_kamar')
             ->orderBy(['a.nomor_kamar' => SORT_ASC])
@@ -219,7 +230,7 @@ class RoomsController extends \yii\web\Controller
         return $this->renderPartial('create', [
             'model' => $model,
             'model2' => $model2,
-            'id' => $id,
+            'id' => $exp[0],
             'ambilharga' => $ambilharga,
             'nomorkamar' => $nomorkamar,
             'listkamar' => $listkamar
@@ -414,7 +425,7 @@ class RoomsController extends \yii\web\Controller
                     'header' => "Berhasil",
                     'message' => "Checkout Berhasil Diproses !",
                 );
-                
+
                 //  var_dump($cekbiodatatamu);exit;
                  echo json_encode($hasil);
                  die();

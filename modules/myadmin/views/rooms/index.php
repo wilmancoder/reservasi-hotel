@@ -92,6 +92,7 @@ opacity: 1;
     <div class="row">
         <?php
         foreach ($model as $key => $value) {
+            $joinid = $value['id'].",".$idharga;
             if($value['status'] == "tersedia"){
 
 
@@ -106,7 +107,7 @@ opacity: 1;
                     <div class='icon'>
                     <i class='ion ion-home'></i>
                     </div>
-                    ".Html::a('<i class="fa fa-check-circle"></i> '.ucfirst($value['status']).'', 'javascript:manage_rooms("'.$value['id'].'")', ['class' => 'small-box-footer labelcekin'])."
+                    ".Html::a('<i class="fa fa-check-circle"></i> '.ucfirst($value['status']).'', 'javascript:manage_rooms("'.$joinid.'")', ['class' => 'small-box-footer labelcekin'])."
 
                     </div>
 
