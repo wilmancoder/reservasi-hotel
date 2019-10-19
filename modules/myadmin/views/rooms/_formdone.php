@@ -325,7 +325,7 @@ use yii\helpers\Html;
         }
     });
 
-    
+
     $(document).on('change','.cek_kamar',function(){
         var urutan = $(this).attr('urutan');
         if ($(this).is(':checked')) {
@@ -569,7 +569,7 @@ use yii\helpers\Html;
                             swal(result.header, result.message, result.status);
 
                             if (result.status == "success") {
-                                window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>";
+                                window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+result.setharga;
                             }
                         },
                         error: function (xhr, ajaxOptions, thrownError) {

@@ -129,7 +129,7 @@ opacity: 1;
                         <div class='icon'>
                             <i class='ion ion-home'></i>
                         </div>
-                        ".Html::a('<i class="fa fa-minus-circle"></i> '.ucfirst($value['status']).'', 'javascript:manage_done("'.$value['id'].'")', ['class' => 'small-box-footer labelcekin'])."
+                        ".Html::a('<i class="fa fa-minus-circle"></i> '.ucfirst($value['status']).'', 'javascript:manage_done("'.$joinid.'")', ['class' => 'small-box-footer labelcekin'])."
                     </div>
                 </div>
                 ";

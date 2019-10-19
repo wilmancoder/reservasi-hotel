@@ -68,8 +68,10 @@ class RoomsController extends \yii\web\Controller
     public function actionIndex()
     {
         $idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : 1;
-
-
+        $session = Yii::$app->session;
+        $session->set('idharga', $idharga);
+        $getsessionharga = $session->get('idharga');
+        // var_dump($getsessionharga);exit;
 
         $status = "tersedia";
         $ambilDatakamar = Logic::dataKamar($idharga,$status);
@@ -82,7 +84,7 @@ class RoomsController extends \yii\web\Controller
 
     public function actionCreate($id) {
         $exp = explode(",",$id);
-        // var_dump($exp[0]);exit;
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $harga = (new \yii\db\Query())
@@ -348,14 +350,16 @@ class RoomsController extends \yii\web\Controller
     }
 
     public function actionCreatedone($idttamu){
-        $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
+        $exp = explode(",",$idttamu);
+        // var_dump($exp);exit;
+        $que1 = MMappingKamar::find()->where(['id'=>$exp[0]])->asArray()->one();
+        // var_dump($que1);exit;
         $quetamu = TTamu::find()->where(['id_mapping_kamar' => $que1['id'], 'status' => 1])->asArray()->one();
         if($quetamu > 0) {
             $que2 = MMappingKamar::find()->where(['nomor_kamar'=>$que1['nomor_kamar']])->andWhere(['id' => $quetamu['id_mapping_kamar']])->andWhere(['status' => 'terisi'])->asArray()->one();
         } else {
-            $que2 = MMappingKamar::find()->where(['nomor_kamar'=>$que1['nomor_kamar']])->andWhere(['<>', 'id', $idttamu])->andWhere(['status' => 'terisi'])->asArray()->one();
+            $que2 = MMappingKamar::find()->where(['nomor_kamar'=>$que1['nomor_kamar']])->andWhere(['<>', 'id', $exp[0]])->andWhere(['status' => 'terisi'])->asArray()->one();
         }
-        // var_dump($que2);exit;
         $cekbiodatatamu = TTamu::find()->where(['id_mapping_kamar'=>$que2['id'],'status'=> 1])->asArray()->one();
         // $cekbiodatatamu = TTamu::find()->where(['id'=>$idttamu])->asArray()->one();
         $idbiodata = $cekbiodatatamu['id_biodata_tamu'];
@@ -368,6 +372,9 @@ class RoomsController extends \yii\web\Controller
     }
      public function actionSimpancekout($idbiodata)
      {
+         // var_dump($idbiodata);exit;
+         $session = Yii::$app->session;
+         $getsessionharga = $session->get('idharga');
          $transaction = Yii::$app->db->beginTransaction();
          try {
              if (Yii::$app->request->post()) {
@@ -388,11 +395,18 @@ class RoomsController extends \yii\web\Controller
                  }
                  if(!(empty($_POST['nomor_kamar']))){
                     foreach ($_POST['nomor_kamar'] as $key ) {
-                        // var_dump($key);
-                        $modelStatuskamar =  MMappingKamar::find()->where(['nomor_kamar' => $key])->one();
-                        $modelStatuskamar['status'] = "tersedia";
-                        $modelStatuskamar->save(false);
+                        $modelStatuskamar =  MMappingKamar::find()->where(['nomor_kamar' => $key])->all();
+                        foreach ($modelStatuskamar as $idx => $valstatkamar) {
+                            // $resultId[] = $valstatkamar['id'];
+
+                            $modStatuskamar =  MMappingKamar::find()->where(['id' => $valstatkamar['id']])->one();
+                            $modStatuskamar['status'] = "tersedia";
+                            $modStatuskamar->save(false);
+                        }
+                        // $imp = implode(",",$resultId);
+                        // var_dump($imp);exit;
                     }
+
                  }
                  if(!empty($_POST['bayarpelunasan'])){
                      $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
@@ -424,6 +438,7 @@ class RoomsController extends \yii\web\Controller
                     'status' => "success",
                     'header' => "Berhasil",
                     'message' => "Checkout Berhasil Diproses !",
+                    'setharga' => $getsessionharga
                 );
 
                 //  var_dump($cekbiodatatamu);exit;
