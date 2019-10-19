@@ -83,6 +83,13 @@ class Logic extends Component
         return str_replace(",", "", $value);
     }
 
+    public static function removeRpTitik($value)
+    {
+        $substring = substr($value,4);
+        $stringreplace = str_replace(".", "", $substring);
+        return $stringreplace;
+    }
+
     public static function dataKamar($idharga=null,$status=null)
     {
         // if($status == "tersedia"){

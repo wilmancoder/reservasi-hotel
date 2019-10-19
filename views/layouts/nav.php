@@ -3,6 +3,10 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 
+$idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : 1;
+$session = Yii::$app->session;
+$session->set('idharga', $idharga);
+$getsessionharga = $session->get('idharga');
 ?>
 <style type="text/css">
     /* .cbrand {
@@ -98,7 +102,7 @@ use yii\helpers\Html;
             <?php if(\Yii::$app->user->identity->role == '1') { ?>
                 <div class="collapse navbar-collapse pull-right" id="navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="<?= Url::to(['/myadmin/rooms']); ?>">Rooms</a></li>
+                        <li class="active"><a href="<?= Url::to(['/myadmin/rooms/index', 'idharga' => $getsessionharga]); ?>">Rooms</a></li>
                         <li><a href="<?= Url::to(['/myadmin/booking']); ?>">Booking</a></li>
                         <li><a href="<?= Url::to(['/myadmin/report']); ?>">Report</a></li>
                     </ul>

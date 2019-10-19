@@ -640,7 +640,7 @@ use yii\helpers\Html;
                             swal(result.header, result.message, result.status);
 
                             if (result.status == "success") {
-                                window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>";
+                                window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+result.setharga;
                             }
                         },
                         error: function (xhr, ajaxOptions, thrownError) {
