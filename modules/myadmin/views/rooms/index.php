@@ -3,6 +3,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 // use yii\grid\GridView;
 use yii\bootstrap\ActiveForm;
+use app\components\Logic;
 
 $this->title = 'Rooms';
 $this->params['breadcrumbs'][] = $this->title;
@@ -117,7 +118,8 @@ opacity: 1;
                     ";
 
             } else {
-
+                $waktu =Logic::durasikamar($value['created_date_cekin'],$value['checkout']);
+                // var_dump($waktu);exit;
 
                 echo"
                 <div class='col-lg-3 col-xs-6'>
@@ -125,6 +127,8 @@ opacity: 1;
                         <div class='inner'>
                             <h3>".$value['nomor_kamar']."</h3>
                             <p>".ucfirst($value['type'])."</p>
+                            <p style='margin-top:-10px;font-size:15px;color:yellow;position:absolute'>Sisa Waktu ".$waktu."</p>
+                            <p style='margin-top:14px;font-size:15px;color:white;position:absolute'>A.n ".$value['nama']."</p>
                         </div>
                         <div class='icon'>
                             <i class='ion ion-home'></i>

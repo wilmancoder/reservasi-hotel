@@ -95,12 +95,12 @@ class Logic extends Component
         // if($status == "tersedia"){
 
             $model = (new \yii\db\Query())
-            ->select(['a.id', 'a.status', 'a.nomor_kamar', 'c.type', 'b.id_kategori_harga', 'g.id_transaksi_tamu', 'e.id_mapping_kamar'])
+            ->select(['a.id', 'a.status', 'a.nomor_kamar', 'c.type', 'b.id_kategori_harga', 'g.id_transaksi_tamu', 'e.id_mapping_kamar','e.checkout','e.checkin','f.nama','e.created_date_cekin'])
             ->from('m_mapping_kamar a')
             ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
             ->join('INNER JOIN', 'm_type c', 'c.id = b.id_type')
             ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
-            ->join('LEFT JOIN', 't_tamu e', 'e.id_mapping_kamar = a.id')
+            ->join('LEFT JOIN', '(select * from t_tamu) e', 'e.id_mapping_kamar = a.id AND e.status = 1')
             ->join('LEFT JOIN', 'biodata_tamu f', 'f.id = e.id_biodata_tamu')
             ->join('LEFT JOIN', 'summary_ttamu g', 'g.id_transaksi_tamu = e.id_biodata_tamu')
             ->where('b.id_kategori_harga = :id_kategori_harga', [':id_kategori_harga' => $idharga])
@@ -335,6 +335,74 @@ class Logic extends Component
         }
 
         return $data;
+    }
+    
+    public static function durasikamar($cekin,$cekout)
+    {
+        $waktuakhir = date_create(); //2019-02-21 09:35 waktu sekarang
+        $waktu = \date('H:i:s',strtotime($cekin ));
+        $shift = (new \yii\db\Query())
+        ->select(['*'])
+        ->from('m_shift')
+        ->where(':waktu BETWEEN start_date AND end_date;', [':waktu' => $waktu])
+        ->one();
+        // var_dump($shift);exit;
+
+        //ini shift 1 atau 2
+        if(!empty($shift)){
+            $waktuakhir = date('Y-m-d 12:00:00', strtotime($cekout . ' +1 day'));
+        }
+        else{
+            $waktuakhir = \date('Y-m-d 12:00:00',strtotime($cekout));
+        }
+        // var_dump($waktuakhir);exit;
+        $waktuakhir = date_create($waktuakhir); //2019-02-21 09:35 waktu sekarang
+        $waktuawal  = date_create(); //waktu di setting
+
+
+        $diff  = date_diff($waktuawal, $waktuakhir);
+
+        $waktu = '';
+        if($diff->y != 0){
+            $waktu = $waktu.$diff->y.' tahun ';
+        }
+        // var_dump($waktu);
+        if($diff->m != 0){
+            $waktu = $waktu.$diff->m.' bulan ';
+        }
+        // var_dump($waktu);
+
+        if($diff->d != 0){
+            $waktu = $waktu.$diff->d.' hari ';
+        }
+
+        if($diff->h != 0){
+            $waktu = $waktu.$diff->h.' jam ';
+        }
+        if($diff->i != 0){
+            $waktu = $waktu.$diff->i.' menit ';
+        }
+
+        // echo 'Selisih waktu: ';
+
+        // // echo $diff->y . ' tahun, ';
+
+        // // echo $diff->m . ' bulan, ';
+
+        // // echo $diff->d . ' hari, ';
+
+        // echo $diff->h . ' jam, ';
+
+        // echo $diff->i . ' menit, ';
+
+        // echo $diff->s . ' detik, ';
+        // var_dump($waktu);
+        // Output : Selisih waktu: 0 tahun, 11 bulan, 30 hari, 18 jam, 35 menit, 11 detik
+
+        return $waktu;
+
+        // echo '<br> Total selisih hari adalah: ' . $diff->days;
+
     }
 
     // public static function durasikerja($res_jamlogin){
