@@ -391,7 +391,7 @@ use yii\helpers\Html;
             autoclose: true
         });
 
-        $('#summaryttamu-dp').val("");
+
         $('#ttamu-hargaperkamar0').val(ambilhargaperkamar);
         $('#firstDate0').val(formattingFirstDate());
         $('#secondDate0').val(formattingSecondDate());
@@ -459,7 +459,8 @@ use yii\helpers\Html;
         $('#summaryttamu-total_harga').number( true );
         $('#summaryttamu-sisa').val(setdefault);
         $('#summaryttamu-sisa').number( true );
-        // $('#summaryttamu-dp').val("");
+        $('#summaryttamu-dp').val(0);
+        $('#summaryttamu-dp').number( true );
 
         $('#ttamu-subtotalkamar"'+valueT+'"').val(setdefault);
         $('#ttamu-durasi"'+valueT+'"').val(setdefault);
@@ -578,79 +579,63 @@ use yii\helpers\Html;
                     $('#ttamu-nomor_identitas').focus();
                 });
                 return false;
-            }
-            else
-            // if( $('.idradio').is(":checked") ){
-            //     var val = $(this).val();
-            //     if(val == "sebagian") {
 
-                    if($('#summaryttamu-dp').val()==0){
-                        swal({
-                            title: 'Perhatian !',
-                            text: 'DP Wajib Diisi.',
-                            icon: "info",
-                            dangerMode: true,
-                        }).then((ya) => {
-                            $('#summaryttamu-dp').focus();
-                        });
-                        return false;
-                    }
-                // }
-            //     else{
-            //         return false;
-            //     }
-            // }
-            swal({
-                title: "Konfirmasi",
-                text: "Anda yakin akan memproses checkin?",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            }).then((ya) => {
-                if (ya) {
-                    var _data = new FormData($("#form-rooms")[0]);
-                    $.ajax({
-                        type: "POST",
-                        data: _data,
-                        dataType: "json",
-                        contentType: false,
-                        processData: false,
-                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/create'])?>?id="+id,
-                        beforeSend: function () {
-                            swal({
-                                title: 'Harap Tunggu',
-                                text: "Sedang memproses check-in",
-                                icon: 'info',
-                                buttons: {
-                                    cancel: false,
-                                    confirm: false,
-                                },
-                                closeOnClickOutside: false,
-                                onOpen: function () {
-                                    swal.showLoading()
-                                },
-                                closeOnEsc: false,
-                            });
-                        },
-                        complete: function () {
-                            swal.close()
-                        },
-                        success: function (result) {
+            } else {
+                // return false;
 
-                            swal(result.header, result.message, result.status);
 
-                            if (result.status == "success") {
-                                window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+result.setharga;
+                swal({
+                    title: "Konfirmasi",
+                    text: "Anda yakin akan memproses checkin?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((ya) => {
+                    if (ya) {
+                        var _data = new FormData($("#form-rooms")[0]);
+                        $.ajax({
+                            type: "POST",
+                            data: _data,
+                            dataType: "json",
+                            contentType: false,
+                            processData: false,
+                            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/create'])?>?id="+id,
+                            beforeSend: function () {
+                                swal({
+                                    title: 'Harap Tunggu',
+                                    text: "Sedang memproses check-in",
+                                    icon: 'info',
+                                    buttons: {
+                                        cancel: false,
+                                        confirm: false,
+                                    },
+                                    closeOnClickOutside: false,
+                                    onOpen: function () {
+                                        swal.showLoading()
+                                    },
+                                    closeOnEsc: false,
+                                });
+                            },
+                            complete: function () {
+                                swal.close()
+                            },
+                            success: function (result) {
+
+                                swal(result.header, result.message, result.status);
+
+                                if (result.status == "success") {
+                                    window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+result.setharga;
+                                }
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                swal("Error!", "Terdapat Kesalahan saat memproses check-in!", "error");
                             }
-                        },
-                        error: function (xhr, ajaxOptions, thrownError) {
-                            swal("Error!", "Terdapat Kesalahan saat memproses check-in!", "error");
-                        }
-                    });
-                } else {
-                    // swal("Informasi", "Dokumen Tidak Dihapus", "info");
-                }
-            });
+                        });
+                    } else {
+                        // swal("Informasi", "Dokumen Tidak Dihapus", "info");
+                    }
+                });
+            }
         }
     }
 
