@@ -529,6 +529,25 @@ use yii\helpers\Html;
 
     function savecekout(idbiodata) {
         {
+            var statuschecked = 0;
+
+            $.each($('.cek_kamar'), function( index, value ) {
+               if ($(this).prop('checked')) {
+                    statuschecked = statuschecked+1;
+
+                    return false;
+                }
+            });
+            if (statuschecked == 0){
+
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Kamar Belum Ada Yang Di Ceklis !',
+                    icon: "info",
+                    dangerMode: true,
+                })
+             return false;
+            }
             swal({
                 title: "Konfirmasi",
                 text: "Anda yakin akan memproses checkout?",
