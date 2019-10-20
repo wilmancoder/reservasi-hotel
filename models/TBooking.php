@@ -22,7 +22,7 @@ use Yii;
  */
 class TBooking extends \yii\db\ActiveRecord
 {
-    public $namatamu, $identitas,$alamat,$totalharga,$list_kamar,$nomor_identitas,$nomor_kontak;
+    public $namatamu, $identitas,$alamat,$totalharga,$list_kamar,$nomor_identitas,$nomor_kontak,$hargaperkamar,$subtotalkamar;
     /**
      * {@inheritdoc}
      */

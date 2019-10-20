@@ -103,7 +103,7 @@ $getsessionharga = $session->get('idharga');
                 <div class="collapse navbar-collapse pull-right" id="navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li class="active"><a href="<?= Url::to(['/myadmin/rooms/index', 'idharga' => $getsessionharga]); ?>">Rooms</a></li>
-                        <li><a href="<?= Url::to(['/myadmin/booking']); ?>">Booking</a></li>
+                        <li><a href="<?= Url::to(['/myadmin/booking/index', 'idharga' => $getsessionharga+1]); ?>">Booking</a></li>
                         <li><a href="<?= Url::to(['/myadmin/report']); ?>">Report</a></li>
                     </ul>
                 </div>

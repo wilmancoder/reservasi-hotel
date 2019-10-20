@@ -17,6 +17,7 @@ use app\models\MMetodePembayaran;
 use app\models\MJenisPembayaran;
 use app\models\MMappingPembayaran;
 use app\models\SummaryBooking;
+use app\models\MMappingHarga;
 
 class BookingController extends \yii\web\Controller
 {
@@ -56,11 +57,12 @@ class BookingController extends \yii\web\Controller
             ],
         ];
     }
-    public function actionIndex()
+    public function actionIndex($idharga)
     {
         $petugas = Yii::$app->user->identity->id_petugas;
         return $this->render('index', [
-            'idpetugas' => $petugas
+            'idpetugas' => $petugas,
+            'idharga' => $idharga
         ]);
     }
 
@@ -99,28 +101,13 @@ class BookingController extends \yii\web\Controller
         }
     }
 
-    public function actionCreate() {
+    public function actionCreate($idharga) {
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            // $harga = (new \yii\db\Query())
-            //     ->select(['a.id', 'a.nomor_kamar', 'a.status', 'b.harga'])
-            //     ->from('m_mapping_kamar a')
-            //     ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
-            //     ->one();
-            // $ambilharga = $harga['harga'];
-            // $nomorkamar = $harga['nomor_kamar'];
+
             $model = new TBooking();
             $model2 = new SummaryBooking();
-            if ($model->load(Yii::$app->request->post())) {
-                $postkamar = $_POST['kamarterpilih'];
-                $expPostkamar = explode(",",$postkamar);
-
-                $postharga = $_POST['hargaterpilih'];
-                $expPostharga = explode(",",$postharga);
-
-
-                // echo"<pre>";
-                // print_r($expPostkamar);exit;
+            if (Yii::$app->request->post()) {
                 $jenisPembayaran = $_POST['TBooking']['radio'];
                 if($jenisPembayaran == "belumbayar"){
                     $metodePembayaran = "unknown";
@@ -168,41 +155,45 @@ class BookingController extends \yii\web\Controller
                     $modelSummaryttamu->save(false);
                 }
 
+                    $modelPengunjung = new TBooking();
+                    $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
+                    $modelPengunjung->id_mapping_kamar = $_POST['TBooking']['list_kamar'];
+                    $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
+                    $modelPengunjung->checkin = $_POST['TBooking']['checkin'];
+                    $modelPengunjung->checkout = $_POST['TBooking']['checkout'];
+                    $modelPengunjung->harga = $_POST['TBooking']['subtotalkamar'];
+                    $modelPengunjung->status = 1;
+                    $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
+                    $modelPengunjung->no_kartu_debit = $_POST['TBooking']['no_kartu_debit'];
+                    $modelPengunjung->created_date = date('Y-m-d H:i:s');
+                    $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
 
-                // simpan ke tabel mapping kamar
-                foreach ($expPostkamar as $key => $value) {
-                    // $jumlahkamar = $value;
-
-                    // $modelStatuskamar =  MMappingKamar::find()->where(['id' => $value])->one();
-                    // $modelStatuskamar->status = "terisi";
-                    // if($modelStatuskamar->save(false)) {
-                        $modelPengunjung = new TBooking();
-                        $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
-                        $modelPengunjung->id_mapping_kamar = $value;
-                        $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran['id'];
-                        $modelPengunjung->checkin = $_POST['TBooking']['checkin'];
-                        $modelPengunjung->checkout = $_POST['TBooking']['checkout'];
-                        $modelPengunjung->harga = $expPostharga[$key];
-                        $modelPengunjung->status = 1;
-                        $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
-                        $modelPengunjung->no_kartu_debit = $nokartudebit;
-                        $modelPengunjung->created_date = date('Y-m-d H:i:s');
-                        $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
-                        // if($jenisPembayaran == "lunas") {
-                        //     $modelPengunjung->bayar = Logic::removeKoma($bayar);
-                        // } else {
-                        //     $modelPengunjung->bayar = null;
-                        // }
-
-                        if($modelPengunjung->save(false)) {
-                            $hasil = array(
-                                'status' => "success",
-                                'header' => "Berhasil",
-                                'message' => "Checkin Berhasil Diproses !",
-                            );
+                    if(!empty($_POST['kamar'])){
+                        foreach ($_POST['kamar'] as $key => $value) {
+                            $durasi = $value['durasi'];
+                            $modelPengunjung = new TBooking();
+                            $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
+                            $modelPengunjung->id_mapping_kamar = $value['list_kamar'];
+                            $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
+                            $modelPengunjung->checkin = $value['checkin'];
+                            $modelPengunjung->checkout = $value['checkout'];
+                            $modelPengunjung->harga = $value['subtotalkamar'];
+                            $modelPengunjung->status = 1;
+                            $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
+                            $modelPengunjung->no_kartu_debit = $_POST['TBooking']['no_kartu_debit'];
+                            $modelPengunjung->created_date = date('Y-m-d H:i:s');
+                            $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
                         }
-                    // }
-                }
+                    }
+
+                    if($modelPengunjung->save(false)) {
+                        $hasil = array(
+                            'status' => "success",
+                            'header' => "Berhasil",
+                            'message' => "Booking Berhasil Diproses !",
+                            'idharga' => $idharga
+                        );
+                    }
                 echo json_encode($hasil);
                 die();
             }
@@ -211,9 +202,32 @@ class BookingController extends \yii\web\Controller
             $transaction->rollBack();
             echo 'Message: ' . $e->getMessage();
         }
+
+        $getkategorikamar = MMappingHarga::find()->where(['id_kategori_harga' => $idharga])->asArray()->all();
+        // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
+        foreach ($getkategorikamar as $key => $valueKategori) {
+            $resultKategori[] = $valueKategori['id'];
+        }
+        $imp = implode(",",$resultKategori);
+        // var_dump($imp);exit;
+
+        $listkamar = (new \yii\db\Query())
+            ->select(['a.id', 'a.nomor_kamar', 'a.status', 'c.type', 'd.kategori_harga', 'b.harga'])
+            ->from('m_mapping_kamar a')
+            ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
+            ->join('INNER JOIN', 'm_type c', 'c.id = b.id_type')
+            ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
+            ->where('a.id_mapping_harga IN('.$imp.')')
+            ->andWhere(['<>', 'a.status', 'terisi'])
+            ->groupBy('a.nomor_kamar')
+            ->orderBy(['a.nomor_kamar' => SORT_ASC])
+            ->all();
         return $this->renderPartial('create', [
             'model' => $model,
-            'model2' => $model2
+            'model2' => $model2,
+            'id' => $idharga,
+            'listkamar' => $listkamar,
+            'setharga' => $idharga
         ]);
     }
 
