@@ -177,12 +177,12 @@ use yii\helpers\Html;
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'namatamu')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Masukkan nama ...']) ?>
+                                        <?= $form->field($model, 'namatamu')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Masukkan nama ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Handphone ...']) ?>
+                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Handphone ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                             </div>
@@ -202,14 +202,14 @@ use yii\helpers\Html;
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_identitas')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...']) ?>
+                                        <?= $form->field($model, 'nomor_identitas')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group required">
-                                <?= $form->field($model, 'alamat')->textarea(['maxlength' => true, 'rows' => '5', 'class' => 'form-control', 'placeholder' => 'Masukkan alamat ...']); ?>
+                                <?= $form->field($model, 'alamat')->textarea(['maxlength' => true, 'rows' => '5', 'class' => 'form-control', 'placeholder' => 'Masukkan alamat ...', 'autocomplete' => 'off']); ?>
                             </div>
                         </div>
                     </div>
@@ -329,7 +329,7 @@ use yii\helpers\Html;
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group required" id="idcarddebit" style="display:none">
-                                            <?= $form->field($model, 'no_kartu_debit')->textInput(['maxlength' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'no_kartu_debit')->textInput(['maxlength' => true, 'class' => 'form-control', 'autocomplete' => 'off']); ?>
                                     </div>
                                 </div>
                             </div>
@@ -355,7 +355,7 @@ use yii\helpers\Html;
 
             <div class="row">
                 <div class="col-md-12">
-                    <?=Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Booking'  : '<i class="fa fa-pencil" aria-hidden="true"></i> Update',$model->isNewRecord ? 'javascript:savebooking()':'javascript:updatebooking()',['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-primary pull-right']) ?>
+                    <?=Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Booking'  : '<i class="fa fa-pencil" aria-hidden="true"></i> Update',$model->isNewRecord ? 'javascript:savebooking("'.$joinid.'")':'javascript:updatebooking()',['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-primary pull-right']) ?>
                     <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
                     <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
                 </div>
@@ -537,7 +537,7 @@ use yii\helpers\Html;
     }
 
 
-    function savebooking(idharga) {
+    function savebooking(joinid) {
         {
             if($('#tbooking-namatamu').val()==''){
                 swal({
@@ -597,7 +597,7 @@ use yii\helpers\Html;
                             dataType: "json",
                             contentType: false,
                             processData: false,
-                            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/booking/create'])?>?idharga="+idharga,
+                            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/booking/create'])?>?joinid="+joinid,
                             beforeSend: function () {
                                 swal({
                                     title: 'Harap Tunggu',
@@ -626,7 +626,7 @@ use yii\helpers\Html;
                                 }
                             },
                             error: function (xhr, ajaxOptions, thrownError) {
-                                swal("Error!", "Terdapat Kesalahan saat memproses check-in!", "error");
+                                swal("Error!", "Terdapat Kesalahan saat memproses booking!", "error");
                             }
                         });
                     } else {

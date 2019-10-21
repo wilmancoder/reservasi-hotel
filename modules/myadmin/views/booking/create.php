@@ -12,7 +12,7 @@
         'model2' => $model2,
         'id' => $id,
         'listkamar' => $listkamar,
-        'setharga' => $setharga
+        'joinid' => $joinid
     ]) ?>
 
 </div>

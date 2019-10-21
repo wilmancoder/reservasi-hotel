@@ -59,9 +59,17 @@ class BookingController extends \yii\web\Controller
     }
     public function actionIndex($idharga)
     {
+        if($idharga == 1) {
+            $idhargabooking = $idharga + 2;
+        } else if($idharga == 2){
+            $idhargabooking = $idharga + 1;
+        } else {
+            $idhargabooking = $idharga;
+        }
         $petugas = Yii::$app->user->identity->id_petugas;
         return $this->render('index', [
             'idpetugas' => $petugas,
+            'idhargabooking' => $idhargabooking,
             'idharga' => $idharga
         ]);
     }
@@ -101,7 +109,10 @@ class BookingController extends \yii\web\Controller
         }
     }
 
-    public function actionCreate($idharga) {
+    public function actionCreate($joinid) {
+        $exp = explode(",",$joinid);
+
+        // var_dump($exp);exit;
         $transaction = Yii::$app->db->beginTransaction();
         try {
 
@@ -191,7 +202,7 @@ class BookingController extends \yii\web\Controller
                             'status' => "success",
                             'header' => "Berhasil",
                             'message' => "Booking Berhasil Diproses !",
-                            'idharga' => $idharga
+                            'idharga' => $exp[1]
                         );
                     }
                 echo json_encode($hasil);
@@ -203,7 +214,7 @@ class BookingController extends \yii\web\Controller
             echo 'Message: ' . $e->getMessage();
         }
 
-        $getkategorikamar = MMappingHarga::find()->where(['id_kategori_harga' => $idharga])->asArray()->all();
+        $getkategorikamar = MMappingHarga::find()->where(['id_kategori_harga' => $exp[0]])->asArray()->all();
         // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
         foreach ($getkategorikamar as $key => $valueKategori) {
             $resultKategori[] = $valueKategori['id'];
@@ -225,9 +236,9 @@ class BookingController extends \yii\web\Controller
         return $this->renderPartial('create', [
             'model' => $model,
             'model2' => $model2,
-            'id' => $idharga,
+            'id' => $exp[1],
             'listkamar' => $listkamar,
-            'setharga' => $idharga
+            'joinid' => $joinid
         ]);
     }
 

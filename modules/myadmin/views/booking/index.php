@@ -5,6 +5,8 @@ use yii\bootstrap\ActiveForm;
 
 $this->title = 'Booking';
 $this->params['breadcrumbs'][] = $this->title;
+
+$joinid = $idhargabooking.",".$idharga;
 ?>
 <style type="text/css">
 
@@ -18,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header with-border">
-                    <?= Html::a('<i class="fa fa-plus"></i> Tambah Booking', 'javascript:addbooking("'.$idharga.'")', ['class' => 'btn btn-default pull-right tombol']) ?>
+                    <?= Html::a('<i class="fa fa-plus"></i> Tambah Booking', 'javascript:addbooking("'.$joinid.'")', ['class' => 'btn btn-default pull-right tombol']) ?>
                 </div>
                 <div class="box-body table-responsive">
                     <table id="tbl_booking" class="table table-striped table-bordered" style="width:100%">
@@ -129,8 +131,8 @@ function booking_preview()
     });
 }
 
-function addbooking(idharga) {
-     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/booking/create']);?>?idharga="+idharga;
+function addbooking(joinid) {
+     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/booking/create']);?>?joinid="+joinid;
      var title = "Form Tambah Booking";
      showModal(url, title);
 }
