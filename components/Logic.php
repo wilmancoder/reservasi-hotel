@@ -350,13 +350,13 @@ class Logic extends Component
 
         //ini shift 1 atau 2
         if(!empty($shift)){
-            $waktuakhir = date('Y-m-d 12:00:00', strtotime($cekout . ' +1 day'));
+            $tanggal_cekout = \date('Y-m-d 12:00:00',strtotime($cekout));
         }
         else{
-            $waktuakhir = \date('Y-m-d 12:00:00',strtotime($cekout));
+            $tanggal_cekout = date('Y-m-d 12:00:00', strtotime($cekout . ' -1 day'));
         }
         // var_dump($waktuakhir);exit;
-        $waktuakhir = date_create($waktuakhir); //2019-02-21 09:35 waktu sekarang
+        $waktuakhir = date_create($tanggal_cekout); //2019-02-21 09:35 waktu sekarang
         $waktuawal  = date_create(); //waktu di setting
 
 
@@ -398,8 +398,9 @@ class Logic extends Component
         // echo $diff->s . ' detik, ';
         // var_dump($waktu);
         // Output : Selisih waktu: 0 tahun, 11 bulan, 30 hari, 18 jam, 35 menit, 11 detik
-
-        return $waktu;
+        $data['text'] = $waktu;
+        $data['tanggal'] = date('d F Y',strtotime($tanggal_cekout));
+        return $data;
 
         // echo '<br> Total selisih hari adalah: ' . $diff->days;
 
