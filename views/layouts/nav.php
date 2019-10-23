@@ -3,7 +3,7 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 
-$idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : $_GET['idharga'];
+$idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : "";
 $session = Yii::$app->session;
 $session->set('idharga', $idharga);
 $getsessionharga = $session->get('idharga');

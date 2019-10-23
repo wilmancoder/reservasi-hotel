@@ -336,7 +336,7 @@ class Logic extends Component
 
         return $data;
     }
-    
+
     public static function durasikamar($cekin,$cekout)
     {
         $waktuakhir = date_create(); //2019-02-21 09:35 waktu sekarang
