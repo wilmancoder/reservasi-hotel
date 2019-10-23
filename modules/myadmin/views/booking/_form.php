@@ -115,10 +115,41 @@ use yii\helpers\Html;
         font-size: 20px !important;
     }
 
+    .mr_tombol {
+        margin-left: 5px;
+    }
+    #garis {
+        padding: 20px;
+        margin: 0px;
+        margin-top: 25px;
+    }
+    .fit {
+        margin: 0px;
+    }
+    .fitappend {
+        margin: 10px;
+    }
+    .textColor {
+        color: #A9A9A9;
+        background-color: white;
+    }
+    .borderColor {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #A9A9A9;
+        margin-bottom: 5px;
+    }
+    .btnbatal {
+        margin: 8px;
+    }
+    .btnadd {
+        margin-top: 5px;
+    }
+
 </style>
 <div class="box box-warning">
     <div class="box-body">
-        <div class="booking-form">
+        <div class="rooms-form">
 
             <?php $form = ActiveForm::begin([
                 'fieldConfig' => [
@@ -146,12 +177,12 @@ use yii\helpers\Html;
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'namatamu')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Masukkan nama ...']) ?>
+                                        <?= $form->field($model, 'namatamu')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Masukkan nama ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...']) ?>
+                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Handphone ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                             </div>
@@ -171,15 +202,14 @@ use yii\helpers\Html;
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_identitas')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...']) ?>
+                                        <?= $form->field($model, 'nomor_identitas')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group required">
-                                <?= $form->field($model, 'alamat')->textarea(['maxlength' => true, 'rows' => '5', 'class' => 'form-control', 'placeholder' => 'Masukkan alamat ...']); ?>
+                                <?= $form->field($model, 'alamat')->textarea(['maxlength' => true, 'rows' => '5', 'class' => 'form-control', 'placeholder' => 'Masukkan alamat ...', 'autocomplete' => 'off']); ?>
                             </div>
                         </div>
                     </div>
@@ -188,48 +218,67 @@ use yii\helpers\Html;
 
             <div class="box box-warning">
                 <div class="box-body">
-                    <!-- <div class="row">
-                        <div class="col-md-12">
-                            <div class="callout callout-info">
-                              <h5>Informasi !</h5>
-                              <p>Anda telah memilih <strong>kamar nomor <?//= $nomorkamar?> dengan harga <?//= "Rp. " . \app\components\Logic::formatNumber($ambilharga, 0);?> per hari</strong></p>
-                            </div>
-                        </div>
-                    </div> -->
                     <div class="row">
-                        <div class="col-md-12">
+                        <!-- <div class="col-md-12">
                             <label class="control-label">Tambah Kamar</label>
-                            <?= $form->field($model, 'list_kamar')->dropDownList(Yii::$app->Logic->arrKamarbooking(), ['class' => 'form-control select validate[required]', 'multiple'=>'multiple'])->label(false); ?>
-                            <!-- <input type="hidden" class="form-control" name="terpilih" id="terpilih" value="<?//= $id?>"> -->
-                            <input type="hidden" class="form-control" name="kamarterpilih" id="kamarterpilih" value="">
-                            <input type="hidden" class="form-control" name="hargaterpilih" id="hargaterpilih" value="">
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group required">
-                                <?= $form->field($model, 'checkin')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal', 'id' =>'firstDate', 'placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group required">
-                                <?= $form->field($model, 'checkout')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal', 'id' =>'secondDate', 'placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <?= $form->field($model, 'durasi')->textInput(['maxlength' => true, 'class' => 'form-control', 'readonly' => true]); ?>
-                            </div>
-                        </div>
-                        <!-- <div class="col-md-3">
-                            <div class="form-group">
-                                <?//= $form->field($model, 'harga')->textInput(['maxlength' => true, 'class' => 'form-control', 'readonly' => true]); ?>
-                            </div>
+                            <?//= $form->field($model, 'list_kamar')->dropDownList(Yii::$app->Logic->arrKamar($id), ['class' => 'form-control select validate[required]', 'multiple'=>'multiple'])->label(false); ?>
+                            <input type="hidden" class="form-control" name="terpilih" id="terpilih" value="<?//= $id?>">
+                            <input type="text" class="form-control" name="kamarterpilih" id="kamarterpilih" value="">
+                            <input type="text" class="form-control" name="hargaterpilih" id="hargaterpilih" value="">
                         </div> -->
-                    </div>
-                    <div class="row" id="generatekamar">
+                        <div class="col-md-12" id="kolomrole">
+                            <div class="row fit" id="kolomrole0">
+                                <div class="col-md-3">
+                                    <div class="form-group required">
+                                        <label class="control-label" required>List Kamar </label>
+                                        <select class="form-control select validate[required] pilih_kamar" id='id_pilihkamar' urutan='0' name="TBooking[list_kamar]">
+                                        <option value="empty">Pilih Kamar ...</option>
+                                        <?php
+                                        foreach ($listkamar as $idx => $value) {
+                                            $selected = '';
+                                            if($value['id'] == $id){
+                                                $selected = 'selected';
+                                            }
+                                        ?>
+                                            <option value="<?php echo $value['id'];?>" harga="<?= $value['harga'] ?>" nomor_kamar="<?= $value['nomor_kamar'] ?>" <?= $selected ?>>Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>
+                                        <?php } ?>
 
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group required">
+                                        <?= $form->field($model, 'checkin')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal', 'id' =>'firstDate0', 'placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group required">
+                                        <?= $form->field($model, 'checkout')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal secondDate', 'id' =>'secondDate0', 'urutan'=> '0','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'durasi')->textInput(['maxlength' => true, 'class' => 'form-control cl_durasi','id' => 'tbooking-durasi0', 'readonly' => true]); ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'hargaperkamar')->textInput(['maxlength' => true, 'class' => 'form-control cl_hargaperkamar', 'id' => 'tbooking-hargaperkamar0', 'readonly' => true]); ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'subtotalkamar')->textInput(['maxlength' => true, 'class' => 'form-control cl_subtotalkamar', 'id' => 'tbooking-subtotalkamar0', 'readonly' => true]); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 btnadd">
+                            <button type="button" onclick="addForm(id='kolomrole0')" class='btn btn-fill btn-info btn-sm' id="btnaddform"><i class="fa fa-plus"></i>&nbsp;&nbsp;Tambah</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -240,26 +289,18 @@ use yii\helpers\Html;
                         <div class="col-md-6">
                             <label class="control-label" style="font-size:15px;">Jenis Pembayaran</label>
                             <div class="row mright-rdio">
-                                <div class="col-md-3">
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="container">Lunas
-                                          <input type="radio" name="TBooking[radio]" class="idradio" value="lunas">
+                                        <label class="container">Pembayaran Penuh
+                                          <input type="radio" checked="checked" name="TBooking[radio]" class="idradio" value="lunas">
                                           <span class="checkmark"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label class="container">Sebagian
-                                            <input type="radio" name="TBooking[radio]" class="idradio" value="sebagian">
-                                            <span class="checkmark"></span>
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="container">Belum Bayar
-                                            <input type="radio" checked="checked" name="TBooking[radio]" class="idradio" value="belumbayar">
+                                        <label class="container">Pembayaran Sebagian
+                                            <input type="radio" name="TBooking[radio]" class="idradio" value="sebagian">
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
@@ -271,7 +312,7 @@ use yii\helpers\Html;
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="container">Cash
-                                          <input type="radio" name="TBooking[radionm]" class="radioid" value="cash">
+                                          <input type="radio" checked="checked" name="TBooking[radionm]" class="radioid" value="cash">
                                           <span class="checkmark"></span>
                                         </label>
                                     </div>
@@ -288,7 +329,7 @@ use yii\helpers\Html;
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group required" id="idcarddebit" style="display:none">
-                                        <?= $form->field($model, 'no_kartu_debit')->textInput(['maxlength' => true, 'class' => 'form-control'])->label(false); ?>
+                                            <?= $form->field($model, 'no_kartu_debit')->textInput(['maxlength' => true, 'class' => 'form-control', 'autocomplete' => 'off']); ?>
                                     </div>
                                 </div>
                             </div>
@@ -314,7 +355,7 @@ use yii\helpers\Html;
 
             <div class="row">
                 <div class="col-md-12">
-                    <?=Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkin'  : '<i class="fa fa-pencil" aria-hidden="true"></i> Update',$model->isNewRecord ? 'javascript:savebooking()':'javascript:updatebooking()',['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-primary pull-right']) ?>
+                    <?=Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Booking'  : '<i class="fa fa-pencil" aria-hidden="true"></i> Update',$model->isNewRecord ? 'javascript:savebooking("'.$joinid.'")':'javascript:updatebooking()',['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-primary pull-right']) ?>
                     <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
                     <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
                 </div>
@@ -325,13 +366,13 @@ use yii\helpers\Html;
     </div>
 </div>
 <script type="text/javascript">
+    var vv = 0;
     $(document).ready(function () {
+        // formattingFirstDate();
+        // formattingSecondDate();
+        $(".pilih").select2();
 
-    $(".pilih").select2();
-
-    $(".select").select2({
-        placeholder: "Pilih Kamar ...",
-    });
+        $(".select").select2();
 
         $('input.numberinput').bind('keypress', function (e) {
             return (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57) && e.which != 46) ? false : true;
@@ -342,324 +383,355 @@ use yii\helpers\Html;
         });
 
 
-        $('#secondDate').on('change', function(event){
-            event.preventDefault();
-            var hasil = hitungDurasi();
-            var jmlkamar = $('.select').val();
-            $('#tbooking-durasi').val(hasil+" Hari");
-            prosesharga(hasil, jmlkamar);
-        });
-
-
-        $('.select').on('change', function(event){
-            event.preventDefault();
-            var hasil = hitungDurasi();
-            var jmlkamar = $('.select').val();
-            if( $('#tbooking-durasi').val() == 0 ) {
-                return false;
-            } else {
-
-                prosesharga(hasil, jmlkamar);
-            }
-        });
-
-        $('.select2-selection__choice__remove').on('change', function(event){
-            event.preventDefault();
-            var hasil = hitungDurasi();
-            var jmlkamar = $('.select').val();
-            prosesharga(hasil, jmlkamar);
-        });
+        $('#tbooking-hargaperkamar0').val(0);
+        // $('#firstDate0').val(formattingFirstDate());
+        // $('#secondDate0').val(formattingSecondDate());
+        $('#tbooking-durasi0').val(0);
+        $('#tbooking-subtotalkamar0').val(0);
 
 
         setDefault();
-        manageSelect();
-        manageMetodePembayaran();
     });
 
-    function hitungDurasi()
+    function formattingFirstDate(){
+        var d = new Date();
+
+        var month = d.getMonth()+1;
+        var day = d.getDate();
+
+        var output = d.getFullYear() + '-' +
+            ((''+month).length<2 ? '0' : '') + month + '-' +
+            ((''+day).length<2 ? '0' : '') + day;
+
+        return output;
+    }
+
+    function formattingSecondDate(){
+        var d = new Date();
+
+        var month = d.getMonth()+1;
+        var day = d.getDate()+1;
+
+        var output = d.getFullYear() + '-' +
+            ((''+month).length<2 ? '0' : '') + month + '-' +
+            ((''+day).length<2 ? '0' : '') + day;
+
+        return output;
+    }
+
+    function delRec(valueT){
+        vv--;
+        $('#garis'+valueT).remove();
+        $('#kolomrole'+valueT).remove();
+        $('#remove_role'+valueT).remove();
+        $('#summarybooking-dp').val(0);
+        $('#summarybooking-dp').number(true);
+        // $('#summarybooking-sisa').val( $('#summarybooking-dp').val() );
+        total();
+    }
+
+    function hitungDurasi(id=null)
     {
         const hasil = 0;
-        const start= new Date($("#firstDate").val());
-        const end= new Date($("#secondDate").val());
-
-        // var days = (end- start) / (1000 * 60 * 60 * 24);
+        const start= new Date($("#firstDate"+id).val());
+        const end= new Date($("#secondDate"+id).val());
         const diffTime = Math.abs(end - start);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        // var hasil = Math.round(days);
-
         return diffDays;
     }
 
     function setDefault()
     {
         var setdefault = 0;
-        // var gethargaawal = <?//= $ambilharga?>;
-        $('#summarybooking-total_bayar').val();
+        $('#summarybooking-total_bayar').val(gethargaawal);
         $('#summarybooking-total_bayar').number( true );
-        // $('#ttamu-harga').val();
-        // $('#ttamu-harga').number( true );
-        $('#summarybooking-sisa').val(setdefault);
-        $('#tbooking-durasi').val(setdefault);
-        $('#summarybooking-total_harga').val();
+        $('#summarybooking-total_harga').val(gethargaawal);
         $('#summarybooking-total_harga').number( true );
+        $('#summarybooking-sisa').val(setdefault);
+        $('#summarybooking-sisa').number( true );
+        $('#summarybooking-dp').val(0);
+        $('#summarybooking-dp').number( true );
+
+        $('#tbooking-subtotalkamar"'+valueT+'"').val(setdefault);
+        $('#tbooking-durasi"'+valueT+'"').val(setdefault);
     }
 
-    function manageMetodePembayaran()
-    {
-        // Start check radio button
-        var val = $("input[name='radionm']:checked").val();
-        console.log(val);
-        $('.radioid').on('click', function() {
+    function addForm() {
+        var valueT = document.getElementById("comcounter").innerHTML;
+        valueT = Number(valueT) + 1;
+        var divid = 'kolomrole'+valueT;
+        document.getElementById("comcounter").innerHTML = valueT;
+        // vv = Number(valueT);
+        vv++;
+        $('#kolomrole').append(
+            '<div id=garis'+valueT+' class="textColor borderColor itemappend">'+
+                '<div class="row" id=remove_role'+valueT+'>'+
+                    '<div class="col-md-12">'+
+                        '<button style="float:right;" id="btnbatal" name="button" type="button" class="btnbatal btn btn-sm btn-danger" id="remove_role'+valueT+'" onClick="delRec('+valueT+')"><span class="fa fa-times"></span></button>'+
+                    '</div>'+
+                    '<div class="col-md-12">' +
+                        '<div class="row fitappend">' +
+                            '<div class="col-md-3">' +
+                                '<div class="form-group required">' +
+                                    '<label class="control-label" required>List Kamar </label>' +
+                                    '<select id="tbooking-list_kamar'+valueT+'" class="form-control select pilih_kamar" urutan="'+valueT+'" validate[required] name="kamar['+valueT+'][list_kamar]">' +
+                                    '<option>Pilih Kamar ...</option>' +
+                                        <?php
+                                        foreach ($listkamar as $idx => $value) {
+                                        ?>
+
+                                            '<option value="<?php echo $value['id'];?>" harga="<?php echo $value['harga'];?>" nomor_kamar="<?php echo $value['nomor_kamar'];?>">Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>' +
+
+                                        <?php } ?>
+
+                                    '</select>' +
+                                    '<input type="hidden" id="nomor_kamar'+valueT+'" name="kamar['+valueT+'][nomor_kamar]">'+
+                                '</div>' +
+                            '</div>'+
+                            '<div class="col-md-2">' +
+                                '<div class="form-group required">' +
+                                    '<label class="control-label" required>Checkin </label>' +
+                                    '<input type="text" id="firstDate'+valueT+'" class="form-control form-tanggal" name="kamar['+valueT+'][checkin]" placeholder="Klik disini ..." autocomplete="off">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col-md-2">' +
+                                '<div class="form-group required">' +
+                                    '<label class="control-label" required>Checkout </label>' +
+                                    '<input type="text" id="secondDate'+valueT+'" class="form-control form-tanggal secondDate"  urutan="'+valueT+'" name="kamar['+valueT+'][checkout]" placeholder="Klik disini ..." autocomplete="off">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col-md-1">' +
+                                '<div class="form-group">' +
+                                    '<label class="control-label">Durasi </label>' +
+                                    '<input type="text" value="0" id="tbooking-durasi'+valueT+'" class="form-control cl_durasi" name="kamar['+valueT+'][durasi]" readonly="true">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col-md-2">' +
+                                '<div class="form-group">' +
+                                    '<label class="control-label">Harga Kamar </label>' +
+                                    '<input type="text" value="0" id="tbooking-hargaperkamar'+valueT+'" class="form-control cl_hargaperkamar" name="kamar['+valueT+'][hargaperkamar]" readonly="true">' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="col-md-2">' +
+                                '<div class="form-group">' +
+                                    '<label class="control-label">SubTotal</label>' +
+                                    '<input type="text" value="0" id="tbooking-subtotalkamar'+valueT+'" class="form-control cl_subtotalkamar" name="kamar['+valueT+'][subtotalkamar]" readonly="true">' +
+                                '</div>' +
+                            '</div>' +
+
+
+                        '</div>' +
+                    '</div>' +
+                    '<div class="waw" id="'+divid+'"></div>'+
+                '</div>'+
+            '</div>'
+        );
+        $(document).ready(function(){
+            $(".select").select2();
+
+            $('.form-tanggal').datepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true
+            });
+        });
+    }
+
+
+    function savebooking(joinid) {
+        {
+            if($('#tbooking-namatamu').val()==''){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Nama Tamu Wajib Diisi.',
+                    icon: "info",
+                    dangerMode: true,
+                }).then((ya) => {
+                    $('#tbooking-namatamu').focus();
+                });
+                return false;
+            } else if($('#tbooking-nomor_kontak').val()==''){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Nomor Handphone Tamu Wajib Diisi.',
+                    icon: "info",
+                    dangerMode: true,
+                }).then((ya) => {
+                    $('#tbooking-nomor_kontak').focus();
+                });
+                return false;
+            } else if($('#tbooking-nomor_identitas').val()==''){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Nomor Identitas Tamu Wajib Diisi.',
+                    icon: "info",
+                    dangerMode: true,
+                }).then((ya) => {
+                    $('#tbooking-nomor_identitas').focus();
+                });
+                return false;
+
+            } else if($('#id_pilihkamar option:selected').val()=='empty'){
+              swal({
+                  title: 'Perhatian !',
+                  text: 'Kamar Belum Ada Yang Dipilih !',
+                  icon: "info",
+                  dangerMode: true,
+              })
+              return false;
+
+            } else {
+                // return false;
+
+                swal({
+                    title: "Konfirmasi",
+                    text: "Anda yakin akan memproses booking?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((ya) => {
+                    if (ya) {
+                        var _data = new FormData($("#form-booking")[0]);
+                        $.ajax({
+                            type: "POST",
+                            data: _data,
+                            dataType: "json",
+                            contentType: false,
+                            processData: false,
+                            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/booking/create'])?>?joinid="+joinid,
+                            beforeSend: function () {
+                                swal({
+                                    title: 'Harap Tunggu',
+                                    text: "Sedang memproses booking",
+                                    icon: 'info',
+                                    buttons: {
+                                        cancel: false,
+                                        confirm: false,
+                                    },
+                                    closeOnClickOutside: false,
+                                    onOpen: function () {
+                                        swal.showLoading()
+                                    },
+                                    closeOnEsc: false,
+                                });
+                            },
+                            complete: function () {
+                                swal.close()
+                            },
+                            success: function (result) {
+
+                                swal(result.header, result.message, result.status);
+
+                                if (result.status == "success") {
+                                    window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/booking/index'])?>?idharga="+result.idharga;
+                                }
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                swal("Error!", "Terdapat Kesalahan saat memproses booking!", "error");
+                            }
+                        });
+                    } else {
+                        // swal("Informasi", "Dokumen Tidak Dihapus", "info");
+                    }
+                });
+            }
+        }
+    }
+
+
+    // js hadi
+    $(document).on('change','.pilih_kamar',function(){
+        var harga = $('option:selected', this).attr('harga');
+        var nomor_kamar = $('option:selected', this).attr('nomor_kamar');
+        var urutan = $(this).attr('urutan');
+        $('#tbooking-hargaperkamar'+urutan).val(harga);
+        $('#nomor_kamar'+urutan).val(nomor_kamar);
+        if($('#secondDate'+urutan).val() != ''){
+            field_kamar(urutan);
+        }
+    });
+
+    $(document).on('change','.secondDate',function(event){
+        event.preventDefault();
+        var urutan = $(this).attr('urutan');
+        $('#summarybooking-dp').val(0);
+        $('#summarybooking-dp').number(true);
+        field_kamar(urutan);
+
+        // prosesharga(hasil, jmlkamar);
+    });
+
+    function field_kamar(urutan){
+        var hasil = hitungDurasi(urutan);
+        // alert(hasil);
+        var hargakamar = $('#tbooking-hargaperkamar'+urutan).val();
+        var jmlkamar = $('#tbooking-list_kamar'+urutan).val();
+        var subtotal = hargakamar * hasil;
+
+        $('#tbooking-subtotalkamar'+urutan).val(subtotal);
+        $('#tbooking-durasi'+urutan).val(hasil);
+        total();
+    }
+
+    function total(){
+        var total = 0;
+        $( ".cl_subtotalkamar" ).each(function( index ) {
+           total = parseInt(total) + parseInt($(this).val());
+        });
+
+        $('#summarybooking-total_harga').val(total);
+        $('#summarybooking-total_harga').number( true );
+        $('#summarybooking-total_bayar').val(total);
+        $('#summarybooking-total_bayar').number( true );
+        $('#summarybooking-sisa').val(0);
+    }
+
+
+
+    $('.radioid').on('click', function() {
             // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
             if( $(this).is(":checked") ){
                 var val = $(this).val();
                 console.log(val);
-                if(val == "cash") {
-                    $('#idcarddebit').hide();
-                    $('#idcarddebit').val("");
-                    $('#tbooking-no_kartu_debit').prop('placeholder', 'Masukkan Nomor Kartu Debit ...');
-                } else if (val == "debit") {
+                if(val == "debit") {
                     $('#idcarddebit').show();
-                    $('#tbooking-no_kartu_debit').prop('placeholder', 'Masukkan Nomor Kartu Debit ...');
+                }
+                else{
+                    $('#tbooking-no_kartu_debit').val('');
+                    $('#idcarddebit').hide();
                 }
             }
-        });
-        // End check radio button
-    }
+    });
 
-    function manageSelect()
-    {
-        // Start check radio button
-        var val = $("input[name='radio']:checked").val();
-        console.log(val);
-        $('.idradio').on('click', function() {
+    $('.idradio').on('click', function() {
             // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
             if( $(this).is(":checked") ){
                 var val = $(this).val();
                 console.log(val);
                 if(val == "lunas") {
-                    $('#idbayar').show();
+                    $('#summarybooking-dp').val($('#summarybooking-total_harga').val());
                     $('#iddp').hide();
-                    $('#summarybooking-dp').val("");
+                    $('.field-summarybooking-total_harga').show();
                     $('#summarybooking-sisa').val(0);
-                    // $('#tdokreferensi-judul_referensi').val("");
-                    // $('#tdokreferensi-vendor_referensi').val("");
-                    // $('#tdokreferensi-tgl_referensi').val("");
-                    // $('#tdokreferensi-deskripsi').val("");
-                    // $('#id_ref_type').val('').trigger("change");
-                    //
-                    // $('#tdokreferensi-nomor_referensi').prop('placeholder', 'Click Here ...');
-                    // $('#tdokreferensi-judul_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-judul_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-vendor_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-vendor_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-deskripsi').prop('readonly', true);
-                    // $('#tdokreferensi-deskripsi').prop('placeholder', 'Automatically filled');
-                    // $('#tdokreferensi-tgl_referensi').prop('readonly', true);
-                    // $('#tdokreferensi-tgl_referensi').prop('placeholder', 'Automatically filled');
-                    // $('#data_source_reference').prop('disabled', true);
-                    // $($('.uhuy').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-                    //
-                    // $('#tdokreferensi-nomor_referensi').on('click', function() {
-                    //     var url = "<?//=\Yii::$app->getUrlManager()->createUrl(['kategoriaset/price/cekdokreferensi']);?>";
-                    //     var title = "List Dokumen Referensi";
-                    //     showModalPrice(url,title);
-                    // });
-                } else if (val == "sebagian") {
-                    // $('#summarybooking-total_bayar').val('');
-                    $('#idbayar').hide();
-                    $('#iddp').show();
-                    $('#summarybooking-dp').val("");
-                    $('#summarybooking-dp').focus();
+                    total();
+                }
+                else{
+                    $('.field-summarybooking-total_harga').hide();
+                    $('#summarybooking-dp').val(0);
                     $('#summarybooking-dp').number( true );
-                    // $('#summarybooking-total_bayar').removeAttr('readonly');
-
-
-                    // $('#data_source_reference').removeAttr('disabled', true);
-                    // $('#tdokreferensi-nomor_referensi').removeAttr('readonly');
-                    // $('#tdokreferensi-nomor_referensi').prop('placeholder', 'Typed Here ...');
-                    // $('#tdokreferensi-nomor_referensi').prop("onclick", null).off("click");
-                    // $('#tdokreferensi-nomor_referensi').val("");
-                    // $('#tdokreferensi-id_referensi').val("");
-                    // $('#tdokreferensi-judul_referensi').removeAttr('readonly');
-                    // $('#tdokreferensi-judul_referensi').val("");
-                    // $('#tdokreferensi-vendor_referensi').removeAttr('readonly');
-                    // $('#tdokreferensi-vendor_referensi').val("");
-                    // $($('.uhuy').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-default btn-file').addClass('btn btn-primary btn-file');
-                    // $('#tdokreferensi-tgl_referensi').removeAttr('readonly');
-                    // $('#tdokreferensi-tgl_referensi').val("");
-                    // $('#tdokreferensi-deskripsi').removeAttr('readonly');
-                    // $('#tdokreferensi-deskripsi').val("");
-                    //
-                    // $('#tdokreferensi-judul_referensi').prop('placeholder', 'Typed Here ...');
-                    // $('#tdokreferensi-vendor_referensi').prop('placeholder', 'Typed Here ...');
-                    // $('#tdokreferensi-deskripsi').prop('placeholder', 'Typed Here ...');
-                    // $('#tdokreferensi-tgl_referensi').prop('placeholder', 'Choose Date ...');
+                    $('#summarybooking-dp').focus();
+                    // $('#summarybooking-sisa').val( $('#summarybooking-total_bayar').val() )
+                    $('#iddp').show();
                 }
             }
-        });
-        // End check radio button
-    }
-
-
-    $("#summarybooking-dp").keyup(function(){
-        var total = $("#summarybooking-total_harga").val();
-        var dp = $("#summarybooking-dp").val();
-        var hasil = total - dp;
-        $("#summarybooking-sisa").val(hasil);
-        $('#summarybooking-sisa').number( true );
     });
 
-    function prosesharga(hasil, jmlkamar) {
-        $.ajax({
-            type: "GET",
-            // data: {hasil:hasil},
-            dataType: "json",
-            contentType: false,
-            processData: false,
-            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/booking/hitungharga'])?>?hasil="+hasil+'&jmlkamar='+jmlkamar,
+    $(document).on('keyup','#summarybooking-dp',function(){
+        var val = $(this).val();
+        var total = $('#summarybooking-total_harga').val();
+        var hasil = parseInt(total) - parseInt(val) ;
+        $('#summarybooking-sisa').val(hasil);
+        $('#summarybooking-sisa').number( true );
 
-            success: function(result) {
-                // $('#ttamu-harga').val(result.sumharga);
-                // $('#ttamu-harga').number( true );
-                $('#hargaterpilih').val(result.hargaperkamar);
-                $('#kamarterpilih').val(result.expjmlkamar);
-                $('#summarybooking-total_harga').val(result.sumharga);
-                $('#summarybooking-total_bayar').val(result.sumharga);
-                $('#summarybooking-sisa').val("0");
-                // alert(result);
-                return false;
-            },
-            error: function(xhr, ajaxOptions, thrownError) {
-                swal("Error submiting!", "Please try again", "error");
-            }
-        });
-    }
-
-    function pilihkamar(id) {
-        var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/booking/listkamar']);?>?id="+id;
-        var title = "Pilih Kamar";
-        showModalPilihkamar(url,title);
-    }
-
-    function savebooking() {
-        {
-            swal({
-                title: "Konfirmasi",
-                text: "Anda yakin akan memproses booking?",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            }).then((ya) => {
-                if (ya) {
-                    var _data = new FormData($("#form-booking")[0]);
-                    $.ajax({
-                        type: "POST",
-                        data: _data,
-                        dataType: "json",
-                        contentType: false,
-                        processData: false,
-                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/booking/create'])?>",
-                        beforeSend: function () {
-                            swal({
-                                title: 'Harap Tunggu',
-                                text: "Sedang memproses booking",
-                                icon: 'info',
-                                buttons: {
-                                    cancel: false,
-                                    confirm: false,
-                                },
-                                closeOnClickOutside: false,
-                                onOpen: function () {
-                                    swal.showLoading()
-                                },
-                                closeOnEsc: false,
-                            });
-                        },
-                        complete: function () {
-                            swal.close()
-                        },
-                        success: function (result) {
-
-                            swal(result.header, result.message, result.status);
-
-                            if (result.status == "success") {
-                                window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/booking/index'])?>";
-                            }
-                        },
-                        error: function (xhr, ajaxOptions, thrownError) {
-                            swal("Error!", "Terdapat Kesalahan saat memproses booking!", "error");
-                        }
-                    });
-                } else {
-                    // swal("Informasi", "Dokumen Tidak Dihapus", "info");
-                }
-            });
-        }
-    }
-
-    function UpdateArtikel(id) {
-        {
-            swal({
-                title: "Konfirmasi",
-                text: "Ubah Artikel ini?",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            }).then((ya) => {
-                if (ya) {
-                    var _data = new FormData($("#form-artikel")[0]);
-                    $.ajax({
-                        type: "POST",
-                        data: _data,
-                        dataType: "json",
-                        contentType: false,
-                        processData: false,
-                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['adm/update'])?>?id=" + id,
-                        beforeSend: function () {
-                            swal({
-                                title: 'Harap Tunggu',
-                                text: "Mengubah Artikel Baru",
-                                icon: 'info',
-                                buttons: {
-                                    cancel: false,
-                                    confirm: false,
-                                },
-                                closeOnClickOutside: false,
-                                onOpen: function () {
-                                    swal.showLoading()
-                                },
-                                closeOnEsc: false,
-                            });
-                        },
-                        complete: function () {
-                            swal.close()
-                        },
-                        success: function (result) {
-
-                            swal(result.header, result.message, result.status);
-
-                            if (result.status == "success") {
-                                window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['adm/artikel'])?>";
-                            }
-                        },
-                        error: function (xhr, ajaxOptions, thrownError) {
-                            swal("Error!", "Terdapat Kesalahan saat memasukan Menu!", "error");
-                        }
-                    });
-                } else {
-                    // swal("Informasi", "Dokumen Tidak Dihapus", "info");
-                }
-            });
-        }
-    }
-
-    // $('#tbooking-list_kamar').on('select2:select', function (e) {
-    // var myStr = e.params.data;
-    // var dat = myStr.text;
-    // // var hasil = dat.replace(/ /g, ',');
-    // var hasil = dat.split(" ");
-    // $('#firstDate').val(hasil[7]);
-    // console.log(hasil[7]);
-    // });
+    });
 </script>
+<div id="comcounter" hidden>0</div>
