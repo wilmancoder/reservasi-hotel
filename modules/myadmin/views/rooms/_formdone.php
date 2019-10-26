@@ -2,7 +2,7 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
-
+// var_dump($ambilDatatamu);exit;
 ?>
 <style type="text/css">
     .geserkanan {
@@ -140,7 +140,9 @@ use yii\helpers\Html;
                     foreach ($ambilDatatamu as $key => $value) {
                         if($value['status'] == 1){
                             $ck = "<input type='checkbox' name='nomor_kamar[]' class='cek_kamar' urutan='".$value['id']."' value='".$value['nomor_kamar']."'>
-                            <input type='checkbox' style='display:none' name='id_tamu[]' value='".$value['id']."' id='id-".$value['id']."'>";
+                            <input type='checkbox' style='display:none' name='id_tamu[]' value='".$value['id']."' id='id-".$value['id']."'>
+                            <a onclick='settingsList(".$value['id'].",".$tipe.")' style='cursor:pointer;' class='text-primary'><i class='fa fa-cogs'></i></a>
+                            ";
                         }
                         else{
                             $ck = "Telah Checkout";
@@ -310,7 +312,38 @@ use yii\helpers\Html;
         </div>
     </div>
 </div>
+
+
+<div class="modal" tabindex="-1" role="dialog" id="modal-edit">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Settings</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="body-setting">
+      </div>
+    </div>
+  </div>
+</div>
 <script type="text/javascript">
+
+    function settingsList(id,tipe){
+        $.ajax({
+            type: "GET",
+            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/setkamar'])?>?id="+id+'&tipe='+tipe,
+            success: function(data) {
+                $('#body-setting').html(data);
+                $('#modal-edit').modal('show');
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                swal("Error submiting!", "Please try again", "error");
+            }
+        });
+    }
+
     $(document).ready(function () {
 
     $(document).on('change','.idpelunasan',function(){

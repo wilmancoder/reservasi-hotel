@@ -151,6 +151,25 @@ class Logic extends Component
         return $model;
     }
 
+    
+    public static function dataTamuOne($id)
+    {
+        $model = (new \yii\db\Query())
+            ->select(['a.id', 'a.id_biodata_tamu', 'a.checkin', 'a.checkout', 'a.durasi', 'a.harga as subtotal', 'a.no_kartu_debit', 'a.status', 'b.nama as namatamu', 'b.identitas', 'b.nomor_identitas', 'b.alamat', 'c.nomor_kamar', 'f.jenis', 'e.metode', 'g.harga', 'h.dp as summary_dp', 'h.sisa as summary_sisa', 'h.total_harga', 'h.total_bayar'])
+            ->from('t_tamu a')
+            ->join('LEFT JOIN', 'biodata_tamu b', 'b.id = a.id_biodata_tamu')
+            ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = a.id_mapping_kamar')
+            ->join('INNER JOIN', 'm_mapping_pembayaran d', 'd.id = a.id_mapping_pembayaran')
+            ->join('INNER JOIN', 'm_metode_pembayaran e', 'e.id = d.id_metode_pembayaran')
+            ->join('INNER JOIN', 'm_jenis_pembayaran f', 'f.id = d.id_jenis_pembayaran')
+            ->join('LEFT JOIN', 'm_mapping_harga g', 'g.id = c.id_mapping_harga')
+            ->join('LEFT JOIN', 'summary_ttamu h', 'h.id_transaksi_tamu = a.id_biodata_tamu')
+            ->where(['a.id' => $id])
+            ->all();
+
+        return $model;
+    }
+
     public static function reportFo($idpetugas)
     {
         $model = (new \yii\db\Query())
