@@ -306,6 +306,7 @@ use yii\helpers\Html;
                                                     <?= $form->field($model, 'subtotalkamar')->textInput(['maxlength' => true, 'class' => 'form-control cl_subtotalkamar', 'id' => 'ttamu-subtotalkamar0', 'readonly' => true]); ?>
                                                 </div>
                                             </div>
+                                            <input type="hidden" id="nomor_kamar0" name='TTamu[nomor_kamar]' value="">
                                         </div>
                                     </div>
                                 </div>
