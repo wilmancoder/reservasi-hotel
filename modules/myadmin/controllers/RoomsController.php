@@ -585,9 +585,7 @@ class RoomsController extends \yii\web\Controller
         $model->id_mapping_pembayaran = $mapPembayaran->id;
         $model->checkout = date('Y-m-d');
         $model->durasi = (string)($model->durasi-$sisa_hari);
-        if($sisa_hari != 0){
-            $model->harga =  (string)($ambilDatatamu[0]['harga'] * $sisa_hari);
-        }
+        $model->harga =  (string)($ambilDatatamu[0]['harga'] * $model->durasi);
         $model->status = 0;
         // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
         ///
@@ -613,12 +611,12 @@ class RoomsController extends \yii\web\Controller
         }
         if($model->save()){
             $model2 = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
-            $model2->total_harga =  (string)($model2->total_harga + $_POST['TTamu']['subtotalkamar']);
             if($ambilDatatamu[0]['jenis'] == 'lunas'){
                 $model2->total_bayar = $model2->total_harga;
-                $model2->dp = (string)($model2->total_harga+$kembalian);
+                $model2->dp = (string)((int)$model2->total_harga+$kembalian);
             }
-            $model2->sisa = (string)($model2->total_harga - $model2->dp);
+            $model2->total_harga =  (string)((int)$model->harga + $_POST['TTamu']['subtotalkamar']);
+            $model2->sisa = (string)((int)$model2->total_harga - $model2->dp);
             $model2->save();
         }
         TTamu::updateAll(['id_mapping_pembayaran' => $mapPembayaran->id ], ['id_biodata_tamu' => $ambilDatatamu[0]['id_biodata_tamu']]);
