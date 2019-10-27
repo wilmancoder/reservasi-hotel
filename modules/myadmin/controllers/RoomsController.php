@@ -160,7 +160,7 @@ class RoomsController extends \yii\web\Controller
                     $modelHistoriSummaryttamu = new HistoriSummarytamu();
                     $modelHistoriSummaryttamu->id_transaksi_tamu = $modelBiodatatamu->id;
                     $modelHistoriSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
-                    if( (!empty($dp) && !empty($sisa)) ){
+                    if($dp != 0 && $sisa != 0){
                         $modelHistoriSummaryttamu->pembayaran = "DP";
                         $modelHistoriSummaryttamu->status_pembayaran = "BELUM LUNAS";
                     } else {
@@ -428,6 +428,7 @@ class RoomsController extends \yii\web\Controller
                      $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
                      $modelSummaryttamu->total_bayar = $_POST['bayarpelunasan'];
                      $modelSummaryttamu->sisa = 0;
+                     $modelSummaryttamu->dp = 0;
                      $modelSummaryttamu->save(false);
                 }
 
@@ -527,7 +528,7 @@ class RoomsController extends \yii\web\Controller
             'model' => $model,
             'model2' => $model2
         ]);
-        
+
     }
     public function actionTambahdurasi($id,$tipe,$hari)
     {
@@ -566,7 +567,7 @@ class RoomsController extends \yii\web\Controller
         echo json_encode($hasil);
     }
 
-    
+
     public function actionGantikamar($id,$tipe)
     {
         date_default_timezone_set('Asia/Jakarta');
@@ -590,9 +591,9 @@ class RoomsController extends \yii\web\Controller
         $model->status = 0;
         // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
         ///
-        
+
         $kembalian = $ambilDatatamu[0]['harga'] * $sisa_hari;
-        
+
         $durasi = $_POST['TTamu']['durasi'];
         $modelPengunjung = new TTamu();
         $modelPengunjung->id_biodata_tamu = $ambilDatatamu[0]['id_biodata_tamu'];
@@ -632,5 +633,5 @@ class RoomsController extends \yii\web\Controller
         );
         echo json_encode($hasil);
     }
-    
+
 }
