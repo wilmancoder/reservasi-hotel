@@ -166,47 +166,55 @@ class BookingController extends \yii\web\Controller
                     $modelSummaryttamu->save(false);
                 }
 
-                    $modelPengunjung = new TBooking();
-                    $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
-                    $modelPengunjung->id_mapping_kamar = $_POST['TBooking']['list_kamar'];
-                    $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
-                    $modelPengunjung->checkin = $_POST['TBooking']['checkin'];
-                    $modelPengunjung->checkout = $_POST['TBooking']['checkout'];
-                    $modelPengunjung->harga = $_POST['TBooking']['subtotalkamar'];
-                    $modelPengunjung->status = 1;
-                    $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
-                    $modelPengunjung->no_kartu_debit = $_POST['TBooking']['no_kartu_debit'];
-                    $modelPengunjung->created_date = date('Y-m-d H:i:s');
-                    $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
+                    // $modelPengunjung = new TBooking();
+                    // $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
+                    // $modelPengunjung->id_mapping_kamar = $_POST['TBooking']['list_kamar'];
+                    // $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
+                    // $modelPengunjung->checkin = $_POST['TBooking']['checkin'];
+                    // $modelPengunjung->checkout = $_POST['TBooking']['checkout'];
+                    // $modelPengunjung->harga = $_POST['TBooking']['subtotalkamar'];
+                    // $modelPengunjung->status = 1;
+                    // $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
+                    // $modelPengunjung->no_kartu_debit = $_POST['TBooking']['no_kartu_debit'];
+                    // $modelPengunjung->created_date = date('Y-m-d H:i:s');
+                    // $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
 
                     if(!empty($_POST['kamar'])){
                         foreach ($_POST['kamar'] as $key => $value) {
-                            $durasi = $value['durasi'];
+                            // var_dump($value);
+                            // $durasi = $value['durasi'];
                             $modelPengunjung = new TBooking();
                             $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
                             $modelPengunjung->id_mapping_kamar = $value['list_kamar'];
                             $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
-                            $modelPengunjung->checkin = $value['checkin'];
-                            $modelPengunjung->checkout = $value['checkout'];
-                            $modelPengunjung->harga = $value['subtotalkamar'];
+                            $modelPengunjung->checkin = $_POST['TBooking']['checkin'];
+                            $modelPengunjung->checkout = $_POST['TBooking']['checkout'];
+                            $modelPengunjung->harga = $_POST['TBooking']['subtotalkamar'];
                             $modelPengunjung->status = 1;
-                            $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
+                            $modelPengunjung->durasi = str_replace('Hari', '',$_POST['TBooking']['durasi']);
                             $modelPengunjung->no_kartu_debit = $_POST['TBooking']['no_kartu_debit'];
                             $modelPengunjung->created_date = date('Y-m-d H:i:s');
                             $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
+                            $modelPengunjung->save(false);
+                            // if($modelPengunjung->save(false)) {
+                            //     $hasil = array(
+                            //         'status' => "success",
+                            //         'header' => "Berhasil",
+                            //         'message' => "Booking Berhasil Diproses !",
+                            //         'idharga' => $exp[1]
+                            //     );
+                            // }
                         }
+                        // exit;
                     }
-
-                    if($modelPengunjung->save(false)) {
-                        $hasil = array(
-                            'status' => "success",
-                            'header' => "Berhasil",
-                            'message' => "Booking Berhasil Diproses !",
-                            'idharga' => $exp[1]
-                        );
-                    }
-                echo json_encode($hasil);
-                die();
+                    $hasil = array(
+                        'status' => "success",
+                        'header' => "Berhasil",
+                        'message' => "Booking Berhasil Diproses !",
+                        'idharga' => $exp[1]
+                    );
+                    echo json_encode($hasil);
+                    die();
             }
         $transaction->commit();
         } catch (Exception $e) {
@@ -229,7 +237,7 @@ class BookingController extends \yii\web\Controller
             ->join('INNER JOIN', 'm_type c', 'c.id = b.id_type')
             ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
             ->where('a.id_mapping_harga IN('.$imp.')')
-            ->andWhere(['<>', 'a.status', 'terisi'])
+            // ->andWhere(['<>', 'a.status', 'terisi'])
             ->groupBy('a.nomor_kamar')
             ->orderBy(['a.nomor_kamar' => SORT_ASC])
             ->all();
@@ -286,6 +294,7 @@ class BookingController extends \yii\web\Controller
         'idtranstamu' => $idtranstamu
         ]);
     }
+
 
     public function actionGeneratedetailbooking($idtranstamu) {
         if(Yii::$app->request->isAjax)
