@@ -607,18 +607,17 @@ class RoomsController extends \yii\web\Controller
         $modelPengunjung->created_date_cekin = date('Y-m-d H:i:s');
         $modelPengunjung->created_by_cekin = \Yii::$app->user->identity->nama;
         // var_dump($kembalian);exit;
-        $modelPengunjung->save();
+        if($modelPengunjung->save()){
+            MMappingKamar::updateAll(['status' => 'terisi', ], ['nomor_kamar' => $_POST['TTamu']['nomor_kamar']]);
+        }
         if($model->save()){
             $model2 = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
             $model2->total_harga =  (string)($model2->total_harga + $_POST['TTamu']['subtotalkamar']);
             if($ambilDatatamu[0]['jenis'] == 'lunas'){
+                $model2->total_bayar = $model2->total_harga;
                 $model2->dp = (string)($model2->total_harga+$kembalian);
-                $model2->sisa = (string)($model2->total_harga - $model2->dp);
             }
-            else{
-                $model2->sisa = (string)($model2->total_harga - $model2->dp);
-            }
-            $model2->total_bayar = $model2->total_harga;
+            $model2->sisa = (string)($model2->total_harga - $model2->dp);
             $model2->save();
         }
         TTamu::updateAll(['id_mapping_pembayaran' => $mapPembayaran->id ], ['id_biodata_tamu' => $ambilDatatamu[0]['id_biodata_tamu']]);
