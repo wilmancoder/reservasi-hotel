@@ -8,7 +8,7 @@ use yii\helpers\Html;
     .geserkanan {
         margin-right: 5px;
     }
-    /* #tbooking-harga {
+    /* #ttamu-harga {
         font-size: 20px;
         font-weight: bold;
         color: black;
@@ -162,7 +162,7 @@ use yii\helpers\Html;
                     ],
                 ],
                 "options" => [
-                    "id" => "form-booking",
+                    "id" => "form-rooms",
                     "class" => "",
                     'onsubmit'=>'return false;',
                     // "data-parsley-validate" => "",
@@ -177,101 +177,107 @@ use yii\helpers\Html;
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'namatamu')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Masukkan nama ...', 'autocomplete' => 'off']) ?>
+                                        <label class="control-label">Nama Tamu</label>
+                                        <input type="text" class="form-control" id="tbooking-namatamu" name="TBooking[namatamu]" value="<?= $modelBooking[0]['namatamu']?>" autocomplete="off" >
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Handphone ...', 'autocomplete' => 'off']) ?>
+                                        <label class="control-label">Nomor Kontak</label>
+                                        <input type="text" class="form-control numberinput" id="tbooking-nomor_kontak" name="TBooking[nomor_kontak]" value="<?= $modelBooking[0]['nomor_kontak']?>" autocomplete="off" >
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?=
-                                            $form->field($model, 'identitas')->dropDownList(
-                                                [
-                                                    'ktp' => 'KTP',
-                                                    'sim' => 'SIM'
-                                                ],
-                                                ['class' => 'form-control pilih']
-                                            );
-                                        ?>
+                                        <label class="control-label">Identitas</label>
+                                        <select class="form-control pilih" id="tbooking-identitas" name="TBooking[identitas]">
+                                            <?php
+                                            $options = array('ktp', 'sim');
+                                            for( $i=0; $i<count($options); $i++ ) {
+                                              echo '
+                                              <option '. ( $modelBooking[0]['identitas'] == $options[$i] ? 'selected="selected"' : '' ) . '>'. $options[$i]. '</option>';
+                                            }
+                                            ?>
+
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_identitas')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...', 'autocomplete' => 'off']) ?>
+                                        <label class="control-label">Nomor Identitas</label>
+                                        <input type="text" class="form-control numberinput" id="tbooking-nomor_identitas" name="TBooking[nomor_identitas]" value="<?= $modelBooking[0]['nomor_identitas']?>" >
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group required">
-                                <?= $form->field($model, 'alamat')->textarea(['maxlength' => true, 'rows' => '5', 'class' => 'form-control', 'placeholder' => 'Masukkan alamat ...', 'autocomplete' => 'off']); ?>
+                                <label class="control-label">Alamat</label>
+                                <textarea id="tbooking-alamat" class="form-control" name="TBooking[alamat]" rows="5" autocomplete="off"><?= $modelBooking[0]['alamat']?></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div class="box box-warning">
                 <div class="box-body">
                     <div class="row">
-                        <!-- <div class="col-md-12">
-                            <label class="control-label">Tambah Kamar</label>
-                            <?//= $form->field($model, 'list_kamar')->dropDownList(Yii::$app->Logic->arrKamar($id), ['class' => 'form-control select validate[required]', 'multiple'=>'multiple'])->label(false); ?>
-                            <input type="hidden" class="form-control" name="terpilih" id="terpilih" value="<?//= $id?>">
-                            <input type="text" class="form-control" name="kamarterpilih" id="kamarterpilih" value="">
-                            <input type="text" class="form-control" name="hargaterpilih" id="hargaterpilih" value="">
-                        </div> -->
                         <div class="col-md-12" id="kolomrole">
                             <div class="row fit" id="kolomrole0">
-                                <div class="col-md-3">
-                                    <div class="form-group required">
-                                        <label class="control-label" required>List Kamar </label>
-                                        <select class="form-control select validate[required] pilih_kamar" id='id_pilihkamar' urutan='0' name="kamar0[list_kamar]">
-                                        <option value="empty">Pilih Kamar ...</option>
-                                        <?php
-                                        foreach ($listkamar as $idx => $value) {
-                                            $selected = '';
-                                            if($value['id'] == $id){
-                                                $selected = 'selected';
-                                            }
-                                        ?>
-                                            <option value="<?php echo $value['id'];?>" harga="<?= $value['harga'] ?>" nomor_kamar="<?= $value['nomor_kamar'] ?>" <?= $selected ?>>Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>
-                                        <?php } ?>
-
-                                        </select>
-
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group required">
-                                        <?= $form->field($model, 'checkin')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal', 'id' =>'firstDate0', 'placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group required">
-                                        <?= $form->field($model, 'checkout')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal secondDate', 'id' =>'secondDate0', 'urutan'=> '0','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'durasi')->textInput(['maxlength' => true, 'class' => 'form-control cl_durasi','id' => 'tbooking-durasi0', 'readonly' => true]); ?>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'hargaperkamar')->textInput(['maxlength' => true, 'class' => 'form-control cl_hargaperkamar', 'id' => 'tbooking-hargaperkamar0', 'readonly' => true]); ?>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'subtotalkamar')->textInput(['maxlength' => true, 'class' => 'form-control cl_subtotalkamar', 'id' => 'tbooking-subtotalkamar0', 'readonly' => true]); ?>
-                                    </div>
-                                </div>
+                                <?php
+                                    foreach ($modelBooking as $key => $value) { ?>
+                                        <!-- $selected = 'selected';
+                                        echo " -->
+                                            <div class='col-md-3'>
+                                                <div class='form-group required'>
+                                                    <label class='control-label' required>List Kamar </label>
+                                                    <select class='form-control select pilih_kamar' id='id_pilihkamar' urutan='0' name='TBooking[list_kamar]'>
+                                                        <option value='empty'>Pilih Kamar ...</option>
+                                                        <?php foreach ($listkamar as $idx => $val) {
+                                                            $selected = '';
+                                                            if($value['idmappingkamar'] == $val['id']){
+                                                                $selected = 'selected';
+                                                            }
+                                                        ?>
+                                                            <option value="<?= $val['id']?>" harga="<?= $val['harga']?>" nomor_kamar="<?= $val['nomor_kamar']?>" <?=$selected?>>Kamar <?= $val['nomor_kamar']?> / <?= $val['type']?></option>
+                                                        <?php } ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <div class='form-group required'>
+                                                    <label class='control-label'>Checkin</label>
+                                                    <input type='text' id='firstDate0' class='form-control form-tanggal' name='TBooking[checkin]' value='<?= $value['checkin']?>' autocomplete='off'>
+                                                </div>
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <div class='form-group required'>
+                                                    <label class='control-label'>Checkout</label>
+                                                    <input type='text' id='secondDate0' class='form-control form-tanggal secondDate' name='TBooking[checkout]' urutan='0' value='<?= $value['checkout']?>' autocomplete='off'>
+                                                </div>
+                                            </div>
+                                            <div class='col-md-1'>
+                                                <div class='form-group'>
+                                                    <label class='control-label'>Durasi</label>
+                                                    <input type='text' id='tbooking-durasi0' class='form-control cl_durasi' name='TBooking[durasi]' readonly='' value='<?= $value['durasi']?>'>
+                                                </div>
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <div class='form-group'>
+                                                    <label class='control-label'>Hargaperkamar</label>
+                                                    <input type='text' id='tbooking-hargaperkamar0' class='form-control cl_hargaperkamar' name='TBooking[hargaperkamar]' readonly='' value='<?= $value['harga']?>'>
+                                                </div>
+                                            </div>
+                                            <div class='col-md-2'>
+                                                <div class='form-group'>
+                                                    <label class='control-label'>Subtotalkamar</label>
+                                                    <input type='text' id='tbooking-subtotalkamar0' class='form-control cl_subtotalkamar' name='TBooking[subtotalkamar]' readonly='' value='<?= $value['subtotal']?>'>
+                                                </div>
+                                            </div>
+                                        <!-- "; -->
+                                    <?php } ?>
                             </div>
                         </div>
                     </div>
@@ -282,86 +288,128 @@ use yii\helpers\Html;
                     </div>
                 </div>
             </div>
-
             <div class="box box-warning">
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-6">
                             <label class="control-label" style="font-size:15px;">Jenis Pembayaran</label>
                             <div class="row mright-rdio">
+                                <?php
+                                $checked = "";
+                                if($modelBooking[0]['jenis'] == "lunas") {
+                                    $checked = "checked";
+                                ?>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="container">Pembayaran Penuh
-                                          <input type="radio" checked="checked" name="TBooking[radio]" class="idradio" value="lunas">
-                                          <span class="checkmark"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="container">Pembayaran Sebagian
-                                            <input type="radio" name="TBooking[radio]" class="idradio" value="sebagian">
+                                            <input type="radio" checked="<?= $checked?>" name="TBooking[radio]" class="idradio" value="lunas">
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
                                 </div>
+                                <?php } else { ?>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="container">Pembayaran Sebagian
+                                            <input type="radio" checked="<?= $checked?>" name="TBooking[radio]" class="idradio" value="sebagian">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <?php } ?>
+
                             </div>
                             <hr>
                             <label class="control-label" style="font-size:15px;">Metode Pembayaran</label>
                             <div class="row mright-rdio">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="container">Cash
-                                          <input type="radio" checked="checked" name="TBooking[radionm]" class="radioid" value="cash">
-                                          <span class="checkmark"></span>
-                                        </label>
+                                <?php
+                                $checked = "";
+                                if($modelBooking[0]['metode'] == "cash") {
+                                    $checked = "checked";
+                                ?>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="container">Cash
+                                              <input type="radio" checked="<?= $checked?>" name="TBooking[radionm]" class="radioid" value="cash">
+                                              <span class="checkmark"></span>
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="container">Debit
-                                            <input type="radio" name="TBooking[radionm]" class="radioid" value="debit">
-                                            <span class="checkmark"></span>
-                                        </label>
+                                <?php } else { ?>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="container">Debit
+                                                <input type="radio" checked="<?= $checked?>" name="TBooking[radionm]" class="radioid" value="debit">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
+                                <?php } ?>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="form-group required" id="idcarddebit" style="display:none">
-                                            <?= $form->field($model, 'no_kartu_debit')->textInput(['maxlength' => true, 'class' => 'form-control', 'autocomplete' => 'off']); ?>
-                                    </div>
+                                    <?php if(!empty($modelBooking[0]['no_kartu_debit'])) { ?>
+                                        <div class="form-group required" id="idcarddebit" style="display:block">
+                                            <label class="control-label">No.Kartu Debit</label>
+                                            <input type='text' id='tbooking-no_kartu_debit' class='form-control' name='TBooking[no_kartu_debit]' autocomplete='off' value="<?= $modelBooking[0]['no_kartu_debit']?>">
+                                        </div>
+                                    <?php } else { ?>
+                                        <div class="form-group required" id="idcarddebit" style="display:none">
+                                            <label class="control-label">No.Kartu Debit</label>
+                                            <input type='text' id='tbooking-no_kartu_debit' class='form-control' name='TBooking[no_kartu_debit]' autocomplete='off' value="">
+                                        </div>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group required" id="idbayar">
-                                <?= $form->field($model2, 'total_bayar')->textInput(['maxlength' => true, 'class' => 'form-control', 'readonly' => true]) ?>
-                            </div>
-                            <div class="form-group required" id="iddp" style="display:none">
-                                <?= $form->field($model2, 'dp')->textInput(['maxlength' => true, 'class' => 'form-control']) ?>
-                            </div>
-                            <div class="form-group required">
-                                <?= $form->field($model2, 'sisa')->textInput(['maxlength' => true, 'class' => 'form-control', 'readonly' => true]) ?>
-                            </div>
-                            <div class="form-group required">
-                                <?= $form->field($model2, 'total_harga')->textInput(['maxlength' => true, 'class' => 'form-control', 'readonly' => true]); ?>
-                            </div>
+                            <?php if(!empty($modelBooking[0]['summary_dp'])) { ?>
+                                <div class="form-group required" id="idbayar">
+                                    <label class="control-label">Total Bayar</label>
+                                    <input type="text" id="summarybooking-total_bayar" class="form-control" name="SummaryBooking[total_bayar]" value="<?= \app\components\Logic::formatNumbertot(!empty($modelBooking['0']['total_bayar']) ? $modelBooking['0']['total_bayar'] : 0)?>" readonly="">
+                                </div>
+                                <div class="form-group required" id="iddp" style="display:block">
+                                    <label class="control-label">Dp</label>
+                                    <input type="text" id="summarybooking-dp" class="form-control" name="SummaryBooking[dp]" value="<?= \app\components\Logic::formatNumbertot(!empty($modelBooking['0']['summary_dp']) ? $modelBooking['0']['summary_dp'] : 0)?>" readonly="">
+                                </div>
+                                <div class="form-group required">
+                                    <label class="control-label">Sisa</label>
+                                    <input type="text" id="summarybooking-sisa" class="form-control" name="SummaryBooking[sisa]" value="<?= \app\components\Logic::formatNumbertot(!empty($modelBooking['0']['summary_sisa']) ? $modelBooking['0']['summary_sisa'] : 0)?>" readonly="">
+                                </div>
+                                <!-- <div class="form-group required">
+                                    <label class="control-label">Total Harga</label>
+                                    <input type="text" id="summarybooking-total_harga" class="form-control" name="SummaryBooking[total_harga]" value="<?//= $modelBooking[0]['total_bayar']?>" readonly="">
+                                </div> -->
+                            <?php } else { ?>
+                                <div class="form-group required" id="idbayar">
+                                    <label class="control-label">Total Bayar</label>
+                                    <input type="text" id="summarybooking-total_bayar" class="form-control" name="SummaryBooking[total_bayar]" value="<?= \app\components\Logic::formatNumbertot(!empty($modelBooking['0']['total_bayar']) ? $modelBooking['0']['total_bayar'] : 0)?>" readonly="">
+                                </div>
+                                <!-- <div class="form-group required" id="iddp" style="display:none">
+                                    <label class="control-label">Dp</label>
+                                    <input type="text" id="summarybooking-dp" class="form-control" name="SummaryBooking[dp]" value="<?//= $modelBooking['0']['summary_dp']?>">
+                                </div> -->
+                                <div class="form-group required">
+                                    <label class="control-label">Sisa</label>
+                                    <input type="text" id="summarybooking-sisa" class="form-control" name="SummaryBooking[sisa]" value="<?= \app\components\Logic::formatNumbertot(!empty($modelBooking['0']['summary_sisa']) ? $modelBooking['0']['summary_sisa'] : 0)?>" readonly="">
+                                </div>
+                                <div class="form-group required">
+                                    <label class="control-label">Total Harga</label>
+                                    <input type="text" id="summarybooking-total_harga" class="form-control" name="SummaryBooking[total_harga]" value="<?= \app\components\Logic::formatNumbertot(!empty($modelBooking['0']['total_harga']) ? $modelBooking['0']['total_harga'] : 0)?>" readonly="">
+                                </div>
+                            <?php } ?>
                         </div>
                     </div>
-
                 </div>
             </div>
-
             <div class="row">
                 <div class="col-md-12">
-                    <?=Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Booking'  : '<i class="fa fa-pencil" aria-hidden="true"></i> Update',$model->isNewRecord ? 'javascript:savebooking("'.$joinid.'")':'javascript:updatebooking()',['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-primary pull-right']) ?>
+                    <?=Html::a('<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkin</i>','javascript:savecekin("'.$idharga.'")',['class' => 'btn btn-success pull-right']) ?>
                     <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
                     <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
                 </div>
             </div>
             <?php ActiveForm::end(); ?>
-
         </div>
     </div>
 </div>
@@ -383,11 +431,11 @@ use yii\helpers\Html;
         });
 
 
-        $('#tbooking-hargaperkamar0').val(0);
+        // $('#tbooking-hargaperkamar0').val(0);
         // $('#firstDate0').val(formattingFirstDate());
         // $('#secondDate0').val(formattingSecondDate());
-        $('#tbooking-durasi0').val(0);
-        $('#tbooking-subtotalkamar0').val(0);
+        // $('#tbooking-durasi0').val(0);
+        // $('#tbooking-subtotalkamar0').val(0);
 
 
         setDefault();
@@ -447,10 +495,10 @@ use yii\helpers\Html;
         // $('#summarybooking-total_bayar').number( true );
         // $('#summarybooking-total_harga').val(gethargaawal);
         // $('#summarybooking-total_harga').number( true );
-        $('#summarybooking-sisa').val(setdefault);
-        $('#summarybooking-sisa').number( true );
-        $('#summarybooking-dp').val(0);
-        $('#summarybooking-dp').number( true );
+        // $('#summarybooking-sisa').val(setdefault);
+        // $('#summarybooking-sisa').number( true );
+        // $('#summarybooking-dp').val(0);
+        // $('#summarybooking-dp').number( true );
 
         $('#tbooking-subtotalkamar"'+valueT+'"').val(setdefault);
         $('#tbooking-durasi"'+valueT+'"').val(setdefault);
@@ -687,43 +735,43 @@ use yii\helpers\Html;
 
 
 
-    $('.radioid').on('click', function() {
-            // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-            if( $(this).is(":checked") ){
-                var val = $(this).val();
-                console.log(val);
-                if(val == "debit") {
-                    $('#idcarddebit').show();
-                }
-                else{
-                    $('#tbooking-no_kartu_debit').val('');
-                    $('#idcarddebit').hide();
-                }
-            }
-    });
+    // $('.radioid').on('click', function() {
+    //         // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
+    //         if( $(this).is(":checked") ){
+    //             var val = $(this).val();
+    //             console.log(val);
+    //             if(val == "debit") {
+    //                 $('#idcarddebit').show();
+    //             }
+    //             else{
+    //                 $('#tbooking-no_kartu_debit').val('');
+    //                 $('#idcarddebit').hide();
+    //             }
+    //         }
+    // });
 
-    $('.idradio').on('click', function() {
-            // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-            if( $(this).is(":checked") ){
-                var val = $(this).val();
-                console.log(val);
-                if(val == "lunas") {
-                    $('#summarybooking-dp').val($('#summarybooking-total_harga').val());
-                    $('#iddp').hide();
-                    $('.field-summarybooking-total_harga').show();
-                    $('#summarybooking-sisa').val(0);
-                    total();
-                }
-                else{
-                    $('.field-summarybooking-total_harga').hide();
-                    $('#summarybooking-dp').val(0);
-                    $('#summarybooking-dp').number( true );
-                    $('#summarybooking-dp').focus();
-                    // $('#summarybooking-sisa').val( $('#summarybooking-total_bayar').val() )
-                    $('#iddp').show();
-                }
-            }
-    });
+    // $('.idradio').on('click', function() {
+    //         // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
+    //         if( $(this).is(":checked") ){
+    //             var val = $(this).val();
+    //             console.log(val);
+    //             if(val == "lunas") {
+    //                 $('#summarybooking-dp').val($('#summarybooking-total_harga').val());
+    //                 $('#iddp').hide();
+    //                 $('.field-summarybooking-total_harga').show();
+    //                 $('#summarybooking-sisa').val(0);
+    //                 total();
+    //             }
+    //             else{
+    //                 $('.field-summarybooking-total_harga').hide();
+    //                 $('#summarybooking-dp').val(0);
+    //                 $('#summarybooking-dp').number( true );
+    //                 $('#summarybooking-dp').focus();
+    //                 // $('#summarybooking-sisa').val( $('#summarybooking-total_bayar').val() )
+    //                 $('#iddp').show();
+    //             }
+    //         }
+    // });
 
     $(document).on('keyup','#summarybooking-dp',function(){
         var val = $(this).val();

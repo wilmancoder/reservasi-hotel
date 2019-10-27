@@ -78,6 +78,12 @@ class Logic extends Component
         return number_format($value,$dec,",",".");
     }
 
+    public static function formatNumbertot($value, $dec = 0)
+    {
+        if(is_null($value) || empty($value)) return 0;
+        return number_format($value,$dec,",",",");
+    }
+
     public static function removeKoma($value)
     {
         return str_replace(",", "", $value);
@@ -152,7 +158,7 @@ class Logic extends Component
         return $model;
     }
 
-    
+
     public static function dataTamuOne($id)
     {
         $model = (new \yii\db\Query())
@@ -205,9 +211,9 @@ class Logic extends Component
         ->join('LEFT JOIN', 'm_mapping_harga g', 'g.id = c.id_mapping_harga')
         ->join('INNER JOIN', 'm_type h', 'h.id = g.id_type')
         ->join('INNER JOIN', 'biodata_tamu_booking i', 'i.id = a.id_transaksi_tamu')
-        ->where('a.id_petugas = :id_petugas', [':id_petugas' => $idpetugas])
+        // ->where('a.id_petugas = :id_petugas', [':id_petugas' => $idpetugas])
         ->groupBy('b.id_biodata_tamu')
-        ->orderBy(['b.created_date' => SORT_ASC])
+        // ->orderBy(['b.created_date' => SORT_ASC])
         ->all();
 
         return $model;
@@ -436,4 +442,23 @@ class Logic extends Component
     //
     //    return $durasi;
     // }
+
+    public static function dataBookingtamu($idtranstamu)
+    {
+        $model = (new \yii\db\Query())
+            ->select(['a.id', 'a.id_biodata_tamu', 'i.type', 'a.id_mapping_kamar as idmappingkamar', 'a.checkin', 'a.checkout', 'a.durasi', 'a.harga as subtotal', 'a.no_kartu_debit', 'a.status', 'b.nama as namatamu', 'b.identitas', 'b.nomor_identitas', 'b.nomor_kontak', 'b.alamat', 'c.nomor_kamar', 'f.jenis', 'e.metode', 'g.harga', 'h.dp as summary_dp', 'h.sisa as summary_sisa', 'h.total_harga', 'h.total_bayar'])
+            ->from('t_booking a')
+            ->join('LEFT JOIN', 'biodata_tamu_booking b', 'b.id = a.id_biodata_tamu')
+            ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = a.id_mapping_kamar')
+            ->join('INNER JOIN', 'm_mapping_pembayaran d', 'd.id = a.id_mapping_pembayaran')
+            ->join('INNER JOIN', 'm_metode_pembayaran e', 'e.id = d.id_metode_pembayaran')
+            ->join('INNER JOIN', 'm_jenis_pembayaran f', 'f.id = d.id_jenis_pembayaran')
+            ->join('LEFT JOIN', 'm_mapping_harga g', 'g.id = c.id_mapping_harga')
+            ->join('LEFT JOIN', 'summary_booking h', 'h.id_transaksi_tamu = a.id_biodata_tamu')
+            ->join('INNER JOIN', 'm_type i', 'i.id = g.id_type')
+            ->where(['a.id_biodata_tamu' => $idtranstamu])
+            ->all();
+
+        return $model;
+    }
 }
