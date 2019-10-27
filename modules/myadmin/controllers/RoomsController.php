@@ -615,7 +615,7 @@ class RoomsController extends \yii\web\Controller
                 $model2->total_bayar = $model2->total_harga;
                 $model2->dp = (string)((int)$model2->total_harga+$kembalian);
             }
-            $model2->total_harga =  (string)((int)$model->harga + $_POST['TTamu']['subtotalkamar']);
+            $model2->total_harga =  (string)(((int)$model2->total_harga + $_POST['TTamu']['subtotalkamar'])- $model->harga);
             $model2->sisa = (string)((int)$model2->total_harga - $model2->dp);
             $model2->save();
         }
