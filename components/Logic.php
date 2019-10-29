@@ -180,8 +180,8 @@ class Logic extends Component
     public static function reportFo($idpetugas)
     {
         $model = (new \yii\db\Query())
-        ->select(['c.nomor_kamar', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'a.total_harga as subtotal'])
-        ->from('summary_ttamu a')
+        ->select(['c.nomor_kamar', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk'])
+        ->from('histori_summarytamu a')
         ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
         ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')
         ->join('INNER JOIN', 'm_mapping_pembayaran d', 'd.id = b.id_mapping_pembayaran')
@@ -189,6 +189,7 @@ class Logic extends Component
         ->join('INNER JOIN', 'm_jenis_pembayaran f', 'f.id = d.id_jenis_pembayaran')
         ->join('LEFT JOIN', 'm_mapping_harga g', 'g.id = c.id_mapping_harga')
         ->join('INNER JOIN', 'm_type h', 'h.id = g.id_type')
+        ->join('INNER JOIN', 'summary_ttamu i', 'i.id_transaksi_tamu = a.id_transaksi_tamu')
         ->where('a.id_petugas = :id_petugas', [':id_petugas' => $idpetugas])
         ->groupBy('b.id_biodata_tamu')
         ->orderBy(['a.id_transaksi_tamu' => SORT_ASC])
@@ -263,9 +264,9 @@ class Logic extends Component
     public static function grandtotalPendapatan($petugas)
     {
         $model = (new \yii\db\Query())
-        ->from('summary_ttamu a')
+        ->from('histori_summarytamu a')
         ->where('a.id_petugas = :idpetugas', [':idpetugas' => $petugas]);
-        $sum = $model->sum('total_harga');
+        $sum = $model->sum('jml_uangmasuk');
 
         return $sum;
     }

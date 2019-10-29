@@ -388,7 +388,8 @@ use yii\helpers\Html;
         });
         $('.form-tanggal').datepicker({
             format: 'yyyy-mm-dd',
-            autoclose: true
+            autoclose: true,
+            startDate: new Date()
         });
 
 
@@ -541,7 +542,8 @@ use yii\helpers\Html;
 
             $('.form-tanggal').datepicker({
                 format: 'yyyy-mm-dd',
-                autoclose: true
+                autoclose: true,
+                startDate: new Date()
             });
         });
     }

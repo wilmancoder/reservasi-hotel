@@ -163,12 +163,13 @@ class RoomsController extends \yii\web\Controller
                     if($dp != 0 && $sisa != 0){
                         $modelHistoriSummaryttamu->pembayaran = "DP";
                         $modelHistoriSummaryttamu->status_pembayaran = "BELUM LUNAS";
+                        $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeKoma($dp);
                     } else {
                         $modelHistoriSummaryttamu->pembayaran = "PENUH";
                         $modelHistoriSummaryttamu->status_pembayaran = "LUNAS";
+                        $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeKoma($bayar);
                     }
                     $modelHistoriSummaryttamu->tgl_uangmasuk = date('Y-m-d');
-                    $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeKoma($dp);
                     $modelHistoriSummaryttamu->save(false);
 
                 }

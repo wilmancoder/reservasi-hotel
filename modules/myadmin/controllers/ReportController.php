@@ -111,8 +111,7 @@ class ReportController extends \yii\web\Controller
                 $row[$i]['type'] = $value['type'];
                 $row[$i]['jenis_pembayaran'] = $value['jenis_pembayaran'];
                 $row[$i]['metode_pembayaran'] = $value['metode_pembayaran'];
-                $row[$i]['no_kartu_debit'] = $value['no_kartu_debit'];
-                $row[$i]['subtotal'] = \app\components\Logic::formatNumber($value['subtotal'], 0);
+                $row[$i]['jml_uangmasuk'] = \app\components\Logic::formatNumber($value['jml_uangmasuk'], 0);
 
                 $row[$i]['fungsi'] = "
                 <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Subtotal' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>

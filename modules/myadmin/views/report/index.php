@@ -49,8 +49,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                                  <th>Type Kamar</th>
                                  <th>Jenis Pembayaran</th>
                                  <th>Metode Pembayaran</th>
-                                 <th>No.Kartu Debit</th>
-                                 <th>Sub Total</th>
+                                 <th>Jumlah Uang Masuk</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -58,7 +57,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="6" style="text-align:right">Jumlah Total Pendapatan:</th>
+                                <th colspan="5" style="text-align:right">Jumlah Total Pendapatan:</th>
                                 <th style="text-align:right" id="ttl_pendapatan"></th>
                             </tr>
                         </tfoot>
@@ -209,11 +208,10 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                 { width: '5%', targets: 1 },
                 { width: '20%', targets: 2 },
                 { width: '15%', targets: 3 },
-                { width: '15%', targets: 4 },
-                { width: '20%', targets: 5 },
+                { width: '20%', targets: 4 },
                 {
-                    width: '20%', targets: 6,
-                    targets: 6,
+                    width: '20%', targets: 5,
+                    targets: 5,
                     className: 'dt-body-right'
                 },
             ],
@@ -234,10 +232,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                  {"data": "type"},
                  {"data": "jenis_pembayaran"},
                  {"data": "metode_pembayaran"},
-                 {"data": "no_kartu_debit"},
-                 {"data": "subtotal"},
-
-
+                 {"data": "jml_uangmasuk"}
              ],
              "footerCallback": function ( row, data, start, end, display ) {
              var api = this.api(), data;
@@ -252,7 +247,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
 
              // Total over all pages
              total = api
-                 .column( 6 )
+                 .column( 5 )
                  .data()
                  .reduce( function (a, b) {
                      return intVal(a) + intVal(b);
@@ -260,14 +255,14 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
 
              // Total over this page
              pageTotal = api
-                 .column( 6, { page: 'current'} )
+                 .column( 5, { page: 'current'} )
                  .data()
                  .reduce( function (a, b) {
                      return intVal(a) + intVal(b);
                  }, 0 );
 
              // Update footer
-             $( api.column( 6 ).footer() ).html(
+             $( api.column( 5 ).footer() ).html(
                  '  Rp.'+ total +''
              );
              // $('#tot_pendapatan').val(pendapatan);
