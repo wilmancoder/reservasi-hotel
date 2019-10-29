@@ -231,7 +231,7 @@ use yii\helpers\Html;
                                 <div class="col-md-3">
                                     <div class="form-group required">
                                         <label class="control-label" required>List Kamar </label>
-                                        <select class="form-control select validate[required] pilih_kamar" id='id_pilihkamar' urutan='0' name="kamar0[list_kamar]">
+                                        <select class="form-control select validate[required] pilih_kamar" id='id_pilihkamar' urutan='0' name="kamar[0][list_kamar]">
                                         <option value="empty">Pilih Kamar ...</option>
                                         <?php
                                         foreach ($listkamar as $idx => $value) {
@@ -244,32 +244,32 @@ use yii\helpers\Html;
                                         <?php } ?>
 
                                         </select>
-
+                                        <input type="hidden" id="nomor_kamar0" name="kamar[0][nomor_kamar]">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'checkin')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal', 'id' =>'firstDate0', 'placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                        <?= $form->field($model, 'checkin')->textInput(['name' => 'kamar[0][checkin]', 'maxlength' => true, 'class' => 'form-control form-tanggal', 'id' =>'firstDate0', 'placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'checkout')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal secondDate', 'id' =>'secondDate0', 'urutan'=> '0','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                        <?= $form->field($model, 'checkout')->textInput(['name' => 'kamar[0][checkout]', 'maxlength' => true, 'class' => 'form-control form-tanggal secondDate', 'id' =>'secondDate0', 'urutan'=> '0','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                                 <div class="col-md-1">
                                     <div class="form-group">
-                                        <?= $form->field($model, 'durasi')->textInput(['maxlength' => true, 'class' => 'form-control cl_durasi','id' => 'tbooking-durasi0', 'readonly' => true]); ?>
+                                        <?= $form->field($model, 'durasi')->textInput(['name' => 'kamar[0][durasi]', 'maxlength' => true, 'class' => 'form-control cl_durasi','id' => 'tbooking-durasi0', 'readonly' => true]); ?>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
-                                        <?= $form->field($model, 'hargaperkamar')->textInput(['maxlength' => true, 'class' => 'form-control cl_hargaperkamar', 'id' => 'tbooking-hargaperkamar0', 'readonly' => true]); ?>
+                                        <?= $form->field($model, 'hargaperkamar')->textInput(['name' => 'kamar[0][hargaperkamar]', 'maxlength' => true, 'class' => 'form-control cl_hargaperkamar', 'id' => 'tbooking-hargaperkamar0', 'readonly' => true]); ?>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
-                                        <?= $form->field($model, 'subtotalkamar')->textInput(['maxlength' => true, 'class' => 'form-control cl_subtotalkamar', 'id' => 'tbooking-subtotalkamar0', 'readonly' => true]); ?>
+                                        <?= $form->field($model, 'subtotalkamar')->textInput(['name' => 'kamar[0][subtotalkamar]', 'maxlength' => true, 'class' => 'form-control cl_subtotalkamar', 'id' => 'tbooking-subtotalkamar0', 'readonly' => true]); ?>
                                     </div>
                                 </div>
                             </div>
@@ -379,7 +379,8 @@ use yii\helpers\Html;
         });
         $('.form-tanggal').datepicker({
             format: 'yyyy-mm-dd',
-            autoclose: true
+            autoclose: true,
+            startDate: new Date()
         });
 
 
@@ -531,7 +532,8 @@ use yii\helpers\Html;
 
             $('.form-tanggal').datepicker({
                 format: 'yyyy-mm-dd',
-                autoclose: true
+                autoclose: true,
+                startDate: new Date()
             });
         });
     }

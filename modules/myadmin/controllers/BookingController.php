@@ -97,7 +97,7 @@ class BookingController extends \yii\web\Controller
                 $row[$i]['subtotal'] = \app\components\Logic::formatNumber($value['subtotal'], 0);
 
                 $row[$i]['fungsi'] = "
-                <button onclick='detailBooking(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Subtotal' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
+                <button onclick='detailBooking(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
                 ";
 
                 $i++;
@@ -129,7 +129,7 @@ class BookingController extends \yii\web\Controller
                 $dp = $_POST['SummaryBooking']['dp'];
                 $sisa = $_POST['SummaryBooking']['sisa'];
                 $totalharga = $_POST['SummaryBooking']['total_harga'];
-                $durasi = $_POST['TBooking']['durasi'];
+                // $durasi = $_POST['TBooking']['durasi'];
                 $nokartudebit = $_POST['TBooking']['no_kartu_debit'];
 
                 $modelJenisPembayaran = MJenisPembayaran::find()->where(['jenis' => $jenisPembayaran])->one();
@@ -180,18 +180,17 @@ class BookingController extends \yii\web\Controller
                     // $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
 
                     if(!empty($_POST['kamar'])){
+                        // var_dump($_POST['kamar']);exit;
                         foreach ($_POST['kamar'] as $key => $value) {
-                            // var_dump($value);
-                            // $durasi = $value['durasi'];
                             $modelPengunjung = new TBooking();
                             $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
                             $modelPengunjung->id_mapping_kamar = $value['list_kamar'];
                             $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
-                            $modelPengunjung->checkin = $_POST['TBooking']['checkin'];
-                            $modelPengunjung->checkout = $_POST['TBooking']['checkout'];
-                            $modelPengunjung->harga = $_POST['TBooking']['subtotalkamar'];
+                            $modelPengunjung->checkin = $value['checkin'];
+                            $modelPengunjung->checkout = $value['checkout'];
+                            $modelPengunjung->harga = $value['subtotalkamar'];
                             $modelPengunjung->status = 1;
-                            $modelPengunjung->durasi = str_replace('Hari', '',$_POST['TBooking']['durasi']);
+                            $modelPengunjung->durasi = str_replace('Hari', '',$value['durasi']);
                             $modelPengunjung->no_kartu_debit = $_POST['TBooking']['no_kartu_debit'];
                             $modelPengunjung->created_date = date('Y-m-d H:i:s');
                             $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
@@ -205,7 +204,6 @@ class BookingController extends \yii\web\Controller
                             //     );
                             // }
                         }
-                        // exit;
                     }
                     $hasil = array(
                         'status' => "success",
