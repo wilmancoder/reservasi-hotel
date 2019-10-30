@@ -147,10 +147,10 @@ class RoomsController extends \yii\web\Controller
                     if($jenisPembayaran == "sebagian") {
                         $modelSummaryttamu->dp = Logic::removeKoma($dp);
                         $modelSummaryttamu->sisa = Logic::removeKoma($sisa);
-                        $modelSummaryttamu->total_bayar = null;
+                        $modelSummaryttamu->total_bayar = 0;
                     } else {
-                        $modelSummaryttamu->dp = null;
-                        $modelSummaryttamu->sisa = null;
+                        $modelSummaryttamu->dp = 0;
+                        $modelSummaryttamu->sisa = 0;
                         $modelSummaryttamu->total_bayar = Logic::removeKoma($bayar);
                     }
                     $modelSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
