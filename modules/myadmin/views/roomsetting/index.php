@@ -153,6 +153,12 @@ function addkamar() {
      showModal(url, title);
 }
 
+function updateroomsetting(id) {
+     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/roomsetting/update']);?>?id="+id;
+     var title = "Form Update Kamar";
+     showModal(url, title);
+}
+
 function showModal(url, title) {
      $("#modalDetailTitle").empty();
      $("#modalDetailTitle").html(title);

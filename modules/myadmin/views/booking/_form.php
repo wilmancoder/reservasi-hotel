@@ -289,18 +289,26 @@ use yii\helpers\Html;
                         <div class="col-md-6">
                             <label class="control-label" style="font-size:15px;">Jenis Pembayaran</label>
                             <div class="row mright-rdio">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label class="container">Pembayaran Penuh
-                                          <input type="radio" checked="checked" name="TBooking[radio]" class="idradio" value="lunas">
+                                        <label class="container">Lunas
+                                          <input type="radio" name="TBooking[radio]" class="idradio" value="lunas">
                                           <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="container">Sebagian
+                                            <input type="radio" name="TBooking[radio]" class="idradio" value="sebagian">
+                                            <span class="checkmark"></span>
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="container">Pembayaran Sebagian
-                                            <input type="radio" name="TBooking[radio]" class="idradio" value="sebagian">
+                                        <label class="container">Belum Bayar
+                                            <input type="radio" checked="checked" name="TBooking[radio]" class="idradio" value="belumbayar">
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
@@ -444,10 +452,10 @@ use yii\helpers\Html;
     function setDefault()
     {
         var setdefault = 0;
-        // $('#summarybooking-total_bayar').val(gethargaawal);
-        // $('#summarybooking-total_bayar').number( true );
-        // $('#summarybooking-total_harga').val(gethargaawal);
-        // $('#summarybooking-total_harga').number( true );
+        $('#summarybooking-total_bayar').val(setdefault);
+        $('#summarybooking-total_bayar').number( true );
+        $('#summarybooking-total_harga').val(setdefault);
+        $('#summarybooking-total_harga').number( true );
         $('#summarybooking-sisa').val(setdefault);
         $('#summarybooking-sisa').number( true );
         $('#summarybooking-dp').val(0);

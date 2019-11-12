@@ -11,6 +11,7 @@ use app\models\MShift;
 use app\models\MMappingKamar;
 use app\models\MKategoriHarga;
 use app\models\MType;
+use app\models\TBooking;
 // use app\components\Query;
 
 class Logic extends Component
@@ -221,6 +222,35 @@ class Logic extends Component
 
     }
 
+    public static function reportAll($getPosting)
+    {
+        if($getPosting != 'all'){
+            $exp = explode(',',$getPosting);
+            $param1 = $exp[0];
+            $param2 = $exp[1];
+
+            $model = (new \yii\db\Query())
+            ->select(['a.*', 'c.nama as nama_petugas'])
+            ->from('histori_summarytamu a')
+            ->join('INNER JOIN', 't_petugas b', 'b.id = a.id_petugas')
+            ->join('INNER JOIN', 'users c', 'c.id = b.id_user')
+            ->where('tgl_uangmasuk BETWEEN :param1 AND :param2', [':param1' => $param1, 'param2' => $param2])
+            ->all();
+
+            return $model;
+        } else {
+            $model = (new \yii\db\Query())
+            ->select(['a.*', 'c.nama as nama_petugas'])
+            ->from('histori_summarytamu a')
+            ->join('INNER JOIN', 't_petugas b', 'b.id = a.id_petugas')
+            ->join('INNER JOIN', 'users c', 'c.id = b.id_user')
+            // ->where('tgl_uangmasuk BETWEEN :param1 AND :param2', [':param1' => $param1, 'param2' => $param2])
+            ->all();
+
+            return $model;
+        }
+    }
+
     public static function detailreportFo($idtranstamu)
     {
         $model = (new \yii\db\Query())
@@ -299,18 +329,34 @@ class Logic extends Component
         return $result[1];
     }
 
-    public static function mappingKamar()
+    public static function mappingKamar($id='')
     {
-        $data = (new \yii\db\Query())
+        if(!empty($id)){
+
+            $data = (new \yii\db\Query())
             ->select(['a.id', 'a.nomor_kamar', 'a.status', 'c.type', 'd.kategori_harga', 'b.harga', 'a.created_date', 'a.created_by'])
             ->from('m_mapping_kamar a')
             ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
             ->join('INNER JOIN', 'm_type c', 'c.id = b.id_type')
             ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
-            ->orderBy(['a.nomor_kamar' => SORT_ASC])
+            ->where(['a.id' => $id])
+            ->orderBy(['a.id' => SORT_ASC])
             ->all();
 
-        return $data;
+            return $data;
+        } else {
+            $data = (new \yii\db\Query())
+            ->select(['a.id', 'a.nomor_kamar', 'a.status', 'c.type', 'd.kategori_harga', 'b.harga', 'a.created_date', 'a.created_by'])
+            ->from('m_mapping_kamar a')
+            ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
+            ->join('INNER JOIN', 'm_type c', 'c.id = b.id_type')
+            ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
+            // ->where(['a.id' => $id])
+            ->orderBy(['a.id' => SORT_ASC])
+            ->all();
+
+            return $data;
+        }
     }
 
     public static function mappingPrice()
@@ -461,5 +507,67 @@ class Logic extends Component
             ->all();
 
         return $model;
+    }
+
+    public static function reminderBooking()
+    {
+        $curdate = date('Y-m-d');
+        $cekbooking = TBooking::find()->asArray()->all();
+        foreach ($cekbooking as $key => $value) {
+            $hasil[] = $value['checkin'];
+            $formathasil[] = date("Y-m-d",strtotime($value['checkin']. "-1 days"));
+        }
+        $result = array_values(array_filter($formathasil, function($v){
+            return $v == date('Y-m-d');
+        }));
+
+        foreach ($result as $keyz => $val) {
+            $format[] = date("Y-m-d",strtotime($val. "+1 days"));
+        }
+        if(isset($format)){
+
+            $modelBooking = (new \yii\db\Query())
+            ->select(['COUNT(*) AS total'])
+            ->from('t_booking')
+            ->where(['checkin' =>$format])
+            // ->where(['>=','checkin', $curdate])
+            ->all();
+        } else {
+            $modelBooking = 0;
+        }
+
+
+        return $modelBooking;
+    }
+
+    public static function reminderCheckout()
+    {
+        $curdate = date('Y-m-d');
+        $cektamu = TTamu::find()->asArray()->all();
+        foreach ($cektamu as $key => $value) {
+            $hasil[] = $value['checkout'];
+            $formathasil[] = date("Y-m-d",strtotime($value['checkout']. "-1 days"));
+        }
+        $result = array_values(array_filter($formathasil, function($v){
+            return $v == date('Y-m-d');
+        }));
+
+        foreach ($result as $keyz => $val) {
+            $format[] = date("Y-m-d",strtotime($val. "+1 days"));
+        }
+        if(isset($format)){
+
+            $modelCheckout = (new \yii\db\Query())
+            ->select(['COUNT(*) AS total'])
+            ->from('t_tamu')
+            ->where(['checkout' =>$format])
+            // ->where(['>=','checkin', $curdate])
+            ->all();
+        } else {
+            $modelCheckout = 0;
+        }
+
+
+        return $modelCheckout;
     }
 }

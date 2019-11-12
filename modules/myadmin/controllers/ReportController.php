@@ -81,20 +81,82 @@ class ReportController extends \yii\web\Controller
     {
         $model = new TTamu();
         return $this->render('indexAll', [
-            'model' => $model
+            'model' => $model,
+            'posting'=>'all'
         ]);
     }
 
     public function actionListreportall()
     {
-        if(Yii::$app->request->isAjax)
-        {
-        var_dump($_POST);exit;
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = Yii::$app->request->post();
+        $ambilPosting = $post['TTamu'];
+        $poststartdate = $ambilPosting['startdate'];
+        $postenddate = $ambilPosting['enddate'];
+        if( !empty($poststartdate) && !empty($postenddate) ){
+            $joinposting = $poststartdate.','.$postenddate;
+        } else {
+            $joinposting = 'all';
         }
+
+        if(!empty($joinposting)){
+
+            $hasil = array(
+                'status' => "success",
+                'joinposting' => $joinposting
+            );
+        }
+        echo json_encode($hasil);
+        die();
+    }
+
+    public function actionGetdatareportall() {
+        // if(Yii::$app->request->isAjax)
+        // {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            $get = Yii::$app->request->get();
+            $getPosting = $get['posting'];
+            // var_dump($getPosting);exit;
+            // if($getPosting != 'all') {
+            //
+            //     $exp = explode(',',$getPosting);
+            //     $param1 = $exp[0];
+            //     $param2 = $exp[1];
+            // } else {
+            //     $param1 = '0000-00-00';
+            //     $param2 = '0000-00-00';
+            // }
+            // var_dump($getPosting);
+            // var_dump($param2);
+            // exit;
+            $data = \app\components\Logic::reportAll($getPosting);
+            // var_dump($data);exit;
+            $row = array();
+            $i = 0;
+            $no = 1;
+            foreach ($data as $idx => $value) {
+                //Asiign All Value To Row
+                foreach ($value as $key => $val) {
+                    $row[$i][$key] = $val;
+                }
+                $row[$i]['no'] = $no++;
+                $row[$i]['nama_petugas'] = $value['nama_petugas'];
+                $row[$i]['pembayaran'] = $value['pembayaran'];
+                $row[$i]['status_pembayaran'] = $value['status_pembayaran'];
+                $row[$i]['tgl_uangmasuk'] = $value['tgl_uangmasuk'];
+                $row[$i]['jml_uangmasuk'] = \app\components\Logic::formatNumber($value['jml_uangmasuk'], 0);
+
+
+                $i++;
+                // $no++;
+            }
+            $hasil['data'] = $row;
+                // var_dump($hasil);exit();
+            return $hasil;
+        // }
     }
 
     public function actionGetdatapendapatan($idpetugas) {
-        // var_dump($idpetugas);exit;
         if(Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;

@@ -18,6 +18,7 @@ use app\models\MJenisPembayaran;
 use app\models\MMappingPembayaran;
 use app\models\SummaryBooking;
 use app\models\MMappingHarga;
+use app\models\HistoriSummarytamu;
 
 class BookingController extends \yii\web\Controller
 {
@@ -164,6 +165,25 @@ class BookingController extends \yii\web\Controller
                     $modelSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
                     $modelSummaryttamu->total_harga = Logic::removeKoma($totalharga);
                     $modelSummaryttamu->save(false);
+
+                    $modelHistoriSummaryttamu = new HistoriSummarytamu();
+                    $modelHistoriSummaryttamu->id_transaksi_tamu = $modelBiodatatamu->id;
+                    $modelHistoriSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
+                    if($jenisPembayaran == "sebagian") {
+                        if($dp != 0 && $sisa != 0){
+                            $modelHistoriSummaryttamu->pembayaran = "DP (BOOKING)";
+                            $modelHistoriSummaryttamu->status_pembayaran = "BELUM LUNAS";
+                            $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeKoma($dp);
+                        }
+                    } else if($jenisPembayaran == "lunas") {
+                        if($sisa == 0){
+                            $modelHistoriSummaryttamu->pembayaran = "PENUH (BOOKING)";
+                            $modelHistoriSummaryttamu->status_pembayaran = "LUNAS";
+                            $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeKoma($bayar);
+                        }
+                    }
+                    $modelHistoriSummaryttamu->tgl_uangmasuk = date('Y-m-d');
+                    $modelHistoriSummaryttamu->save(false);
                 }
 
                     // $modelPengunjung = new TBooking();

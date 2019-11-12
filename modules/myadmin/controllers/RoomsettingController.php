@@ -82,31 +82,32 @@ class RoomsettingController extends \yii\web\Controller
 
     public function actionUpdate($id)
     {
+        // $getdata = Logic::mappingKamar($id);
         $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post())) {
-            $model->id_type = $_POST['MMappingHarga']['id_type'];
-            $model->id_kategori_harga = $_POST['MMappingHarga']['id_kategori_harga'];
+        if (Yii::$app->request->post()) {
+            $model->nomor_kamar = $_POST['MMappingKamar']['nomor_kamar'];
+            $model->id_mapping_harga = $_POST['MMappingKamar']['id_mapping_harga'];
             $model->created_date = date('Y-m-d H:i:s');
             $model->created_by = Yii::$app->user->identity->nama;
             if ($model->save()) {
                 $hasil = array(
                     'status' => "success",
                     'header' => "Berhasil",
-                    'message' => "Kategori Harga Berhasil Di Update !",
+                    'message' => "Kamar Berhasil Di Update !",
                 );
                 echo json_encode($hasil);
                 die();
             }
         }
-        $kategoriharga=MKategoriHarga::find()->all();
-        $listDataharga=ArrayHelper::map($kategoriharga,'id','kategori_harga');
-        $typekamar=MType::find()->all();
-        $listDatatype=ArrayHelper::map($typekamar,'id','type');
+        // $kategoriharga=MKategoriHarga::find()->all();
+        // $listDataharga=ArrayHelper::map($kategoriharga,'id','kategori_harga');
+        // $typekamar=MType::find()->all();
+        // $listDatatype=ArrayHelper::map($typekamar,'id','type');
         return $this->renderPartial('update', [
             'model' => $model,
-            'id' => $id,
-            'listDataharga' => $listDataharga,
-            'listDatatype' => $listDatatype
+            'id' => $id
+            // 'listDataharga' => $listDataharga,
+            // 'listDatatype' => $listDatatype
         ]);
     }
 
@@ -224,5 +225,13 @@ class RoomsettingController extends \yii\web\Controller
         );
         echo json_encode($hasil);
         die();
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = MMappingKamar::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

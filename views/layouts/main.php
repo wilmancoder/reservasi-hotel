@@ -28,20 +28,34 @@ AppAsset::register($this);
   <?php $this->head() ?>
 
 </head>
+<style type="text/css">
+    .dashboard {
+        background-color: red;
+    }
+    .desc {
+        font-size: 14px;
+    }
+</style>
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
 <body class="hold-transition skin-yellow layout-top-nav">
 <?php $this->beginBody() ?>
 <div class="wrapper">
-    <?//= $this->render('info_timer.php'); ?>
+
     <?php
         $jamlogin = \Yii::$app->user->identity->sign_in;
         $res_jamlogin = date("Y-m-d H:i:s",strtotime($jamlogin));
-
         // $modelJamkerja = Logic::durasikerja($res_jamlogin);
-        // var_dump($modelJamkerja);exit;
+
+
+        $modelReminderbooking = Logic::reminderBooking();
+        $modelRemindercheckout = Logic::reminderCheckout();
+
+        // var_dump($modelReminder);exit;
     ?>
 
   <!-- <header class="main-header"> -->
+
+
     <?= $this->render('nav.php',[
         // 'modelJamkerja' => $modelJamkerja
     ]); ?>
@@ -52,8 +66,43 @@ AppAsset::register($this);
     <div class="container-fluid">
         <!-- <div class="container"> -->
         <section class="content-header">
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-3">
+                    <div class="info-boxz bg-aqua">
+                        <span class="info-boxz-icon"><i class="ion ion-android-clipboard"></i></span>
+                        <div class="info-boxz-content">
+                          <span class="info-boxz-text">Booking Reminder</span>
+                          <span class="info-boxz-number">Total <?= !empty($modelReminderbooking[0]['total']) ? $modelReminderbooking[0]['total'] : 0; ?></span>
+                          <div class="progress">
+                            <div class="progress-bar" style="width: 100%"></div>
+                          </div>
+                          <span class="progress-description desc">
+                            Checking in One Day Remaining
+                          </span>
+                      </div><!-- /.info-boxz-content -->
+                  </div><!-- /.info-boxz -->
+                </div>
+
+                <div class="col-md-3">
+                    <div class="info-boxz bg-aqua">
+                        <span class="info-boxz-icon"><i class="ion ion-log-out"></i></span>
+                        <div class="info-boxz-content">
+                          <span class="info-boxz-text">Checkout Reminder</span>
+                          <span class="info-boxz-number">Total <?= !empty($modelRemindercheckout[0]['total']) ? $modelRemindercheckout[0]['total'] : 0; ?></span>
+                          <div class="progress">
+                            <div class="progress-bar" style="width: 100%"></div>
+                          </div>
+                          <span class="progress-description desc">
+                            Checking in One Day Remaining
+                          </span>
+                      </div><!-- /.info-boxz-content -->
+                  </div><!-- /.info-boxz -->
+                </div>
+                <div class="col-md-3"></div>
+            </div>
           <?= Alert::widget() ?>
-      </section>
+        </section>
           <?= $content ?>
         <!-- </div> -->
     </div>
@@ -80,7 +129,7 @@ AppAsset::register($this);
         <div class="pull-right hidden-xs">
             <b>Version</b> 1.0
         </div>
-        <strong>Copyright © 2014-2019 <a href="https://www.telkom.co.id/">Telkom</a>.</strong> All rights
+        <strong>Copyright © 2019-2020 <a href="#">Millenia</a>.</strong> All rights
         reserved.
     </div>
     <!-- /.container -->

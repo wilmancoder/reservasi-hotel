@@ -55,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-4">
                     <label class="control-label labelcari">Cari</label>
                     <div class="form-group">
-                        <?= Html::button('<i class="fa fa-search" aria-hidden="true"></i> Cari', ['class' => 'btn btn-success btn-block', 'onClick' => 'reportpreview()']) ?>
+                        <?= Html::button('<i class="fa fa-search" aria-hidden="true"></i> Cari', ['class' => 'btn btn-success btn-block', 'onclick' => 'reportpreview()']) ?>
                     </div>
                 </div>
                 <?php ActiveForm::end(); ?>
@@ -67,8 +67,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         <thead>
                             <tr>
                                  <th>No.</th>
-                                 <th>Tanggal</th>
-                                 <th>Total</th>
+                                 <th>Nama Petugas</th>
+                                 <th>Jenis Pembayaran</th>
+                                 <th>Status Pembayaran</th>
+                                 <th>Tanggal Uang Masuk</th>
+                                 <th>Jumlah Uang Masuk</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,14 +85,48 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <script type="text/javascript">
     var t = null;
-
+    var posting = '<?= $posting?>';
     $(document).ready(function () {
         $('.form-tanggal').datepicker({
             format: 'yyyy-mm-dd',
             autoclose: true
         });
-        t = $('#tbl_report_all').DataTable();
-        // report_all();
+        t = $('#tbl_report_all').DataTable({
+            "processing": true,
+            // "serverSide": true,
+            "ordering": true,
+            // "paging": true,
+            // "info": false,
+            "searching": true,
+            columnDefs: [
+                { width: '5%', targets: 0 },
+                { width: '20%', targets: 1 },
+                { width: '15%', targets: 2 },
+                { width: '20%', targets: 3 },
+                { width: '15%', targets: 4 },
+                {
+                    width: '25%', targets: 5,
+                    targets: 5,
+                    className: 'dt-body-right'
+                },
+            ],
+            "ajax": {
+                "type": 'GET',
+                "dataType": "JSON",
+                "url": "<?=\Yii::$app->getUrlManager()->createUrl("myadmin/report/getdatareportall");?>?posting="+posting,
+            },
+            "columns": [
+
+                 {"data": "no"},
+                 {"data": "nama_petugas"},
+                 {"data": "pembayaran"},
+                 {"data": "status_pembayaran"},
+                 {"data": "tgl_uangmasuk"},
+                 {"data": "jml_uangmasuk"}
+
+
+             ],
+        });
     });
 
     function reportpreview() {
@@ -101,34 +138,67 @@ $this->params['breadcrumbs'][] = $this->title;
             contentType: false,
             processData: false,
             url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/report/listreportall'])?>",
-            beforeSend: function () {
-                swal({
-                    title: 'Harap Tunggu',
-                    text: "Sedang memproses",
-                    icon: 'info',
-                    buttons: {
-                        cancel: false,
-                        confirm: false,
-                    },
-                    closeOnClickOutside: false,
-                    onOpen: function () {
-                        swal.showLoading()
-                    },
-                    closeOnEsc: false,
-                });
-            },
-            complete: function () {
-                swal.close()
-            },
+
             success: function (result) {
-
-                swal(result.header, result.message, result.status);
-
-
+                if(result.status == 'success'){
+                    var posting = result.joinposting;
+                    // alert(posting); return false;
+                    reportAll(posting);
+                }
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 swal("Error!", "Terdapat Kesalahan saat memproses semua data laporan!", "error");
             }
         });
+    }
+
+    // function reportAll(posting)
+    // {
+    //     // alert(posting); return false;
+    //     var url = "<?php //echo \Yii::$app->getUrlManager()->createUrl("myadmin/report/loadtbl");?>?posting="+posting;
+    //     $('#tbl_report_all').load(url);
+    // }
+
+    function reportAll(posting)
+    {
+        t.destroy();
+
+        t = $('#tbl_report_all').DataTable({
+            "processing": true,
+            // "serverSide": true,
+            "ordering": true,
+            // "paging": true,
+            // "info": false,
+            "searching": true,
+            columnDefs: [
+                { width: '5%', targets: 0 },
+                { width: '20%', targets: 1 },
+                { width: '15%', targets: 2 },
+                { width: '20%', targets: 3 },
+                { width: '15%', targets: 4 },
+                {
+                    width: '25%', targets: 5,
+                    targets: 5,
+                    className: 'dt-body-right'
+                },
+            ],
+            "ajax": {
+                "type": 'GET',
+                "dataType": "JSON",
+                "url": "<?=\Yii::$app->getUrlManager()->createUrl("myadmin/report/getdatareportall");?>?posting="+posting,
+            },
+            "columns": [
+
+                 {"data": "no"},
+                 {"data": "nama_petugas"},
+                 {"data": "pembayaran"},
+                 {"data": "status_pembayaran"},
+                 {"data": "tgl_uangmasuk"},
+                 {"data": "jml_uangmasuk"}
+
+
+             ],
+        });
+
     }
 </script>

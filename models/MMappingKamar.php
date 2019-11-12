@@ -16,6 +16,7 @@ use Yii;
  */
 class MMappingKamar extends \yii\db\ActiveRecord
 {
+    public $type,$kategori_harga,$harga;
     /**
      * {@inheritdoc}
      */
@@ -32,7 +33,7 @@ class MMappingKamar extends \yii\db\ActiveRecord
         return [
             [['nomor_kamar', 'id_mapping_harga'], 'integer'],
             [['created_date'], 'safe'],
-            [['created_by', 'status'], 'string', 'max' => 50],
+            [['created_by', 'status','type','kategori_harga','harga'], 'string', 'max' => 50],
         ];
     }
 
@@ -46,6 +47,9 @@ class MMappingKamar extends \yii\db\ActiveRecord
             'nomor_kamar' => 'Nomor Kamar',
             'id_mapping_harga' => 'Id Mapping Harga',
             'status' => 'Status',
+            'type' => 'Type',
+            'kategori_harga' => 'Kategori Harga',
+            'harga' => 'Harga',
             'created_date' => 'Created Date',
             'created_by' => 'Created By',
         ];

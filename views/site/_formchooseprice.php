@@ -13,41 +13,44 @@
 </style>
 
 <div class="row">
-  <div class="col-md-1"></div>
-  <a href="#" onclick='javascript:setharga("<?= $model[0]['id'];?>")'>
-  <div class="col-md-4">
-    <!-- small box -->
-    <div class="small-boxz bg-aquaz">
-      <div class="inner">
-        <!-- <h3>Harga Reguler</h3> -->
-        <p>Harga</p>
-        <p><?= ucfirst($model[0]['kategori_harga']);?></p>
-      </div>
-      <div class="icon">
-        <i class="fa fa-tags fa-xs"></i>
-      </div>
-
-    </div>
-  </div>
-  </a>
-  <div class="col-md-2"></div>
-  <a href="#" onclick='javascript:setharga("<?= $model[1]['id'];?>")'>
-  <div class="col-md-4">
-    <!-- small box -->
-    <div class="small-boxz bg-aquaz">
-      <div class="inner">
-        <!-- <h3>Harga Reguler</h3> -->
-        <p>Harga</p>
-        <p><?= ucfirst($model[1]['kategori_harga']);?></p>
-      </div>
-      <div class="icon">
-        <i class="fa fa-tags fa-xs"></i>
-      </div>
-
-    </div>
-  </div>
-  </a>
-  <div class="col-md-1"></div>
+    <div class="col-md-1"></div>
+    <a href="#" onclick='javascript:setharga("<?= $model[0]['id'];?>")'>
+        <div class="col-md-5">
+            <div class="info-boxz bg-aqua">
+                <span class="info-boxz-icon"><i class="fa fa-tags"></i></span>
+                <div class="info-boxz-content">
+                  <span class="info-boxz-text">Setting Harga</span>
+                  <span class="info-boxz-number">Harga <?= ucfirst($model[0]['kategori_harga']);?></span>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 100%"></div>
+                  </div>
+                  <span class="progress-description desc">
+                    Setting ke kategori harga normal.
+                  </span>
+              </div><!-- /.info-boxz-content -->
+          </div><!-- /.info-boxz -->
+        </div>
+    </a>
+    <!-- <div class="col-md-2"></div> -->
+    <a href="#" onclick='javascript:setharga("<?= $model[1]['id'];?>")'>
+        <div class="col-md-5">
+            <div class="info-boxz bg-aqua">
+                <span class="info-boxz-icon"><i class="fa fa-tags"></i></span>
+                <div class="info-boxz-content">
+                  <span class="info-boxz-text">Setting Harga</span>
+                  <span class="info-boxz-number">Harga <?= ucfirst($model[1]['kategori_harga']);?></span>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 100%"></div>
+                  </div>
+                  <span class="progress-description desc">
+                    Setting ke kategori harga weekend.
+                  </span>
+              </div><!-- /.info-boxz-content -->
+          </div><!-- /.info-boxz -->
+        </div>
+    </a>
+    <div class="col-md-1"></div>
+  <!-- <div class="col-md-1"></div> -->
 </div>
 
 <script type="text/javascript">
