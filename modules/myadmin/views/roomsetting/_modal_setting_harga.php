@@ -28,6 +28,7 @@ use yii\helpers\Html;
 
 <script type="text/javascript">
 var t = null;
+var mode = '<?= $mode?>';
 $(document).ready(function () {
 
     t = $('#tbl_settingharga').DataTable();
@@ -78,7 +79,7 @@ function settingharga_preview()
 function terpilih(id){
     $.ajax({
              type: "GET",
-             url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/roomsetting/getpropsettingharga'])?>?id="+id,
+             url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/roomsetting/getpropsettingharga'])?>?id="+id+"&mode="+mode,
              //contentType: "application/json",
              dataType: "json",
              //async: false,
@@ -88,6 +89,7 @@ function terpilih(id){
                   var kategoriharga  = response.kategoriharga;
                   var type  = response.type;
                   var harga = response.harga;
+                  var modz = response.mode;
                   swal({
                      title: "Konfirmasi",
                      text: "Anda memilih Kategori Harga "+kategoriharga+", Type Kamar "+type+", dan Harga "+harga+" ?",
@@ -95,13 +97,23 @@ function terpilih(id){
                      buttons: true,
                      dangerMode: true,
                    }).then((konfirm) => {
-                     if (konfirm) {
-                             $('#mmappingkamar-id_mapping_harga').val(id);
-                             $('#mmappingkamar-type').val(kategoriharga);
-                             $('#mmappingkamar-kategori_harga').val(type);
-                             $('#mmappingkamar-harga').val(harga);
-                             $('#modalHargaId').modal('hide');
-                     }
+                        if (konfirm) {
+                            if(modz == 'create') {
+                                // alert("masuk1"); return false;
+                                $('#mmappingkamar-id_mapping_harga').val(id);
+                                $('#mmappingkamar-type').val(type);
+                                $('#mmappingkamar-kategori_harga').val(kategoriharga);
+                                $('#mmappingkamar-harga').val(harga);
+                                $('#modalHargaId').modal('hide');
+                            } else if(modz == 'update'){
+                                // alert("masuk2"); return false;
+                                $('#mmappingkamar-id_mapping_harga').val(id);
+                                $('#mtype-type').val(type);
+                                $('#mkategoriharga-kategori_harga').val(kategoriharga);
+                                $('#mmappingharga-harga').val(harga);
+                                $('#modalHargaId').modal('hide');
+                            }
+                        }
                    });
 
              },

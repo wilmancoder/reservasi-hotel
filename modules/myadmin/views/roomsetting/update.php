@@ -9,6 +9,10 @@
 
     <?= $this->render('_form', [
         'model' => $model,
+        'mode' => 'update',
+        'typekamar' => $typekamar,
+        'kategoriharga' => $kategoriharga,
+        'mappingharga' => $mappingharga,
         'id' => $id
     ]) ?>
 

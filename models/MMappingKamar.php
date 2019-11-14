@@ -54,4 +54,25 @@ class MMappingKamar extends \yii\db\ActiveRecord
             'created_by' => 'Created By',
         ];
     }
+
+    public function getMappingHarga()
+    {
+        return $this->hasOne(MMappingHarga::class, ['id' => 'id_mapping_harga']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getTypeKamar()
+    {
+        return $this->hasOne(MType::class, ['id' => 'id_type'])->via('mappingHarga');
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getKategoriHarga()
+    {
+        return $this->hasOne(MKategoriHarga::class, ['id' => 'id_kategori_harga'])->via('mappingHarga');
+    }
 }

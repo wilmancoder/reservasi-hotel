@@ -40,16 +40,28 @@ use yii\helpers\Html;
                                 <?= $form->field($model, 'nomor_kamar')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Masukkan nomor kamar ...']); ?>
                             </div>
                             <div class="form-group required">
-                                <?= $form->field($model, 'type')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Klik untuk setting harga ...']); ?>
+                                <?php if($mode == 'create') { ?>
+                                    <?= $form->field($model, 'type')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Klik untuk setting harga ...']); ?>
+                                <?php } else { ?>
+                                    <?= $form->field($typekamar, 'type')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Klik untuk setting harga ...']); ?>
+                                <?php } ?>
                                 <?= $form->field($model, 'id_mapping_harga')->hiddenInput(['maxlength' => true, 'class' => 'form-control'])->label(false); ?>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group required">
-                                <?= $form->field($model, 'kategori_harga')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Terisi Otomatis', 'readonly' => true]); ?>
+                                <?php if($mode == 'create') { ?>
+                                    <?= $form->field($model, 'kategori_harga')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Terisi Otomatis', 'readonly' => true]); ?>
+                                <?php } else { ?>
+                                    <?= $form->field($kategoriharga, 'kategori_harga')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Terisi Otomatis', 'readonly' => true]); ?>
+                                <?php } ?>
                             </div>
                             <div class="form-group required">
-                                <?= $form->field($model, 'harga')->textInput(['maxlength' => true, 'class' => 'form-control hargakamar', 'placeholder' => 'Terisi Otomatis', 'readonly' => true]); ?>
+                                <?php if($mode == 'create') { ?>
+                                    <?= $form->field($model, 'harga')->textInput(['maxlength' => true, 'class' => 'form-control hargakamar', 'placeholder' => 'Terisi Otomatis', 'readonly' => true]); ?>
+                                <?php } else { ?>
+                                    <?= $form->field($mappingharga, 'harga')->textInput(['maxlength' => true, 'class' => 'form-control hargakamar', 'placeholder' => 'Terisi Otomatis', 'readonly' => true]); ?>
+                                <?php } ?>
                             </div>
                         </div>
                     </div>
@@ -68,16 +80,26 @@ use yii\helpers\Html;
 <?php ActiveForm::end(); ?>
 
 <script type="text/javascript">
+var mode = '<?= $mode?>';
 $(document).ready(function () {
     $('.hargakamar').number( true );
     $(".select").select2();
 
 });
+if(mode == 'create'){
+    $('#mmappingkamar-type').on('click', function() {
+        var url = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/roomsetting/ceksettingharga']);?>?mode="+mode;
+        var title = "List Setting Harga";
+        showModalharga(url,title);
+    });
+} else {
+    $('#mtype-type').on('click', function() {
+        var url = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/roomsetting/ceksettingharga']);?>?mode="+mode;
+        var title = "List Setting Harga";
+        showModalharga(url,title);
+    });
+}
 
-$('#mmappingkamar-type').on('click', function() {
-    var url = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/roomsetting/ceksettingharga']);?>";
-    var title = "List Setting Harga";
-    showModalharga(url,title);
-});
+
 
 </script>

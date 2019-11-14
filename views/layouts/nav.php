@@ -124,18 +124,23 @@ $getsessionharga = $session->get('idharga');
                                     <!-- </a> -->
                                     <!-- <ul class="menu"> -->
                                         <li>
-                                            <a href="<?= Url::to(['/myadmin/roomsetting']); ?>">
-                                                <font color="white">Manajemen Kamar</font>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="<?= Url::to(['/myadmin/pricesetting']); ?>">
+                                            <a href="<?= Url::to(['/myadmin/pricesetting', 'idharga' => $getsessionharga]); ?>">
                                                 <font color="white">Manajemen Harga</font>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="<?= Url::to(['/myadmin/paysetting']); ?>">
+                                            <a href="<?= Url::to(['/myadmin/paysetting', 'idharga' => $getsessionharga]); ?>">
                                                 <font color="white">Manajemen Pembayaran</font>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="<?= Url::to(['/myadmin/roomsetting', 'idharga' => $getsessionharga]); ?>">
+                                                <font color="white">Manajemen Kamar</font>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="<?= Url::to(['/myadmin/usersetting', 'idharga' => $getsessionharga]); ?>">
+                                                <font color="white">Manajemen User</font>
                                             </a>
                                         </li>
                                     <!-- </ul> -->

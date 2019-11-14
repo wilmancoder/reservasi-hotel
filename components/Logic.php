@@ -341,7 +341,7 @@ class Logic extends Component
             ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
             ->where(['a.id' => $id])
             ->orderBy(['a.id' => SORT_ASC])
-            ->all();
+            ->one();
 
             return $data;
         } else {
@@ -366,6 +366,18 @@ class Logic extends Component
             ->from('m_mapping_harga a')
             ->join('INNER JOIN', 'm_type b', 'b.id = a.id_type')
             ->join('INNER JOIN', 'm_kategori_harga c', 'c.id = a.id_kategori_harga')
+            ->orderBy(['a.id' => SORT_ASC])
+            ->all();
+
+        return $data;
+    }
+
+    public static function mappingUser()
+    {
+        $data = (new \yii\db\Query())
+            ->select(['a.*', 'b.nm_shift'])
+            ->from('users a')
+            ->join('LEFT JOIN', 'm_shift b', 'b.id = a.id_shift')
             ->orderBy(['a.id' => SORT_ASC])
             ->all();
 

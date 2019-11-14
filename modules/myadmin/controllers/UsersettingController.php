@@ -14,7 +14,7 @@ use app\models\MMappingHarga;
 use app\models\MKategoriHarga;
 use app\models\MType;
 
-class PricesettingController extends \yii\web\Controller
+class UsersettingController extends \yii\web\Controller
 {
     public $user = null;
     public $notLogin = false;
@@ -134,10 +134,10 @@ class PricesettingController extends \yii\web\Controller
         // return $this->redirect(['adm/artikel']);
     }
 
-    public function actionGetdatapricesetting()
+    public function actionGetdatausersetting()
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = Logic::mappingPrice();
+        $model = Logic::mappingUser();
 
         // var_dump($model);exit;
         $row = array();
@@ -149,15 +149,16 @@ class PricesettingController extends \yii\web\Controller
                 $row[$i][$key] = $val;
             }
 
-            $row[$i]['kategoriharga'] = $value['kategori_harga'];
-            $row[$i]['type'] = $value['type'];
-            $row[$i]['harga'] = "Rp. " . \app\components\Logic::formatNumber($value['harga'], 0);
-            $row[$i]['created_date'] = $value['created_date'];
-            $row[$i]['created_by'] = $value['created_by'];
+            $row[$i]['username'] = $value['username'];
+            $row[$i]['nama'] = $value['nama'];
+            $row[$i]['email'] = $value['email'];
+            $row[$i]['role'] = $value['role'];
+            $row[$i]['nm_shift'] = $value['nm_shift'];
+            $row[$i]['updated_at'] = $value['updated_at'];
 
             $row[$i]['fungsi'] = "
-            <button onclick='updatepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Edit Harga' class='btn btn-sm btn-warning btn-flat'><i class='fa fa-edit'></i></button>
-            <button onclick='deletepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Hapus Harga' class='btn btn-sm btn-danger btn-flat'><i class='fa fa-trash'></i></button>
+            <button onclick='updatepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Edit User' class='btn btn-sm btn-warning btn-flat'><i class='fa fa-edit'></i></button>
+            <button onclick='deletepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Hapus User' class='btn btn-sm btn-danger btn-flat'><i class='fa fa-trash'></i></button>
             ";
 
             $i++;

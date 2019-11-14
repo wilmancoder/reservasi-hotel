@@ -44,7 +44,7 @@ class RoomsettingController extends \yii\web\Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['GET'],
                 ],
             ],
         ];
@@ -58,6 +58,9 @@ class RoomsettingController extends \yii\web\Controller
     public function actionCreate()
     {
         $model = new MMappingKamar();
+        $typekamar = $model->typeKamar;
+        $kategoriharga = $model->kategoriHarga;
+        $mappingharga = $model->mappingHarga;
         if ($model->load(Yii::$app->request->post())) {
             $model->nomor_kamar = $_POST['MMappingKamar']['nomor_kamar'];
             $model->id_mapping_harga = $_POST['MMappingKamar']['id_mapping_harga'];
@@ -76,15 +79,19 @@ class RoomsettingController extends \yii\web\Controller
         }
 
         return $this->renderPartial('create', [
-            'model' => $model
+            'model' => $model,
+            'mode' => 'create'
         ]);
     }
 
     public function actionUpdate($id)
     {
-        // $getdata = Logic::mappingKamar($id);
         $model = $this->findModel($id);
-        if (Yii::$app->request->post()) {
+        $typekamar = $model->typeKamar;
+        $kategoriharga = $model->kategoriHarga;
+        $mappingharga = $model->mappingHarga;
+
+        if ($model->load(Yii::$app->request->post())) {
             $model->nomor_kamar = $_POST['MMappingKamar']['nomor_kamar'];
             $model->id_mapping_harga = $_POST['MMappingKamar']['id_mapping_harga'];
             $model->created_date = date('Y-m-d H:i:s');
@@ -93,21 +100,20 @@ class RoomsettingController extends \yii\web\Controller
                 $hasil = array(
                     'status' => "success",
                     'header' => "Berhasil",
-                    'message' => "Kamar Berhasil Di Update !",
+                    'message' => "Setting Kamar Berhasil Di Update !",
                 );
                 echo json_encode($hasil);
                 die();
             }
         }
-        // $kategoriharga=MKategoriHarga::find()->all();
-        // $listDataharga=ArrayHelper::map($kategoriharga,'id','kategori_harga');
-        // $typekamar=MType::find()->all();
-        // $listDatatype=ArrayHelper::map($typekamar,'id','type');
+
         return $this->renderPartial('update', [
             'model' => $model,
+            'mode' => 'update',
+            'typekamar' => $typekamar,
+            'kategoriharga' => $kategoriharga,
+            'mappingharga' => $mappingharga,
             'id' => $id
-            // 'listDataharga' => $listDataharga,
-            // 'listDatatype' => $listDatatype
         ]);
     }
 
@@ -117,7 +123,7 @@ class RoomsettingController extends \yii\web\Controller
         $hasil = array(
             'status' => "success",
             'header' => "Berhasil",
-            'message' => "Kategori Harga Berhasil Di Hapus !",
+            'message' => "Setting Kamar Berhasil Di Hapus !",
         );
         echo json_encode($hasil);
         die();
@@ -159,9 +165,10 @@ class RoomsettingController extends \yii\web\Controller
         return $hasil;
     }
 
-    public function actionCeksettingharga()
+    public function actionCeksettingharga($mode)
     {
         return $this->renderPartial('_modal_setting_harga', [
+            'mode' => $mode
         ]);
     }
 
@@ -206,7 +213,7 @@ class RoomsettingController extends \yii\web\Controller
         return $hasil;
     }
 
-    public function actionGetpropsettingharga($id)
+    public function actionGetpropsettingharga($id,$mode)
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $cek_settingharga = (new \yii\db\Query())
@@ -221,7 +228,8 @@ class RoomsettingController extends \yii\web\Controller
             'id' => $cek_settingharga['id'],
             'kategoriharga' => $cek_settingharga['kategori_harga'],
             'type' => $cek_settingharga['type'],
-            'harga' => $cek_settingharga['harga']
+            'harga' => $cek_settingharga['harga'],
+            'mode' => $mode
         );
         echo json_encode($hasil);
         die();

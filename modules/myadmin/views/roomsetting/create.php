@@ -8,7 +8,8 @@
 <div class="roomsetting-create">
 
     <?= $this->render('_form', [
-        'model' => $model
+        'model' => $model,
+        'mode' => 'create'
     ]) ?>
 
 </div>
