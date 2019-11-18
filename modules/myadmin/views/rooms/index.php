@@ -127,8 +127,8 @@ opacity: 1;
                         <div class='inner'>
                             <h3>".$value['nomor_kamar']."</h3>
                             <p>".ucfirst($value['type'])."</p>
-                            <p style='margin-top:-10px;font-size:15px;color:yellow;position:absolute'>Sisa Waktu ".$waktu['text']."</p>
-                            
+
+
                         </div>
                         <div class='icon'>
                             <i class='ion ion-home'></i>

@@ -117,15 +117,15 @@ function user_preview()
     });
 }
 
-function addpricesetting() {
-     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/create']);?>";
-     var title = "Form Tambah Setting Harga";
+function addusersetting() {
+     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/create']);?>";
+     var title = "Form Tambah Setting User";
      showModal(url, title);
 }
 
-function updatepricesetting(id) {
-     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/update']);?>?id="+id;
-     var title = "Form Update Setting Harga";
+function updateusersetting(id) {
+     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/update']);?>?id="+id;
+     var title = "Form Update Setting User";
      showModal(url, title);
 }
 
@@ -142,80 +142,135 @@ function showModal(url, title) {
      return false;
 }
 
-function savesetharga() {
+function savesetuser(id) {
     {
-        swal({
-            title: "Konfirmasi",
-            text: "Anda yakin akan menambahkan Setting Harga?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then((ya) => {
-            if (ya) {
-                var _data = new FormData($("#form-pricesetting")[0]);
-                $.ajax({
-                    type: "POST",
-                    data: _data,
-                    dataType: "json",
-                    contentType: false,
-                    processData: false,
-                    url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/create'])?>",
-                    beforeSend: function () {
-                        swal({
-                            title: 'Harap Tunggu',
-                            text: "Sedang proses ...",
-                            icon: 'info',
-                            buttons: {
-                                cancel: false,
-                                confirm: false,
-                            },
-                            closeOnClickOutside: false,
-                            onOpen: function () {
-                                swal.showLoading()
-                            },
-                            closeOnEsc: false,
-                        });
-                    },
-                    complete: function () {
-                        swal.close()
-                    },
-                    success: function (result) {
+        if($('#users-nama').val()==''){
+            swal({
+                title: 'Perhatian !',
+                text: 'Nama Wajib Diisi.',
+                icon: "info",
+                dangerMode: true,
+            }).then((ya) => {
+                $('#users-nama').focus();
+            });
+            return false;
+        } else if($('#users-id_shift option:selected').val()==''){
+            swal({
+                title: 'Perhatian !',
+                text: 'Shift Wajib Di isi !',
+                icon: "info",
+                dangerMode: true,
+            }).then((ya) => {
+                $('#users-id_shift').focus();
+            });
+            return false;
+        } else if($('#users-username').val()==''){
+            swal({
+                title: 'Perhatian !',
+                text: 'Username Wajib Diisi.',
+                icon: "info",
+                dangerMode: true,
+            }).then((ya) => {
+                $('#users-username').focus();
+            });
+            return false;
+        } else if($('#users-password').val()==''){
+            swal({
+                title: 'Perhatian !',
+                text: 'Password Wajib Diisi.',
+                icon: "info",
+                dangerMode: true,
+            }).then((ya) => {
+                $('#users-password').focus();
+            });
+            return false;
+        } else if($('#users-role option:selected').val()=='empty'){
+            swal({
+                title: 'Perhatian !',
+                text: 'Role Wajib Di isi !',
+                icon: "info",
+                dangerMode: true,
+            }).then((ya) => {
+                $('#users-role').focus();
+            });
+            return false;
+        } else {
+            // return false;
 
-                        swal(result.header, result.message, result.status);
 
-                        if (result.status == "success") {
-                            window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/index'])?>";
+            swal({
+                title: "Konfirmasi",
+                text: "Anda yakin akan memproses User ini?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((ya) => {
+                if (ya) {
+                    var _data = new FormData($("#form-usersetting")[0]);
+                    $.ajax({
+                        type: "POST",
+                        data: _data,
+                        dataType: "json",
+                        contentType: false,
+                        processData: false,
+                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/create'])?>?id="+id,
+                        beforeSend: function () {
+                            swal({
+                                title: 'Harap Tunggu',
+                                text: "Sedang Proses ...",
+                                icon: 'info',
+                                buttons: {
+                                    cancel: false,
+                                    confirm: false,
+                                },
+                                closeOnClickOutside: false,
+                                onOpen: function () {
+                                    swal.showLoading()
+                                },
+                                closeOnEsc: false,
+                            });
+                        },
+                        complete: function () {
+                            swal.close()
+                        },
+                        success: function (result) {
+
+                            swal(result.header, result.message, result.status);
+
+                            if (result.status == "success") {
+                                window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/index'])?>";
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            swal("Error!", "Terdapat Kesalahan saat memproses check-in!", "error");
                         }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        swal("Error!", "Terdapat Kesalahan saat menambahkan Setting Harga!", "error");
-                    }
-                });
-            } else {
-                return false;
-            }
-        });
+                    });
+                } else {
+                    // swal("Informasi", "Dokumen Tidak Dihapus", "info");
+                }
+            });
+        }
     }
 }
 
-function updatesetharga(id) {
+function updatesetuser(id) {
      {
          swal({
              title: "Konfirmasi",
-             text: "Ubah Setting Harga ini?",
+             text: "Ubah Setting User ini?",
              icon: "warning",
              buttons: true,
              dangerMode: true,
          }).then((ya) => {
              if (ya) {
-                 var _data = new FormData($("#form-pricesetting")[0]);
+                 var _data = new FormData($("#form-usersetting")[0]);
                  $.ajax({
                      type: "POST",
                      data: _data,
                      dataType: "json",
                      contentType: false,
                      processData: false,
-                     url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/update'])?>?id=" + id,
+                     url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/update'])?>?id=" + id,
                      beforeSend: function () {
                          swal({
                              title: 'Harap Tunggu',
@@ -240,11 +295,11 @@ function updatesetharga(id) {
                          swal(result.header, result.message, result.status);
 
                          if (result.status == "success") {
-                             window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/index'])?>";
+                             window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/index'])?>";
                          }
                      },
                      error: function (xhr, ajaxOptions, thrownError) {
-                         swal("Error!", "Terdapat Kesalahan saat mengubah Setting Harga!", "error");
+                         swal("Error!", "Terdapat Kesalahan saat mengubah Setting User!", "error");
                      }
                  });
              } else {
@@ -254,11 +309,11 @@ function updatesetharga(id) {
      }
     }
 
-function deletepricesetting(id) {
+function deleteusersetting(id) {
  {
      swal({
          title: "Konfirmasi",
-         text: "Hapus Kategori Harga ini?",
+         text: "Hapus Setting User ini?",
          icon: "warning",
          buttons: true,
          dangerMode: true,
@@ -270,11 +325,11 @@ function deletepricesetting(id) {
                  dataType: "json",
                  contentType: false,
                  processData: false,
-                 url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/delete'])?>?id=" + id,
+                 url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/delete'])?>?id=" + id,
                  beforeSend: function () {
                      swal({
                          title: 'Harap Tunggu',
-                         text: "Sedang Menghapus Kategori Harga",
+                         text: "Sedang Proses ...",
                          icon: 'info',
                          buttons: {
                              cancel: false,
@@ -295,11 +350,11 @@ function deletepricesetting(id) {
                      swal(result.header, result.message, result.status);
 
                      if (result.status == "success") {
-                         window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/pricesetting/index'])?>";
+                         window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/index'])?>";
                      }
                  },
                  error: function (xhr, ajaxOptions, thrownError) {
-                     swal("Error!", "Terdapat Kesalahan saat menghapus Kategori Harga!", "error");
+                     swal("Error!", "Terdapat Kesalahan saat menghapus Setting User!", "error");
                  }
              });
          } else {

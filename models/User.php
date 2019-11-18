@@ -2,9 +2,11 @@
 
 namespace app\models;
 
+use Yii;
+use yii\db\ActiveRecord;
 // use app\models\MShift;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
     public $id;
     public $username;

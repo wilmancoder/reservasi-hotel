@@ -11,7 +11,6 @@
   height: 130px;
 }
 </style>
-
 <div class="row">
     <div class="col-md-1"></div>
     <a href="#" onclick='javascript:setharga("<?= $model[0]['id'];?>")'>

@@ -10,9 +10,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\helpers\ArrayHelper;
 use app\components\Logic;
-use app\models\MMappingHarga;
-use app\models\MKategoriHarga;
-use app\models\MType;
+use app\models\MShift;
 
 class UsersettingController extends \yii\web\Controller
 {
@@ -60,33 +58,31 @@ class UsersettingController extends \yii\web\Controller
 
     public function actionCreate()
     {
-        $model = new MMappingHarga();
+        $model = new Users();
         if ($model->load(Yii::$app->request->post())) {
-            $harga = $_POST['MMappingHarga']['harga'];
-            $model->id_type = $_POST['MMappingHarga']['id_type'];
-            $model->id_kategori_harga = $_POST['MMappingHarga']['id_kategori_harga'];
-            $model->harga = Logic::removeKoma($harga);
-
-            $model->created_date = date('Y-m-d H:i:s');
-            $model->created_by = Yii::$app->user->identity->nama;
+            $model->username = $_POST['Users']['username'];
+            $model->nama = $_POST['Users']['nama'];
+            $model->email = $_POST['Users']['email'];
+            $model->role = $_POST['Users']['role'];
+            $model->id_shift = $_POST['Users']['id_shift'];
+            $model->password = sha1($_POST['Users']['password']);
+            $model->created_at = date('Y-m-d H:i:s');
             if ($model->save()) {
                 $hasil = array(
                     'status' => "success",
                     'header' => "Berhasil",
-                    'message' => "Setting Harga Berhasil Di input !",
+                    'message' => "Setting User Berhasil Di input !",
                 );
                 echo json_encode($hasil);
                 die();
             }
         }
-        $kategoriharga=MKategoriHarga::find()->all();
-        $listDataharga=ArrayHelper::map($kategoriharga,'id','kategori_harga');
-        $typekamar=MType::find()->all();
-        $listDatatype=ArrayHelper::map($typekamar,'id','type');
+        $modelShift=MShift::find()->all();
+        $listShift=ArrayHelper::map($modelShift,'id','nm_shift');
+
         return $this->renderPartial('create', [
             'model' => $model,
-            'listDataharga' => $listDataharga,
-            'listDatatype' => $listDatatype
+            'listShift' => $listShift
         ]);
     }
 
@@ -94,30 +90,30 @@ class UsersettingController extends \yii\web\Controller
     {
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
-            $model->id_type = $_POST['MMappingHarga']['id_type'];
-            $model->id_kategori_harga = $_POST['MMappingHarga']['id_kategori_harga'];
-            $model->harga = Logic::removeKoma($_POST['MMappingHarga']['harga']);
-            $model->created_date = date('Y-m-d H:i:s');
-            $model->created_by = Yii::$app->user->identity->nama;
+            $model->username = $_POST['Users']['username'];
+            $model->nama = $_POST['Users']['nama'];
+            $model->email = $_POST['Users']['email'];
+            $model->role = $_POST['Users']['role'];
+            $model->id_shift = $_POST['Users']['id_shift'];
+            $model->password = sha1($_POST['Users']['password']);
+            $model->updated_at = date('Y-m-d H:i:s');
             if ($model->save()) {
                 $hasil = array(
                     'status' => "success",
                     'header' => "Berhasil",
-                    'message' => "Kategori Harga Berhasil Di Update !",
+                    'message' => "Setting User Berhasil Di Update !",
                 );
                 echo json_encode($hasil);
                 die();
             }
         }
-        $kategoriharga=MKategoriHarga::find()->all();
-        $listDataharga=ArrayHelper::map($kategoriharga,'id','kategori_harga');
-        $typekamar=MType::find()->all();
-        $listDatatype=ArrayHelper::map($typekamar,'id','type');
+        $modelShift=MShift::find()->all();
+        $listShift=ArrayHelper::map($modelShift,'id','nm_shift');
+
         return $this->renderPartial('update', [
             'model' => $model,
             'id' => $id,
-            'listDataharga' => $listDataharga,
-            'listDatatype' => $listDatatype
+            'listShift' => $listShift
         ]);
     }
 
@@ -127,7 +123,7 @@ class UsersettingController extends \yii\web\Controller
         $hasil = array(
             'status' => "success",
             'header' => "Berhasil",
-            'message' => "Kategori Harga Berhasil Di Hapus !",
+            'message' => "Setting User Berhasil Di Hapus !",
         );
         echo json_encode($hasil);
         die();
@@ -157,8 +153,8 @@ class UsersettingController extends \yii\web\Controller
             $row[$i]['updated_at'] = $value['updated_at'];
 
             $row[$i]['fungsi'] = "
-            <button onclick='updatepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Edit User' class='btn btn-sm btn-warning btn-flat'><i class='fa fa-edit'></i></button>
-            <button onclick='deletepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Hapus User' class='btn btn-sm btn-danger btn-flat'><i class='fa fa-trash'></i></button>
+            <button onclick='updateusersetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Edit User' class='btn btn-sm btn-warning btn-flat'><i class='fa fa-edit'></i></button>
+            <button onclick='deleteusersetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Hapus User' class='btn btn-sm btn-danger btn-flat'><i class='fa fa-trash'></i></button>
             ";
 
             $i++;
@@ -171,7 +167,7 @@ class UsersettingController extends \yii\web\Controller
 
     protected function findModel($id)
     {
-        if (($model = MMappingHarga::findOne($id)) !== null) {
+        if (($model = Users::findOne($id)) !== null) {
             return $model;
         }
         throw new NotFoundHttpException('The requested page does not exist.');

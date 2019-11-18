@@ -64,10 +64,14 @@ class SiteController extends Controller
      */
      public function actionIndex()
      {
-         if (Yii::$app->user->isGuest)
-             return $this->redirect(['site/login']);
-
-         return $this->redirect(['site/chooseprice']);
+        if (Yii::$app->user->isGuest)
+            return $this->redirect(['site/login']);
+        $rolebase = \Yii::$app->user->identity->role;
+        if($rolebase == 1) {
+            return $this->redirect(['site/chooseprice']);
+        } else {
+            return $this->redirect(['/myadmin/report/indexall']);
+        }
      }
 
     public function actionHome()
@@ -86,7 +90,6 @@ class SiteController extends Controller
         return $this->render('chooseprice', [
             'model' => $model
         ]);
-        // return $this->render('chooseprice');
     }
 
     public function actionGetchooseprice()

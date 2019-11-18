@@ -113,8 +113,8 @@ use yii\helpers\Html;
                 </div>
             </div>
             <hr>
-            <div class="box box-warning">
-                <div class="box-body">
+            <div class="box box-warning" id="wadahkamar-id">
+                <div class="box-body" id="listkamar-id">
                     <div class='row'>
                         <div class='col-md-2'>
                             <label class="control-label">Nomor Kamar</label>
@@ -278,7 +278,6 @@ use yii\helpers\Html;
                                 <div class="form-group">
                                       <input type="checkbox" name="pelunasan" class="idpelunasan" value="pelunasan">
                                       <span>Ceklist jika anda telah menerima pelunasan pembayaran.</span>
-                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -288,7 +287,6 @@ use yii\helpers\Html;
                                 <div class="form-group">
                                       <input type="checkbox" name="pelunasan" class="idpelunasan" value="pelunasan">
                                       <span>Ceklist jika anda telah menerima pelunasan pembayaran.</span>
-                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -335,8 +333,9 @@ use yii\helpers\Html;
             type: "GET",
             url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/setkamar'])?>?id="+id+'&tipe='+tipe,
             success: function(data) {
-                $('#body-setting').html(data);
-                $('#modal-edit').modal('show');
+                $('#modalPilihkamarBody').html(data);
+                $('#modalPilihkamarId').modal({backdrop: 'static', keyboard: false});
+                $('#modalPilihkamarId').modal('show');
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 swal("Error submiting!", "Please try again", "error");
@@ -520,6 +519,9 @@ use yii\helpers\Html;
     //     // End check radio button
     // }
 
+    $(document).on('hidden.bs.modal', '.modal', function () {
+        $('.modal:visible').length && $(document.body).addClass('modal-open');
+    });
 
     $("#ttamu-dp").keyup(function(){
         var total = $("#ttamu-totalharga").val();

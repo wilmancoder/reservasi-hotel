@@ -170,7 +170,21 @@ use yii\helpers\Html;
                     // 'novalidate' => 'novalidate'
                 ]
             ]); ?>
+
             <div class="box-body">
+                <div class='row'>
+                    <div class='col-md-12'>
+                        <?php if($tipe == 1) { ?>
+                            <div class='form-group'>
+                                <label class="control-label title">Kategori Harga Normal</label>
+                            </div>
+                        <?php } else { ?>
+                            <div class='form-group'>
+                                <label class="control-label title">Kategori Harga Weekend</label>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
                 <div class='row'>
                     <div class='col-md-2'>
                         <label class="control-label">Nomor Kamar</label>
@@ -230,7 +244,7 @@ use yii\helpers\Html;
                     ";
 
                 }
-                ?>  
+                ?>
                 <!-- <hr> -->
             </div>
             <input type="hidden" name="id" id="id-kamar" value="<?= $id ?>">
@@ -243,16 +257,17 @@ use yii\helpers\Html;
                     <a class="nav-link" href="#pindah_kamar" role="tab" data-toggle="tab">Pindah Kamar</a>
                 </li>
             </ul>
-
+            </br>
                 <!-- Tab panes -->
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade in active" id="tambah_durasi">
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Tambah Berapa hari ?</label>
+                        <label class="control-label" for="exampleInputEmail1">Tambah Berapa hari ?</label>
                         <input type="number" class="form-control" id="jumah_hari"  placeholder="HARI">
                     </div>
                     <div class="form-group">
-                        <button type="button" id="btn-durasi" class="btn btn-success pull-right"><i class="fa fa-floppy-o" aria-hidden="true"></i> save</button>
+                        <button type="button" id="btn-durasi" class="btn btn-success pull-right"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+                        <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
                     </div>
                 </div>
                 <div role="tabpanel" class="tab-pane fade" id="pindah_kamar">
@@ -261,24 +276,39 @@ use yii\helpers\Html;
                             <div class="box-body">
                                 <div class="row">
                                     <div class="col-md-12" id="kolomrole">
+                                        <?php if($tipe == 1) { ?>
+                                            <div class="form-group">
+                                                  <input type="checkbox" name="weekend" class="clweekend" value="2" lawan="1">
+                                                  <span>Ceklist jika ingin dirubah ke kategori <strong>Harga Weekend.</strong></span>
+                                            </div>
+                                        <?php } else { ?>
+                                            <div class="form-group">
+                                                  <input type="checkbox" name="normal" class="clnormal" value="1" lawan="2">
+                                                  <span>Ceklist jika ingin dirubah ke kategori <strong>Harga Normal.</strong></span>
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12" id="kolomrole">
                                         <div class="row fit" id="kolomrole0">
                                             <div class="col-md-3">
-                                                <div class="form-group required">
+                                                <div class="form-group required" id="divgantikamar">
                                                     <label class="control-label" required>List Kamar </label>
-                                                    <select class="form-control select validate[required] pilih_kamar" urutan='0' name="TTamu[list_kamar]">
-                                                    <option>Pilih Kamar ...</option>
+                                                    <select id="gantikamar-id" class="form-control select validate[required] pilih_kamar" urutan='0' name="TTamu[list_kamar]">
+                                                    <option selected='selected'>Pilih Kamar ...</option>
                                                     <?php
                                                     foreach ($listkamar as $idx => $value) {
-                                                        $selected = '';
-                                                        if($value['id'] == $id){
-                                                            $selected = 'selected';
-                                                        }
+                                                        // $selected = '';
+                                                        // if($value['id'] == $id){
+                                                        //     $selected = 'selected';
+                                                        // }
                                                     ?>
-                                                        <option value="<?php echo $value['id'];?>" harga="<?= $value['harga'] ?>" nomor_kamar="<?= $value['nomor_kamar'] ?>" <?= $selected ?>>Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>
+                                                        <option value="<?php echo $value['id'];?>" harga="<?= $value['harga'] ?>" nomor_kamar="<?= $value['nomor_kamar'] ?>">Kamar <?php echo $value['nomor_kamar'];?> / <?php echo $value['type'];?></option>
                                                     <?php } ?>
 
                                                     </select>
-                                                    
+
                                                 </div>
                                             </div>
                                             <div class="col-md-2">
@@ -312,21 +342,23 @@ use yii\helpers\Html;
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
-                            <button type="button" id="btn-ganti" class="btn btn-success pull-right"><i class="fa fa-floppy-o" aria-hidden="true"></i> save</button>
+                            <button type="button" id="btn-ganti" class="btn btn-success pull-right"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+                            <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
                         </div>
                     </div>
                 </div>
             </div>
 
-                
+
             <?php ActiveForm::end(); ?>
 
         </div>
     </div>
 </div>
 <script type="text/javascript">
+    var id = <?= $id?>;
     var vv = 0;
     $(document).ready(function () {
         $('#btn-durasi').click(function(){
@@ -355,9 +387,13 @@ use yii\helpers\Html;
                 },
                 success: function(result) {
                     swal(result.header, result.message, result.status);
-
+                    // alert(result.idtamu); return false;
                     if (result.status == "success") {
-                        window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
+                        $('#modalPilihkamarId').modal('hide');
+                        var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
+                        var title = "Form Check-out";
+                        showModalRooms(url,title);
+                        // window.location = "<?//=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
                     }
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
@@ -365,7 +401,21 @@ use yii\helpers\Html;
                 }
             });
         });
-        
+
+        function showModalRooms(url,title)
+          {
+              $("#modalRoomsTitle").empty();
+              $("#modalRoomsTitle").html(title);
+
+              $("#modalRoomsBody").empty();
+              $("#modalRoomsBody").html("Loading ...");
+              $("#modalRoomsBody").load(url);
+
+              $('#modalRoomsId').modal({backdrop: 'static', keyboard: false});
+              $("#modalRoomsId").modal("show");
+              return false;
+        }
+
         $('#btn-ganti').click(function(){
             var id = $('#id-kamar').val();
             var tipe = $('#tipe').val();
@@ -433,6 +483,176 @@ use yii\helpers\Html;
 
 
         setDefault();
+    });
+
+    $(document).on('change','.clweekend',function(){
+        if ($(this).is(':checked')) {
+            var tipe = $('.clweekend').val();
+            $.ajax({
+                type: "GET",
+                dataType :'json',
+                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/gantikategoriharga'])?>?id="+id+"&tipe="+tipe,
+                beforeSend: function () {
+                    swal({
+                        title: 'Harap Tunggu',
+                        text: "Sedang Proses ...",
+                        icon: 'info',
+                        buttons: {
+                            cancel: false,
+                            confirm: false,
+                        },
+                        closeOnClickOutside: false,
+                        onOpen: function () {
+                            swal.showLoading()
+                        },
+                        closeOnEsc: false,
+                    });
+                },
+                complete: function () {
+                    swal.close()
+                },
+                success: function(result) {
+
+                    $('#ttamu-hargaperkamar0').val('');
+                    $('#gantikamar-id').empty();
+                    // var options=$('<select>');
+                    $('#gantikamar-id').append($('<option>').text("Pilih Kamar ..."));
+                    $.each(result.listkamar, function(i, obj) {
+                        $('#gantikamar-id').append($('<option>').text('Kamar '+obj.nomor_kamar+' / '+obj.type).attr('value', obj.id).attr('harga', obj.harga).attr('nomor_kamar', obj.nomor_kamar));
+                    });
+
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    swal("Error submiting!", "Please try again", "error");
+                }
+            });
+
+        } else if (!$(this).is(':checked')) {
+            var tipe = $(".clweekend").attr("lawan");
+            $.ajax({
+                type: "GET",
+                dataType :'json',
+                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/gantikategoriharga'])?>?id="+id+"&tipe="+tipe,
+                beforeSend: function () {
+                    swal({
+                        title: 'Harap Tunggu',
+                        text: "Sedang Proses ...",
+                        icon: 'info',
+                        buttons: {
+                            cancel: false,
+                            confirm: false,
+                        },
+                        closeOnClickOutside: false,
+                        onOpen: function () {
+                            swal.showLoading()
+                        },
+                        closeOnEsc: false,
+                    });
+                },
+                complete: function () {
+                    swal.close()
+                },
+                success: function(result) {
+
+                    $('#ttamu-hargaperkamar0').val('');
+                    $('#gantikamar-id').empty();
+                    // var options=$('<select>');
+                    $('#gantikamar-id').append($('<option>').text("Pilih Kamar ..."));
+                    $.each(result.listkamar, function(i, obj) {
+                        $('#gantikamar-id').append($('<option>').text('Kamar '+obj.nomor_kamar+' / '+obj.type).attr('value', obj.id).attr('harga', obj.harga).attr('nomor_kamar', obj.nomor_kamar));
+                    });
+
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    swal("Error submiting!", "Please try again", "error");
+                }
+            });
+        }
+
+    });
+
+    $(document).on('change','.clnormal',function(){
+        if ($(this).is(':checked')) {
+            var tipe = $('.clnormal').val();
+            $.ajax({
+                type: "GET",
+                dataType :'json',
+                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/gantikategoriharga'])?>?id="+id+"&tipe="+tipe,
+                beforeSend: function () {
+                    swal({
+                        title: 'Harap Tunggu',
+                        text: "Sedang Proses ...",
+                        icon: 'info',
+                        buttons: {
+                            cancel: false,
+                            confirm: false,
+                        },
+                        closeOnClickOutside: false,
+                        onOpen: function () {
+                            swal.showLoading()
+                        },
+                        closeOnEsc: false,
+                    });
+                },
+                complete: function () {
+                    swal.close()
+                },
+                success: function(result) {
+                    $('#ttamu-hargaperkamar0').val('');
+                    $('#gantikamar-id').empty();
+                    // var options=$('<select>');
+                    $('#gantikamar-id').append($('<option>').text("Pilih Kamar ..."));
+                    $.each(result.listkamar, function(i, obj) {
+                        $('#gantikamar-id').append($('<option>').text('Kamar '+obj.nomor_kamar+' / '+obj.type).attr('value', obj.id).attr('harga', obj.harga).attr('nomor_kamar', obj.nomor_kamar));
+                    });
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    swal("Error submiting!", "Please try again", "error");
+                }
+            });
+
+        } else if (!$(this).is(':checked')) {
+            var tipe = $(".clweekend").attr("lawan");
+            $.ajax({
+                type: "GET",
+                dataType :'json',
+                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/gantikategoriharga'])?>?id="+id+"&tipe="+tipe,
+                beforeSend: function () {
+                    swal({
+                        title: 'Harap Tunggu',
+                        text: "Sedang Proses ...",
+                        icon: 'info',
+                        buttons: {
+                            cancel: false,
+                            confirm: false,
+                        },
+                        closeOnClickOutside: false,
+                        onOpen: function () {
+                            swal.showLoading()
+                        },
+                        closeOnEsc: false,
+                    });
+                },
+                complete: function () {
+                    swal.close()
+                },
+                success: function(result) {
+
+                    $('#ttamu-hargaperkamar0').val('');
+                    $('#gantikamar-id').empty();
+                    // var options=$('<select>');
+                    $('#gantikamar-id').append($('<option>').text("Pilih Kamar ..."));
+                    $.each(result.listkamar, function(i, obj) {
+                        $('#gantikamar-id').append($('<option>').text('Kamar '+obj.nomor_kamar+' / '+obj.type).attr('value', obj.id).attr('harga', obj.harga).attr('nomor_kamar', obj.nomor_kamar));
+                    });
+
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    swal("Error submiting!", "Please try again", "error");
+                }
+            });
+        }
+
     });
 
     function formattingFirstDate(){

@@ -524,14 +524,19 @@ class Logic extends Component
     public static function reminderBooking()
     {
         $curdate = date('Y-m-d');
+        $formathasil = [];
         $cekbooking = TBooking::find()->asArray()->all();
         foreach ($cekbooking as $key => $value) {
             $hasil[] = $value['checkin'];
             $formathasil[] = date("Y-m-d",strtotime($value['checkin']. "-1 days"));
         }
-        $result = array_values(array_filter($formathasil, function($v){
-            return $v == date('Y-m-d');
-        }));
+        if(!empty($formathasil)) {
+            $result = array_values(array_filter($formathasil, function($v){
+                return $v == date('Y-m-d');
+            }));
+        } else {
+            return 0;
+        }
 
         foreach ($result as $keyz => $val) {
             $format[] = date("Y-m-d",strtotime($val. "+1 days"));
@@ -555,14 +560,19 @@ class Logic extends Component
     public static function reminderCheckout()
     {
         $curdate = date('Y-m-d');
+        $formathasil = [];
         $cektamu = TTamu::find()->asArray()->all();
         foreach ($cektamu as $key => $value) {
             $hasil[] = $value['checkout'];
             $formathasil[] = date("Y-m-d",strtotime($value['checkout']. "-1 days"));
         }
-        $result = array_values(array_filter($formathasil, function($v){
-            return $v == date('Y-m-d');
-        }));
+        if(!empty($formathasil)) {
+            $result = array_values(array_filter($formathasil, function($v){
+                return $v == date('Y-m-d');
+            }));
+        } else {
+            return 0;
+        }
 
         foreach ($result as $keyz => $val) {
             $format[] = date("Y-m-d",strtotime($val. "+1 days"));

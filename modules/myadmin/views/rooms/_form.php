@@ -375,10 +375,11 @@ use yii\helpers\Html;
 </div>
 <script type="text/javascript">
     var ambilhargaperkamar = <?= $ambilharga?>;
+    var cekShift = <?= \Yii::$app->user->identity->id_shift; ?>;
     var vv = 0;
     $(document).ready(function () {
         formattingFirstDate();
-        formattingSecondDate();
+        formattingSecondDate(cekShift);
         $(".pilih").select2();
 
         $(".select").select2();
@@ -395,7 +396,7 @@ use yii\helpers\Html;
 
         $('#ttamu-hargaperkamar0').val(ambilhargaperkamar);
         $('#firstDate0').val(formattingFirstDate());
-        $('#secondDate0').val(formattingSecondDate());
+        $('#secondDate0').val(formattingSecondDate(cekShift));
         $('#ttamu-durasi0').val(1);
         $('#ttamu-subtotalkamar0').val(ambilhargaperkamar);
 
@@ -416,11 +417,16 @@ use yii\helpers\Html;
         return output;
     }
 
-    function formattingSecondDate(){
+    function formattingSecondDate(cekShift){
+        // alert(cekShift); return false;
         var d = new Date();
 
         var month = d.getMonth()+1;
-        var day = d.getDate()+1;
+        if(cekShift == 3) {
+            var day = d.getDate();
+        } else {
+            var day = d.getDate()+1;
+        }
 
         var output = d.getFullYear() + '-' +
             ((''+month).length<2 ? '0' : '') + month + '-' +
@@ -440,14 +446,28 @@ use yii\helpers\Html;
         total();
     }
 
-    function hitungDurasi(id=null)
+    function hitungDurasi(id=null,cekShift=null)
     {
         const hasil = 0;
+        const diffDays = 1;
+        var first = $("#firstDate"+id).val();
+        var second = $("#secondDate"+id).val();
         const start= new Date($("#firstDate"+id).val());
         const end= new Date($("#secondDate"+id).val());
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays;
+        if(cekShift == 3) {
+            if(first == second){
+                return diffDays;
+            } else {
+                const diffTime = Math.abs(end - start);
+                const refdiffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffDays = refdiffDays + 1;
+                return diffDays;
+            }
+        } else {
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
     }
 
     function setDefault()
@@ -659,14 +679,14 @@ use yii\helpers\Html;
         var urutan = $(this).attr('urutan');
         $('#summaryttamu-dp').val(0);
         $('#summaryttamu-dp').number(true);
-        field_kamar(urutan);
+        field_kamar(urutan,cekShift);
 
         // prosesharga(hasil, jmlkamar);
     });
 
-    function field_kamar(urutan){
-        var hasil = hitungDurasi(urutan);
-        // alert(hasil);
+    function field_kamar(urutan,cekShift=null){
+        // alert(cekShift); return false;
+        var hasil = hitungDurasi(urutan,cekShift);
         var hargakamar = $('#ttamu-hargaperkamar'+urutan).val();
         var jmlkamar = $('#ttamu-list_kamar'+urutan).val();
         var subtotal = hargakamar * hasil;

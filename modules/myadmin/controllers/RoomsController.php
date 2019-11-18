@@ -372,7 +372,7 @@ class RoomsController extends \yii\web\Controller
 
     public function actionCreatedone($idttamu){
         $exp = explode(",",$idttamu);
-        // var_dump($exp);exit;
+        // var_dump($idttamu);exit;
         $que1 = MMappingKamar::find()->where(['id'=>$exp[0]])->asArray()->one();
         // var_dump($que1);exit;
         $quetamu = TTamu::find()->where(['id_mapping_kamar' => $que1['id'], 'status' => 1])->asArray()->one();
@@ -527,16 +527,56 @@ class RoomsController extends \yii\web\Controller
             'tipe' => $tipe,
             'listkamar' => $listkamar,
             'model' => $model,
-            'model2' => $model2
+            'model2' => $model2,
+            'status' => "success"
         ]);
 
     }
+
+    public function actionGantikategoriharga($id,$tipe)
+    {
+
+        $model = new TTamu();
+        $model->checkin = date('Y-m-d');
+        $getkategorikamar = MMappingHarga::find()->where(['id_kategori_harga' => $tipe])->asArray()->all();
+        // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
+        foreach ($getkategorikamar as $key => $valueKategori) {
+            $resultKategori[] = $valueKategori['id'];
+        }
+        $imp = implode(",",$resultKategori);
+        // $ambilDatatamu = Logic::dataTamuOne($id);
+        // $model2 = new SummaryTtamu();
+
+        $listkamar = (new \yii\db\Query())
+            ->select(['a.id', 'a.nomor_kamar', 'c.type', 'b.harga'])
+            ->from('m_mapping_kamar a')
+            ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
+            ->join('INNER JOIN', 'm_type c', 'c.id = b.id_type')
+            ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
+            ->where('a.id_mapping_harga IN('.$imp.')')
+            ->andWhere(['<>', 'a.status', 'terisi'])
+            ->groupBy('a.nomor_kamar')
+            ->orderBy(['a.nomor_kamar' => SORT_ASC])
+            ->all();
+
+        // var_dump($listkamar);exit;
+        $hasil = [
+            // 'status' => "success",
+            'listkamar' => $listkamar
+
+        ];
+        echo json_encode($hasil);
+    }
+
     public function actionTambahdurasi($id,$tipe,$hari)
     {
         $ambilDatatamu = Logic::dataTamuOne($id);
+        $idbio = $ambilDatatamu[0]['id_biodata_tamu'];
+        $idttamu = $idbio.",".$tipe;
+        // var_dump($idtamu);exit;
+
         $harga_tambahan = $ambilDatatamu[0]['harga'] * $hari;
         $mapPembayaran = MMappingPembayaran::find()->where(['id_metode_pembayaran' => $tipe, 'id_jenis_pembayaran' => 2])->one();
-        // var_dump($mapPembayaran->id);exit;
         $model = TTamu::find()->where(['id' => $id])->one();
         $model->id_mapping_pembayaran = $mapPembayaran->id;
         $model->checkout = date('Y-m-d', strtotime($model->checkout . ' +'.$hari.' day'));
@@ -552,6 +592,7 @@ class RoomsController extends \yii\web\Controller
             }
             else{
                 $model2->total_harga =  (string)($model2->total_harga + $harga_tambahan);
+                $model2->sisa = (string)($model2->total_harga - $model2->dp);
             }
             $model2->total_bayar = $model2->total_harga;
             $model2->save();
@@ -561,6 +602,7 @@ class RoomsController extends \yii\web\Controller
             'status' => "success",
             'header' => "Berhasil",
             'message' => "Checkin Berhasil Diproses !",
+            'idttamu' => $idttamu,
             'cek1' => $model->getErrors(),
             'cek2' => @$model2->getErrors()
 
