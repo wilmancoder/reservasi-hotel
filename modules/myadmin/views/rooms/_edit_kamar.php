@@ -228,6 +228,7 @@ use yii\helpers\Html;
                             <div class='col-md-2'>
                                 <div class='form-group required'>
                                     <input type='text' class='form-control' name='harga' value='"."Rp. " . \app\components\Logic::formatNumber($value['harga'], 0)."' disabled='true'>
+                                    <input type='hidden' name='katharga' id='katharga' value='".$value['harga']."'>
                                 </div>
                             </div>
                             <div class='col-md-2'>
@@ -263,7 +264,11 @@ use yii\helpers\Html;
                 <div role="tabpanel" class="tab-pane fade in active" id="tambah_durasi">
                     <div class="form-group">
                         <label class="control-label" for="exampleInputEmail1">Tambah Berapa hari ?</label>
-                        <input type="number" class="form-control" id="jumah_hari"  placeholder="HARI">
+                        <input type="number" class="form-control" id="jumah_hari" value=0  placeholder="HARI" flag='normalhari'>
+                    </div>
+                    <div class="form-group">
+                          <input type="checkbox" name="add_half" class="claddhalf" value="setengah" flag='setengahhari'>
+                          <span>Ceklist jika ingin tambah durasi <strong>Setengah Hari.</strong></span>
                     </div>
                     <div class="form-group">
                         <button type="button" id="btn-durasi" class="btn btn-success pull-right"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
@@ -365,10 +370,17 @@ use yii\helpers\Html;
             var id = $('#id-kamar').val();
             var tipe = $('#tipe').val();
             var hari = $('#jumah_hari').val();
+            var katharga = $('#katharga').val();
+            if ($('.claddhalf').is(':checked')) {
+                var flag = $('.claddhalf').attr('flag');
+            } else if (!$('.claddhalf').is(':checked')) {
+                var flag = 'normalhari';
+            }
+            // alert(flag); return false;
             $.ajax({
                 type: "GET",
                 dataType :'json',
-                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/tambahdurasi'])?>?id="+id+'&tipe='+tipe+'&hari='+hari,
+                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/tambahdurasi'])?>?id="+id+'&tipe='+tipe+'&hari='+hari+'&katharga='+katharga+'&flag='+flag,
                 beforeSend: function () {
                     swal({
                         title: 'Harap Tunggu',
@@ -401,20 +413,6 @@ use yii\helpers\Html;
                 }
             });
         });
-
-        function showModalRooms(url,title)
-          {
-              $("#modalRoomsTitle").empty();
-              $("#modalRoomsTitle").html(title);
-
-              $("#modalRoomsBody").empty();
-              $("#modalRoomsBody").html("Loading ...");
-              $("#modalRoomsBody").load(url);
-
-              $('#modalRoomsId').modal({backdrop: 'static', keyboard: false});
-              $("#modalRoomsId").modal("show");
-              return false;
-        }
 
         $('#btn-ganti').click(function(){
             var id = $('#id-kamar').val();
@@ -451,7 +449,11 @@ use yii\helpers\Html;
                     swal(result.header, result.message, result.status);
 
                     if (result.status == "success") {
-                        window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
+                        $('#modalPilihkamarId').modal('hide');
+                        var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
+                        var title = "Form Check-out";
+                        showModalRooms(url,title);
+                        // window.location = "<?//=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
                     }
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -459,6 +461,20 @@ use yii\helpers\Html;
                 }
             });
         });
+
+        function showModalRooms(url,title)
+          {
+              $("#modalRoomsTitle").empty();
+              $("#modalRoomsTitle").html(title);
+
+              $("#modalRoomsBody").empty();
+              $("#modalRoomsBody").html("Loading ...");
+              $("#modalRoomsBody").load(url);
+
+              $('#modalRoomsId').modal({backdrop: 'static', keyboard: false});
+              $("#modalRoomsId").modal("show");
+              return false;
+        }
 
         formattingFirstDate();
         formattingSecondDate();
@@ -483,6 +499,12 @@ use yii\helpers\Html;
 
 
         setDefault();
+    });
+
+    $(document).on('change','.claddhalf',function(){
+        if ($(this).is(':checked')) {
+            $('#jumah_hari').attr('disabled',true);
+        }
     });
 
     $(document).on('change','.clweekend',function(){

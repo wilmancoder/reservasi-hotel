@@ -177,12 +177,12 @@ use yii\helpers\Html;
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'namatamu')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Masukkan nama ...']) ?>
+                                        <?= $form->field($model, 'namatamu')->textInput(['maxlength' => true, 'class' => 'form-control', 'placeholder' => 'Masukkan nama ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Handphone ...']) ?>
+                                        <?= $form->field($model, 'nomor_kontak')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Handphone ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                             </div>
@@ -202,7 +202,7 @@ use yii\helpers\Html;
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group required">
-                                        <?= $form->field($model, 'nomor_identitas')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...']) ?>
+                                        <?= $form->field($model, 'nomor_identitas')->textInput(['maxlength' => true, 'class' => 'form-control numberinput', 'placeholder' => 'Masukkan Nomor Identitas ...', 'autocomplete' => 'off']) ?>
                                     </div>
                                 </div>
                             </div>
