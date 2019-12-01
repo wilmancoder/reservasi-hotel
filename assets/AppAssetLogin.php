@@ -28,10 +28,12 @@ class AppAssetLogin extends AssetBundle
         'admin_lte/css/AdminLTE.css',
         'css/custom.css',
         'ext/animated/animate.css',
+        'ext/select2/dist/css/select2.min.css'
     ];
     public $js = [
         'vendor/bootstrap/dist/js/bootstrap.min.js',
         'ext/animated/wow.min.js',
+        'ext/select2/dist/js/select2.min.js'
     ];
 
     public $depends = [

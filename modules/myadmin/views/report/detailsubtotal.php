@@ -27,11 +27,21 @@ $this->params['breadcrumbs'][] = $this->title;
                          <th>Checkin</th>
                          <th>Checkout</th>
                          <th>Durasi</th>
-                         <th>Type</th>
+                         <th>Nomor Kamar</th>
+                         <th>Type Kamar</th>
                          <th>Harga Kamar</th>
-                         <th>Total Sewa PerKamar</th>
+                         <th>Subtotal PerKamar</th>
                      </tr>
                      </thead>
+                     <tbody>
+
+                     </tbody>
+                     <tfoot>
+                         <tr>
+                             <th colspan="6" style="text-align:right">Total :</th>
+                             <th style="text-align:right" id="grandtotal"></th>
+                         </tr>
+                     </tfoot>
                     </table>
                 </div>
             </div>
@@ -80,22 +90,75 @@ $this->params['breadcrumbs'][] = $this->title;
         // table.destroy();
         t = $('#tbl_detail_subtotal').DataTable({
             "processing": true,
-            "serverSide": true,
-            "ordering": false,
-            "paging": false,
-            "info": false,
-            "searching": false,
+            // "serverSide": true,
+            // "ordering": false,
+            // "paging": false,
+            // "info": false,
+            // "searching": false,
+            columnDefs: [
+                { width: '5%', targets: 0 },
+                { width: '5%', targets: 1 },
+                { width: '20%', targets: 2 },
+                { width: '15%', targets: 3 },
+                { width: '20%', targets: 4 },
+                {
+                    width: '20%', targets: 5,
+                    targets: 5,
+                    className: 'dt-body-right'
+                },
+                {
+                    width: '20%', targets: 6,
+                    targets: 6,
+                    className: 'dt-body-right'
+                },
+            ],
             "ajax": '<?=\Yii::$app->getUrlManager()->createUrl("myadmin/report/generatedetailsubtotal");?>?idtranstamu='+idtranstamu,
             "columns": [
 
                  {"data": "checkin"},
                  {"data": "checkout"},
                  {"data": "durasi"},
+                 {"data": "nomor_kamar"},
                  {"data": "type"},
                  {"data": "harga_kamar"},
                  {"data": "biaya_sewa_perkamar"}
 
              ],
+            "footerCallback": function ( row, data, start, end, display ) {
+                 var api = this.api(), data;
+
+                 // Remove the formatting to get integer data for summation
+                 var intVal = function ( i ) {
+                     return typeof i === 'string' ?
+                         i.replace(/[\$.]/g, '')*1 :
+                         typeof i === 'number' ?
+                             i : 0;
+                 };
+
+                 // Total over all pages
+                 total = api
+                     .column( 6 )
+                     .data()
+                     .reduce( function (a, b) {
+                         return intVal(a) + intVal(b);
+                     }, 0 );
+
+                 // Total over this page
+                 pageTotal = api
+                     .column( 6, { page: 'current'} )
+                     .data()
+                     .reduce( function (a, b) {
+                         return intVal(a) + intVal(b);
+                     }, 0 );
+
+                 // Update footer
+                 $( api.column( 6 ).footer() ).html(
+                     '  Rp.'+ total +''
+                 );
+                 var convert = toRupiah(total);
+
+                 $('th#grandtotal').text('  Rp. '+ convert +'');
+            }
         });
 
         // $('#tbl_laporan_pendapatan tbody').on('click', 'td.details-control', function () {

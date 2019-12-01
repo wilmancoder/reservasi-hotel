@@ -56,7 +56,7 @@ class UsersettingController extends \yii\web\Controller
         return $this->render('index');
     }
 
-    public function actionCreate()
+    public function actionCreate($action)
     {
         $model = new Users();
         if ($model->load(Yii::$app->request->post())) {
@@ -64,7 +64,7 @@ class UsersettingController extends \yii\web\Controller
             $model->nama = $_POST['Users']['nama'];
             $model->email = $_POST['Users']['email'];
             $model->role = $_POST['Users']['role'];
-            $model->id_shift = $_POST['Users']['id_shift'];
+            // $model->id_shift = $_POST['Users']['id_shift'];
             $model->password = sha1($_POST['Users']['password']);
             $model->created_at = date('Y-m-d H:i:s');
             if ($model->save()) {
@@ -82,20 +82,28 @@ class UsersettingController extends \yii\web\Controller
 
         return $this->renderPartial('create', [
             'model' => $model,
-            'listShift' => $listShift
+            'listShift' => $listShift,
+            'action' => $action
         ]);
     }
 
-    public function actionUpdate($id)
+    public function actionUpdate($id,$action)
     {
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
+            $passForm = isset($_POST['Users']['password']) ? $_POST['Users']['password'] : "";
+
             $model->username = $_POST['Users']['username'];
             $model->nama = $_POST['Users']['nama'];
             $model->email = $_POST['Users']['email'];
             $model->role = $_POST['Users']['role'];
-            $model->id_shift = $_POST['Users']['id_shift'];
-            $model->password = sha1($_POST['Users']['password']);
+            if($passForm){
+                $passForm = $_POST['Users']['password'];
+                $model->password = sha1($passForm);
+            }
+            // $model->id_shift = $_POST['Users']['id_shift'];
+
+            // $model->password = sha1($_POST['Users']['password']);
             $model->updated_at = date('Y-m-d H:i:s');
             if ($model->save()) {
                 $hasil = array(
@@ -113,7 +121,8 @@ class UsersettingController extends \yii\web\Controller
         return $this->renderPartial('update', [
             'model' => $model,
             'id' => $id,
-            'listShift' => $listShift
+            'listShift' => $listShift,
+            'action' => $action
         ]);
     }
 
@@ -149,11 +158,11 @@ class UsersettingController extends \yii\web\Controller
             $row[$i]['nama'] = $value['nama'];
             $row[$i]['email'] = $value['email'];
             $row[$i]['role'] = $value['role'];
-            $row[$i]['nm_shift'] = $value['nm_shift'];
+            // $row[$i]['nm_shift'] = $value['nm_shift'];
             $row[$i]['updated_at'] = $value['updated_at'];
 
             $row[$i]['fungsi'] = "
-            <button onclick='updateusersetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Edit User' class='btn btn-sm btn-warning btn-flat'><i class='fa fa-edit'></i></button>
+            <button onclick='updateusersetting(\"" . $value['id'] . "\",\"update\")' type='button' rel='tooltip' data-toggle='tooltip' title='Edit User' class='btn btn-sm btn-warning btn-flat'><i class='fa fa-edit'></i></button>
             <button onclick='deleteusersetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Hapus User' class='btn btn-sm btn-danger btn-flat'><i class='fa fa-trash'></i></button>
             ";
 

@@ -160,6 +160,7 @@ class RoomsController extends \yii\web\Controller
                     $modelHistoriSummaryttamu = new HistoriSummarytamu();
                     $modelHistoriSummaryttamu->id_transaksi_tamu = $modelBiodatatamu->id;
                     $modelHistoriSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
+                    $modelHistoriSummaryttamu->id_user = Yii::$app->user->identity->id_user;
                     if($dp != 0 && $sisa != 0){
                         $modelHistoriSummaryttamu->pembayaran = "DP";
                         $modelHistoriSummaryttamu->status_pembayaran = "BELUM LUNAS";

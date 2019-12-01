@@ -13,6 +13,9 @@ $this->params['breadcrumbs'][] = $this->title;
 .labelcari {
     color: white;
 }
+.labeldownload {
+    color: white;
+}
 </style>
 <div class="reportall-index">
     <h1 class="title"><i class="fa fa-list" aria-hidden="true"></i> <?= Html::encode($this->title) ?></h1><br>
@@ -52,10 +55,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?= $form->field($model, 'enddate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label class="control-label labelcari">Cari</label>
                     <div class="form-group">
                         <?= Html::button('<i class="fa fa-search" aria-hidden="true"></i> Cari', ['class' => 'btn btn-success btn-block', 'onclick' => 'reportpreview()']) ?>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="control-label labeldownload">Download</label>
+                    <div class="form-group">
+                        <?= Html::button('<i class="fa fa-download" aria-hidden="true"></i> Download', ['class' => 'btn btn-primary btn-block', 'onclick' => 'reportdownload()']) ?>
                     </div>
                 </div>
                 <?php ActiveForm::end(); ?>

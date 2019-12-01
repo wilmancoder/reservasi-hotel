@@ -12,6 +12,8 @@ use app\models\ContactForm;
 use app\models\TPetugas;
 use app\models\MKategoriHarga;
 use app\models\MMappingHarga;
+use app\models\MShift;
+use yii\helpers\ArrayHelper;
 
 class SiteController extends Controller
 {
@@ -138,9 +140,10 @@ class SiteController extends Controller
          $model = new LoginForm();
 
          if ($model->load(Yii::$app->request->post()) && $model->login()) {
-
+            $post = Yii::$app->request->post();
             $modelPetugas = new TPetugas();
             $modelPetugas->id_user = Yii::$app->user->identity->id_user;
+            $modelPetugas->id_shift = $post['LoginForm']['id_shift'];
             $modelPetugas->sign_in = date('Y-m-d H:i:s');
             if($modelPetugas->save(false)) {
 
@@ -148,9 +151,13 @@ class SiteController extends Controller
             }
         }
 
+        $modelShift=MShift::find()->all();
+        $listShift=ArrayHelper::map($modelShift,'id','nm_shift');
+
 
         return $this->render('login', [
              'model' => $model,
+             'listShift' => $listShift
         ]);
      }
 

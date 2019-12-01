@@ -56,6 +56,7 @@ class ReportController extends \yii\web\Controller
 
     public function actionIndex()
     {
+        $model = new TTamu();
         $sumSummarytamu = 0;
         $petugas = Yii::$app->user->identity->id_petugas;
         $idshift = Yii::$app->user->identity->id_shift;
@@ -73,7 +74,8 @@ class ReportController extends \yii\web\Controller
             'Summarytamupendapatan' => $Summarytamupendapatan,
             'Summarytamupengeluaran' => $Summarytamupengeluaran,
             'resultGrandtotal' => $resultGrandtotal,
-            'user' => $user
+            'user' => $user,
+            'model' => $model
         ]);
     }
 
@@ -87,6 +89,30 @@ class ReportController extends \yii\web\Controller
     }
 
     public function actionListreportall()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = Yii::$app->request->post();
+        $ambilPosting = $post['TTamu'];
+        $poststartdate = $ambilPosting['startdate'];
+        $postenddate = $ambilPosting['enddate'];
+        if( !empty($poststartdate) && !empty($postenddate) ){
+            $joinposting = $poststartdate.','.$postenddate;
+        } else {
+            $joinposting = 'all';
+        }
+
+        if(!empty($joinposting)){
+
+            $hasil = array(
+                'status' => "success",
+                'joinposting' => $joinposting
+            );
+        }
+        echo json_encode($hasil);
+        die();
+    }
+
+    public function actionListreportfo()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = Yii::$app->request->post();
@@ -156,6 +182,67 @@ class ReportController extends \yii\web\Controller
         // }
     }
 
+    public function actionGetdatareportfo() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $get = Yii::$app->request->get();
+        $getPosting = $get['posting'];
+        $getidpetugas = \Yii::$app->user->identity->id_petugas;
+        $getiduser = \Yii::$app->user->identity->id_user;
+
+        $data = \app\components\Logic::reportPetugas($getPosting,$getidpetugas,$getiduser);
+
+        $row = array();
+        $i = 0;
+        $no = 1;
+        foreach ($data as $idx => $value) {
+            foreach ($value as $key => $val) {
+                $row[$i][$key] = $val;
+            }
+            $row[$i]['no'] = $no++;
+            $row[$i]['nama_tamu'] = $value['nama_tamu'];
+            $row[$i]['jenis_pembayaran'] = $value['jenis_pembayaran'];
+            $row[$i]['metode_pembayaran'] = $value['metode_pembayaran'];
+            $row[$i]['jml_uangmasuk'] = \app\components\Logic::formatNumber($value['jml_uangmasuk'], 0);
+
+            $row[$i]['fungsi'] = "
+            <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Data Tamu' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
+            ";
+
+
+            $i++;
+        }
+        $hasil['data'] = $row;
+        return $hasil;
+    }
+
+    public function actionGetdatareportfopengeluaran() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $get = Yii::$app->request->get();
+        $getPosting = $get['posting'];
+        $getidpetugas = \Yii::$app->user->identity->id_petugas;
+        $getiduser = \Yii::$app->user->identity->id_user;
+
+        $data = \app\components\Logic::reportPetugaspengeluaran($getPosting,$getidpetugas,$getiduser);
+
+        $row = array();
+        $i = 0;
+        $no = 1;
+        foreach ($data as $idx => $value) {
+            foreach ($value as $key => $val) {
+                $row[$i][$key] = $val;
+            }
+            $row[$i]['no'] = $no++;
+            $row[$i]['item'] = $value['item'];
+            $row[$i]['qty'] = $value['qty'];
+            $row[$i]['harga_per_item'] = \app\components\Logic::formatNumber($value['harga_per_item'], 0);
+            $row[$i]['total_harga_item'] = \app\components\Logic::formatNumber($value['total_harga_item'], 0);
+
+            $i++;
+        }
+        $hasil['data'] = $row;
+        return $hasil;
+    }
+
     public function actionGetdatapendapatan($idpetugas) {
         if(Yii::$app->request->isAjax)
         {
@@ -170,13 +257,14 @@ class ReportController extends \yii\web\Controller
                     $row[$i][$key] = $val;
                 }
                 $row[$i]['no'] = $no++;
-                $row[$i]['type'] = $value['type'];
+                $row[$i]['nama_tamu'] = $value['nama_tamu'];
                 $row[$i]['jenis_pembayaran'] = $value['jenis_pembayaran'];
                 $row[$i]['metode_pembayaran'] = $value['metode_pembayaran'];
+                $row[$i]['tgl_uangmasuk'] = $value['tgl_uangmasuk'];
                 $row[$i]['jml_uangmasuk'] = \app\components\Logic::formatNumber($value['jml_uangmasuk'], 0);
 
                 $row[$i]['fungsi'] = "
-                <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Subtotal' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
+                <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Data Tamu' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
                 ";
 
                 $i++;
@@ -204,6 +292,7 @@ class ReportController extends \yii\web\Controller
                 }
                 $row[$i]['no'] = $no++;
                 $row[$i]['item'] = $value['item'];
+                $row[$i]['tgl_uangkeluar'] = $value['tgl_uangkeluar'];
                 $row[$i]['qty'] = $value['qty'];
                 $row[$i]['harga_per_item'] = \app\components\Logic::formatNumber($value['harga_per_item'], 0);
                 $row[$i]['total_harga_item'] = \app\components\Logic::formatNumber($value['total_harga_item'], 0);
@@ -240,6 +329,8 @@ class ReportController extends \yii\web\Controller
 
                         $modelPengeluaran = new TPengeluaranPetugas();
                         $modelPengeluaran->id_petugas = $idpetugas;
+                        $modelPengeluaran->id_user = \Yii::$app->user->identity->id_user;
+                        $modelPengeluaran->tgl_uangkeluar = date('Y-m-d');
                         $modelPengeluaran->item = $post['item'][$i];
                         $modelPengeluaran->qty = $qty;
                         $modelPengeluaran->harga_per_item = $conv_hargaitem;
@@ -283,7 +374,8 @@ class ReportController extends \yii\web\Controller
                 }
                 $row[$i]['checkin'] = $value['checkin'];
                 $row[$i]['checkout'] = $value['checkout'];
-                $row[$i]['durasi'] = $value['durasi'];
+                $row[$i]['durasi'] = $value['durasi']." Hari";
+                $row[$i]['nomor_kamar'] = $value['nomor_kamar'];
                 $row[$i]['type'] = $value['type'];
                 $row[$i]['harga_kamar'] = \app\components\Logic::formatNumber($value['harga_kamar'], 0);
                 $row[$i]['biaya_sewa_perkamar'] = \app\components\Logic::formatNumber($value['biaya_sewa_perkamar'], 0);;

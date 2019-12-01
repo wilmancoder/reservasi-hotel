@@ -43,6 +43,17 @@ $this->params['breadcrumbs'][] = $this->title;
                         ?>
                     </p>
                 </div>
+                <div class="form-group has-feedback">
+                    <?= $form->field($model, 'id_shift')->dropDownList($listShift, ['name' => 'LoginForm[id_shift]', 'class' => 'form-control select validate[required]', 'prompt' => 'Pilih Shift ...'])->label(false); ?>
+                    <p class="help-block help-block-error" style="color:#fff!important">
+                        <?php
+                        if (!empty($model->errors)) {
+                            if (isset($model->errors['id_shift'][0]))
+                                echo $model->errors['id_shift'][0];
+                        }
+                        ?>
+                    </p>
+                </div>
                 <div>
                     <button type="submit" class="btn btn-login btn-block"><i class="fa fa-sign-in"></i> Sign In</button>
                 </div>
@@ -54,3 +65,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".select").select2();
+    });
+</script>

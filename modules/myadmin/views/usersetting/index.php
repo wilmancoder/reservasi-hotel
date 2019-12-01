@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-12">
             <div class="box">
                 <div class="box-header with-border">
-                    <?= Html::a('<i class="fa fa-plus"></i> Tambah User', 'javascript:addusersetting()', ['class' => 'btn btn-default pull-right tombol']) ?>
+                    <?= Html::a('<i class="fa fa-plus"></i> Tambah User', 'javascript:addusersetting(\'insert\')', ['class' => 'btn btn-default pull-right tombol']) ?>
                 </div>
                 <div class="box-body table-responsive">
                     <table id="tbl_user" class="table table-striped table-bordered" style="width:100%">
@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                  <th>Nama Lengkap</th>
                                  <th>Email</th>
                                  <th>Role</th>
-                                 <th>Shift</th>
+                                 <!-- <th>Shift</th> -->
                                  <th>Tgl Update User</th>
                                  <th>#</th>
                             </tr>
@@ -104,7 +104,7 @@ function user_preview()
              {"data": "nama"},
              {"data": "email"},
              {"data": "role"},
-             {"data": "nm_shift"},
+             // {"data": "nm_shift"},
              {"data": "updated_at"},
              {
                  "orderable": false,
@@ -117,14 +117,14 @@ function user_preview()
     });
 }
 
-function addusersetting() {
-     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/create']);?>";
+function addusersetting(action) {
+     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/create']);?>?action="+action;
      var title = "Form Tambah Setting User";
      showModal(url, title);
 }
 
-function updateusersetting(id) {
-     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/update']);?>?id="+id;
+function updateusersetting(id,action) {
+     var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/update']);?>?id="+id+"&action="+action;
      var title = "Form Update Setting User";
      showModal(url, title);
 }
@@ -142,7 +142,7 @@ function showModal(url, title) {
      return false;
 }
 
-function savesetuser(id) {
+function savesetuser(action) {
     {
         if($('#users-nama').val()==''){
             swal({
@@ -213,7 +213,7 @@ function savesetuser(id) {
                         dataType: "json",
                         contentType: false,
                         processData: false,
-                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/create'])?>?id="+id,
+                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/create'])?>?action="+action,
                         beforeSend: function () {
                             swal({
                                 title: 'Harap Tunggu',
@@ -253,7 +253,7 @@ function savesetuser(id) {
     }
 }
 
-function updatesetuser(id) {
+function updatesetuser(id,action) {
      {
          swal({
              title: "Konfirmasi",
@@ -270,7 +270,7 @@ function updatesetuser(id) {
                      dataType: "json",
                      contentType: false,
                      processData: false,
-                     url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/update'])?>?id=" + id,
+                     url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/usersetting/update'])?>?id=" + id + "&action=" + action,
                      beforeSend: function () {
                          swal({
                              title: 'Harap Tunggu',

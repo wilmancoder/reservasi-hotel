@@ -114,6 +114,7 @@ $getsessionharga = $session->get('idharga');
                         <li class="active"><a href="<?= Url::to(['/myadmin/index', 'idharga' => $getsessionharga]); ?>">Rooms</a></li>
                         <li><a href="<?= Url::to(['/myadmin/booking', 'idharga' => $getsessionharga]); ?>">Booking</a></li>
                         */ ?>
+                        <li><a href="<?= Url::to(['/myadmin/booking/index', 'idharga' => '3']); ?>">Booking</a></li>
                         <li><a href="<?= Url::to(['/myadmin/report/indexall', 'idharga' => $getsessionharga]); ?>">Report All</a></li>
 
 

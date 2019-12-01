@@ -10,7 +10,8 @@
     <?= $this->render('_form', [
         'model' => $model,
         'id' => $id,
-        'listShift' => $listShift
+        'listShift' => $listShift,
+        'action' => $action
     ]) ?>
 
 </div>

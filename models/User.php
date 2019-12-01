@@ -61,12 +61,10 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     public static function findIdentity($id)
     {
         // return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
-
-
         $user = Users::find()->where(['username' => $id])->asArray()->one();
         $roles = MRoles::find()->where(['id' =>$user['role']])->asArray()->one();
-        $shift = MShift::find()->where(['id'=>$user['id_shift']])->asArray()->one();
         $petugas = TPetugas::find()->where(['id_user' => $user['id']])->orderBy(['id' => SORT_DESC])->asArray()->one();
+        $shift = MShift::find()->where(['id'=>$petugas['id_shift']])->asArray()->one();
         $identity = new User();
         $identity->id           = $id;
         $identity->id_user      = $user['id'];
