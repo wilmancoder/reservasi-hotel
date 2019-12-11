@@ -14,11 +14,15 @@ use app\models\MShift;
 use app\models\TPengeluaranPetugas;
 use app\models\SummaryTtamu;
 use app\models\TTamu;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class ReportController extends \yii\web\Controller
 {
     public $user = null;
     public $notLogin = false;
+    public $enableCsrfValidation = false;
 
     public function init()
     {
@@ -57,6 +61,11 @@ class ReportController extends \yii\web\Controller
     public function actionIndex()
     {
         $model = new TTamu();
+        $idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : 1;
+        $session = Yii::$app->session;
+        $session->set('idharga', $idharga);
+        $getsessionharga = $session->get('idharga');
+        // var_dump($getsessionharga);exit;
         $sumSummarytamu = 0;
         $petugas = Yii::$app->user->identity->id_petugas;
         $idshift = Yii::$app->user->identity->id_shift;
@@ -75,7 +84,8 @@ class ReportController extends \yii\web\Controller
             'Summarytamupengeluaran' => $Summarytamupengeluaran,
             'resultGrandtotal' => $resultGrandtotal,
             'user' => $user,
-            'model' => $model
+            'model' => $model,
+            'getsessionharga' => $getsessionharga
         ]);
     }
 
@@ -386,5 +396,628 @@ class ReportController extends \yii\web\Controller
             $hasil['data'] = $row;
             return $hasil;
         }
+    }
+
+    public function actionDownloadreportfo() {
+
+        $path = Yii::getAlias('@app') .
+                DIRECTORY_SEPARATOR .
+                'web' .
+                DIRECTORY_SEPARATOR .
+                'download' .
+                DIRECTORY_SEPARATOR;
+
+        $filename = 'write-' . date('Y-m-d') . '.xls';
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $post = Yii::$app->request->post();
+        $poststartdate = $post['start'];
+        $postenddate = $post['end'];
+        if( !empty($poststartdate) && !empty($postenddate) ){
+            $getPosting = $poststartdate.','.$postenddate;
+        } else {
+            $getPosting = 'all';
+        }
+        $getidpetugas = \Yii::$app->user->identity->id_petugas;
+        $getiduser = \Yii::$app->user->identity->id_user;
+        $getnmfo = \Yii::$app->user->identity->nama;
+
+
+        $getshift = \Yii::$app->user->identity->nm_shift;
+        $getstartdate = \Yii::$app->user->identity->start_date;
+        $getenddate = \Yii::$app->user->identity->end_date;
+
+
+        $data = \app\components\Logic::downloadReportpetugas($getPosting,$getidpetugas,$getiduser);
+        $data2 = \app\components\Logic::reportPetugas($getPosting,$getidpetugas,$getiduser);
+        $data3 = \app\components\Logic::reportPetugaspengeluaran($getPosting,$getidpetugas,$getiduser);
+        // var_dump($data);exit;
+
+        $htmlDetail = '
+        <table>
+            <tr>
+                <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.$poststartdate.' s/d '.$postenddate.'</strong></h3></td>
+            </tr>';
+            if($getPosting != 'all') {
+                $htmlDetail .= '
+                <tr>
+                    <td colspan=11 style="text-align: center;"></td>
+                </tr>';
+            } else {
+                $htmlDetail .= '
+                <tr>
+                    <td colspan=11 style="text-align: center;"><h5>'.$getshift.' ('.$getstartdate.' - '.$getenddate.')</h5></td>
+                </tr>';
+            }
+        $htmlDetail .= '
+        </table>
+        <table border=1px>
+            <thead>
+                <tr>
+                    <td style="width: 5px; text-align: center;" rowspan=2>NO</td>
+                    <td style="width: 25px; text-align: center;" rowspan=2>NAMA TAMU</td>
+                    <td style="width: 20px; text-align: center;" rowspan=2>CHECKIN</td>
+                    <td style="width: 20px; text-align: center;" rowspan=2>CHECKOUT</td>
+                    <td style="width: 10px; text-align: center;" rowspan=2>DURASI</td>
+                    <td colspan=3 style="text-align: center;">KAMAR TERJUAL</td>
+                    <td style="width: 28px; text-align: center;" rowspan=2>TOTAL PERKAMAR</td>
+                    <td style="width: 20px; text-align: center;" rowspan=2>STATUS PEMBAYARAN</td>
+                    <td style="width: 15px; text-align: center;" rowspan=2>KETERANGAN</td>
+                </tr>
+                <tr>
+                    <td style="width: 20px; text-align: center;">NOMOR KAMAR</td>
+                    <td style="width: 20px; text-align: center;">TYPE KAMAR</td>
+                    <td style="width: 28px; text-align: center;">HARGA KAMAR</td>
+                </tr>
+            </thead>
+            <tbody>';
+                $no=1;
+                foreach ($data as $key => $value) {
+                $htmlDetail .='<tr>
+                        <td>'.$no.'</td>
+                        <td>'.$value['nama_tamu'].'</td>
+                        <td>'.$value['checkin'].'</td>
+                        <td>'.$value['checkout'].'</td>
+                        <td>'.$value['durasi'].'</td>
+                        <td>'.$value['nomor_kamar'].'</td>
+                        <td>'.$value['type'].'</td>
+                        <td>'.$value['harga_kamar'].'</td>
+                        <td>'.$value['biaya_sewa_perkamar'].'</td>
+                        <td>'.$value['status_pembayaran'].'</td>
+                        <td>'.$value['metode_pembayaran'].'</td>
+                    </tr>';
+                    $no++;
+                }
+            $htmlDetail .= '</tbody>
+        </table>
+        <table>
+            <tr>
+                <td colspan=11 style="text-align: center;"></td>
+            </tr>
+        </table>';
+
+
+
+
+        $htmlPendapatan = '
+        <table>
+            <tr>
+                <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN</strong></h3></td>
+            </tr>
+            <tr>
+                <td colspan=11 style="text-align: center;"></td>
+            </tr>
+        </table>
+        <table border=1px>
+            <thead>
+                <tr>
+                    <td style="width: 5px; text-align: center;">NO</td>
+                    <td style="width: 25px; text-align: center;">NAMA TAMU</td>
+                    <td style="width: 20px; text-align: center;" colspan=3>KATEGORI PEMBAYARAN</td>
+                    <td style="width: 20px; text-align: center;" colspan=3>STATUS PEMBAYARAN</td>
+                    <td style="width: 10px; text-align: center;" colspan=2>TOTAL TAGIHAN</td>
+                    <td style="width: 20px; text-align: center;">JML.UANG DITERIMA</td>
+                </tr>
+            </thead>
+            <tbody>';
+            $no=1;
+            $totaluangmasuk=0;
+            foreach ($data2 as $key => $val) {
+            $htmlPendapatan .='<tr>
+                    <td>'.$no.'</td>
+                    <td>'.$val['nama_tamu'].'</td>
+                    <td colspan=3>'.$val['jenis_pembayaran'].'</td>
+                    <td colspan=3>'.$val['status_pembayaran'].'</td>
+                    <td colspan=2>'.$val['subtotal'].'</td>
+                    <td>'.$val['jml_uangmasuk'].'</td>
+                </tr>';
+                $no++;
+
+                $totaluangmasuk += $val['jml_uangmasuk'];
+            }
+        $htmlPendapatan .= '
+            </tbody>
+                <tr>
+                    <td colspan=10 style="text-align: right;"><h3><strong>Total Uang Masuk :</strong></h3></td>
+                    <td style="text-align: right;"><h3><strong>'.$totaluangmasuk.'</strong></h3></td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+        </table>';
+
+        $htmlPengeluaran = '
+        <table>
+            <tr>
+                <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENGELUARAN</strong></h3></td>
+            </tr>
+            <tr>
+                <td colspan=11 style="text-align: center;"></td>
+            </tr>
+        </table>
+        <table border=1px>
+            <thead>
+                <tr>
+                    <td style="width: 5px; text-align: center;">NO</td>
+                    <td style="width: 25px; text-align: center;">NAMA ITEM</td>
+                    <td style="width: 20px; text-align: center;" colspan=3>TGL.UANG KELUAR</td>
+                    <td style="width: 20px; text-align: center;" colspan=2>QUANTITY</td>
+                    <td style="width: 10px; text-align: center;" colspan=2>HARGA PER ITEM</td>
+                    <td style="width: 20px; text-align: center;" colspan=2>TOTAL HARGA ITEM</td>
+                </tr>
+            </thead>
+            <tbody>';
+            $no=1;
+            $totaluangkeluar=0;
+            foreach ($data3 as $key => $valu) {
+            $htmlPengeluaran .='<tr>
+                    <td>'.$no.'</td>
+                    <td>'.$valu['item'].'</td>
+                    <td colspan=3>'.$valu['tgl_uangkeluar'].'</td>
+                    <td colspan=2>'.$valu['qty'].'</td>
+                    <td colspan=2>'.$valu['harga_per_item'].'</td>
+                    <td colspan=2>'.$valu['total_harga_item'].'</td>
+                </tr>';
+                $no++;
+
+                $totaluangkeluar += $valu['total_harga_item'];
+            }
+        $htmlPengeluaran .= '
+            </tbody>
+                <tr>
+                    <td colspan=10 style="text-align: right;"><h3><strong>Total Uang Keluar :</strong></h3></td>
+                    <td style="text-align: right;"><h3><strong>'.$totaluangkeluar.'</strong></h3></td>
+                </tr>
+        </table>';
+        $totalsisa=0;
+        $totalsisa = $totaluangmasuk - $totaluangkeluar;
+
+        $htmlFooter = '
+        <table>
+            <tr>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+        <table border=1px>
+            <tr>
+                <td></td>
+                <td>Jumlah Total Pendapatan</td>
+                <td>Rp. '.$totaluangmasuk.'</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td colspan=2 style="text-align: center;">'.$getnmfo.'</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Jumlah Total Pengeluaran</td>
+                <td>Rp. '.$totaluangkeluar.'</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><strong>Jumlah Disetor</strong></td>
+                <td><strong>Rp. '.$totalsisa.'</strong></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td colspan=2 style="text-align: center;">Petugas FO</td>
+            </tr>
+        </table>';
+
+
+
+        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Html();
+        $spreadsheet = $reader->loadFromString($htmlDetail.$htmlPendapatan.$htmlPengeluaran.$htmlFooter);
+
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
+        $writer->save($path.$filename);
+
+
+        return [
+            'success' => true,
+            'message' => 'Report excel berhasil digenerate',
+            'filename' => $filename
+        ];
+        exit;
+
+        // var_dump($data);exit;
+        // $spreadsheet = new Spreadsheet();
+		// $spreadsheet->getProperties()
+		// 	->setCreator('Hotel Millenia')
+		// 	->setLastModifiedBy('Hotel Millenia')
+		// 	->setTitle('Office 2007 XLSX Talent')
+		// 	->setSubject('Office 2007 XLSX Talent')
+		// 	->setDescription('')
+		// 	->setKeywords('')
+		// 	->setCategory('');
+        //
+        //
+        //
+        // // no
+		// $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('A')->setWidth(7);
+        //
+        // // namatamu
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('B')->setWidth(25);
+        //
+        // // cekin,cekout,durasi
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('C')->setWidth(15);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('D')->setWidth(15);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('E')->setWidth(12);
+        //
+        // // kamar terjual
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('F')->setWidth(15);
+		// $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('G')->setWidth(15);
+		// $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('H')->setWidth(15);
+        //
+        // // subtotal
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('I')->setWidth(23);
+        //
+        // // sts pembayaran
+		// $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('J')->setWidth(23);
+        //
+        // // keterangan
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('K')->setWidth(25);
+        //
+        // $spreadsheet->getActiveSheet()->getStyle("A3:K3")->getFont()->setBold(true);
+        // $spreadsheet->getActiveSheet()->getStyle("A4:K4")->getFont()->setBold(true);
+        //
+        // $spreadsheet->setActiveSheetIndex(0)
+        // ->setCellValue('A1', 'LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '  .$poststartdate.' s/d '.$postenddate);
+        // $spreadsheet->setActiveSheetIndex(0)
+        // ->setCellValue('A2',$getshift. ' (' .$getstartdate. ' - ' .$getenddate. ')');
+        // $spreadsheet->setActiveSheetIndex(0)
+		// 	->setCellValue('A3', 'NO')
+		// 	->setCellValue('B3', 'NAMA TAMU')
+		// 	->setCellValue('C3', 'CHECKIN')
+		// 	->setCellValue('D3', 'CHECKOUT')
+		// 	->setCellValue('E3', 'DURASI')
+        //     ->setCellValue('F3', 'KAMAR TERJUAL')
+        //     ->setCellValue('G3', '')
+        //     ->setCellValue('H3', '')
+        //     ->setCellValue('I3', 'TOTAL PERKAMAR')
+        //     ->setCellValue('J3', 'STATUS PEMBAYARAN')
+        //     ->setCellValue('K3', 'KETERANGAN');
+        //
+        // $spreadsheet->setActiveSheetIndex(0)
+		// 	->setCellValue('A4', '')
+		// 	->setCellValue('B4', '')
+		// 	->setCellValue('C4', '')
+		// 	->setCellValue('D4', '')
+		// 	->setCellValue('E4', '')
+        //     ->setCellValue('F4', 'NOMOR KAMAR')
+        //     ->setCellValue('G4', 'TYPE KAMAR')
+        //     ->setCellValue('H4', 'HARGA KAMAR')
+        //     ->setCellValue('I4', '')
+        //     ->setCellValue('J4', '')
+        //     ->setCellValue('K4', '');
+        //
+        //     $row_start = 5;
+        //     $count = 1;
+        //
+        //     $style = array(
+        //         'borders' => array(
+        //             'top' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'right' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'bottom' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'left' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //         ),
+        //     );
+        //
+        //
+        //
+        // $spreadsheet->getActiveSheet()->getStyle('A3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('B3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('C3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('D3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('E3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('F3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('G3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('H3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('I3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('J3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('K3')->applyFromArray($style);
+        //
+        // $spreadsheet->getActiveSheet()->getStyle('A4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('B4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('C4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('D4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('E4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('F4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('G4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('H4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('I4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('J4')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('K4')->applyFromArray($style);
+        //
+        // $spreadsheet->getActiveSheet()->mergeCells("A1:K1");
+        // $spreadsheet->getActiveSheet()->getStyle('A1:K1')->getAlignment()->setHorizontal('center');
+        //
+        // $spreadsheet->getActiveSheet()->mergeCells("A2:K2");
+        // $spreadsheet->getActiveSheet()->getStyle('A2:K2')->getAlignment()->setHorizontal('center');
+        //
+        // $spreadsheet->getActiveSheet()->mergeCells("A3:A4");
+        // $spreadsheet->getActiveSheet()->getStyle('A3:A4')->getAlignment()->setVertical('center');
+        // $spreadsheet->getActiveSheet()->getStyle('A3:A4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->mergeCells("B3:B4");
+        // $spreadsheet->getActiveSheet()->getStyle('B3:B4')->getAlignment()->setVertical('center');
+        // $spreadsheet->getActiveSheet()->getStyle('B3:B4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->mergeCells("C3:C4");
+        // $spreadsheet->getActiveSheet()->getStyle('C3:C4')->getAlignment()->setVertical('center');
+        // $spreadsheet->getActiveSheet()->getStyle('C3:C4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->mergeCells("D3:D4");
+        // $spreadsheet->getActiveSheet()->getStyle('D3:D4')->getAlignment()->setVertical('center');
+        // $spreadsheet->getActiveSheet()->getStyle('D3:D4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->mergeCells("E3:E4");
+        // $spreadsheet->getActiveSheet()->getStyle('E3:E4')->getAlignment()->setVertical('center');
+        // $spreadsheet->getActiveSheet()->getStyle('E3:E4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->mergeCells("F3:H3");
+        // $spreadsheet->getActiveSheet()->getStyle('F3:H3')->getAlignment()->setHorizontal('center');
+        //
+        // $spreadsheet->getActiveSheet()->mergeCells("I3:I4");
+        // $spreadsheet->getActiveSheet()->getStyle('I3:I4')->getAlignment()->setVertical('center');
+        // $spreadsheet->getActiveSheet()->getStyle('I3:I4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->mergeCells("J3:J4");
+        // $spreadsheet->getActiveSheet()->getStyle('J3:J4')->getAlignment()->setVertical('center');
+        // $spreadsheet->getActiveSheet()->getStyle('J3:J4')->getAlignment()->setHorizontal('center');
+        // $spreadsheet->getActiveSheet()->mergeCells("K3:K4");
+        // $spreadsheet->getActiveSheet()->getStyle('K3:K4')->getAlignment()->setVertical('center');
+        // $spreadsheet->getActiveSheet()->getStyle('K3:K4')->getAlignment()->setHorizontal('center');
+        //
+        //
+        // foreach($data as $val) {
+		// 	$spreadsheet->setActiveSheetIndex(0)
+		// 	->setCellValue('A' . $row_start, $count)
+		// 	->setCellValue('B' . $row_start, $val['nama_tamu'])
+        //     ->setCellValue('C' . $row_start, $val['checkin'])
+        //     ->setCellValue('D' . $row_start, $val['checkout'])
+        //     ->setCellValue('E' . $row_start, $val['durasi'])
+        //     ->setCellValue('F' . $row_start, $val['nomor_kamar'])
+		// 	->setCellValue('G' . $row_start, $val['type'])
+		// 	->setCellValue('H' . $row_start, $val['harga_kamar'])
+        //     ->setCellValue('I' . $row_start, $val['biaya_sewa_perkamar'])
+		// 	->setCellValue('J' . $row_start, $val['status_pembayaran'])
+        //     ->setCellValue('K' . $row_start, $val['metode_pembayaran']);
+        //
+		// 	$spreadsheet->getActiveSheet()->getStyle('A' . $row_start)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('B' . $row_start)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('C' . $row_start)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('D' . $row_start)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('E' . $row_start)->applyFromArray($style);
+        //     $spreadsheet->getActiveSheet()->getStyle('F' . $row_start)->applyFromArray($style);
+        //     $spreadsheet->getActiveSheet()->getStyle('G' . $row_start)->applyFromArray($style);
+        //     $spreadsheet->getActiveSheet()->getStyle('H' . $row_start)->applyFromArray($style);
+        //     $spreadsheet->getActiveSheet()->getStyle('I' . $row_start)->applyFromArray($style);
+        //     $spreadsheet->getActiveSheet()->getStyle('J' . $row_start)->applyFromArray($style);
+        //     $spreadsheet->getActiveSheet()->getStyle('K' . $row_start)->applyFromArray($style);
+		// 	$row_start++;
+		// 	$count++;
+		// }
+        //
+        // $spreadsheet->getActiveSheet()->setTitle('Detail Penjualan Kamar ');
+		// $spreadsheet->setActiveSheetIndex(0);
+        //
+        //
+        // // Sheet Laporan Pendapatan
+        // $myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'LAPORAN PENDAPATAN');
+        // $spreadsheet->addSheet($myWorkSheet, 0);
+        // $spreadsheet->getSheetByName('LAPORAN PENDAPATAN');
+        //
+		// $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('A')->setWidth(7);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('B')->setWidth(25);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('C')->setWidth(25);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('D')->setWidth(25);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('E')->setWidth(25);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('F')->setWidth(25);
+        // $spreadsheet->getActiveSheet()->getStyle("A3:F3")->getFont()->setBold(true);
+        //
+        // $spreadsheet->setActiveSheetIndex(0)
+        // ->setCellValue('A2', 'LAPORAN PENDAPATAN');
+        //
+        // $spreadsheet->setActiveSheetIndex(0)
+		// 	->setCellValue('A3', 'NO')
+		// 	->setCellValue('B3', 'NAMA TAMU')
+		// 	->setCellValue('C3', 'KATEGORI PEMBAYARAN')
+		// 	->setCellValue('D3', 'STATUS PEMBAYARAN')
+		// 	->setCellValue('E3', 'TOTAL TAGIHAN')
+        //     ->setCellValue('F3', 'JML.UANG DITERIMA');
+        //
+        //     $row_startz = 4;
+        //     $countz = 1;
+        //
+        //     $style = array(
+        //         'borders' => array(
+        //             'top' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'right' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'bottom' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'left' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //         ),
+        //     );
+        //
+        // $spreadsheet->getActiveSheet()->getStyle('A3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('B3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('C3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('D3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('E3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('F3')->applyFromArray($style);
+        //
+        // $spreadsheet->getActiveSheet()->mergeCells("A2:F2");
+        // $spreadsheet->getActiveSheet()->getStyle('A2:F2')->getAlignment()->setHorizontal('center');
+        //
+        // foreach($data2 as $value) {
+		// 	$spreadsheet->setActiveSheetIndex(0)
+		// 	->setCellValue('A' . $row_startz, $countz)
+		// 	->setCellValue('B' . $row_startz, $value['nama_tamu'])
+        //     ->setCellValue('C' . $row_startz, $value['pembayaran'])
+        //     ->setCellValue('D' . $row_startz, $value['status_pembayaran'])
+        //     ->setCellValue('E' . $row_startz, $value['subtotal'])
+        //     ->setCellValue('F' . $row_startz, $value['jml_uangmasuk']);
+        //
+        //     $spreadsheet->getActiveSheet()->getStyle('A' . $row_startz)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('B' . $row_startz)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('C' . $row_startz)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('D' . $row_startz)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('E' . $row_startz)->applyFromArray($style);
+        //     $spreadsheet->getActiveSheet()->getStyle('F' . $row_startz)->applyFromArray($style);
+		// 	$row_startz++;
+		// 	$countz++;
+		// }
+        //
+        //
+        // // Sheet Laporan Pengeluaran
+        // $myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'LAPORAN PENGELUARAN');
+        // $spreadsheet->addSheet($myWorkSheet, 0);
+        // $spreadsheet->getSheetByName('LAPORAN PENGELUARAN');
+        //
+		// $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('A')->setWidth(7);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('B')->setWidth(25);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('C')->setWidth(25);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('D')->setWidth(25);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('E')->setWidth(25);
+        // $spreadsheet->setActiveSheetIndex(0)->getColumnDimension('F')->setWidth(25);
+        // $spreadsheet->getActiveSheet()->getStyle("A3:F3")->getFont()->setBold(true);
+        //
+        // $spreadsheet->setActiveSheetIndex(0)
+        // ->setCellValue('A2', 'LAPORAN PENGELUARAN');
+        //
+        // $spreadsheet->setActiveSheetIndex(0)
+		// 	->setCellValue('A3', 'NO')
+		// 	->setCellValue('B3', 'NAMA ITEM')
+		// 	->setCellValue('C3', 'TGL.UANGKELUAR')
+		// 	->setCellValue('D3', 'QUANTITY')
+		// 	->setCellValue('E3', 'HARGA PER ITEM')
+        //     ->setCellValue('F3', 'TOTAL HARGA ITEM');
+        //
+        //     $row_startx = 4;
+        //     $countx = 1;
+        //
+        //     $style = array(
+        //         'borders' => array(
+        //             'top' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'right' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'bottom' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //             'left' => array(
+        //                 'borderStyle' => Border::BORDER_THIN,
+        //                 'color' => array('argb' => 'FF000000'),
+        //             ),
+        //         ),
+        //     );
+        //
+        // $spreadsheet->getActiveSheet()->getStyle('A3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('B3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('C3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('D3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('E3')->applyFromArray($style);
+        // $spreadsheet->getActiveSheet()->getStyle('F3')->applyFromArray($style);
+        //
+        // $spreadsheet->getActiveSheet()->mergeCells("A2:F2");
+        // $spreadsheet->getActiveSheet()->getStyle('A2:F2')->getAlignment()->setHorizontal('center');
+        //
+        // foreach($data3 as $valu) {
+		// 	$spreadsheet->setActiveSheetIndex(0)
+		// 	->setCellValue('A' . $row_startx, $countx)
+		// 	->setCellValue('B' . $row_startx, $valu['item'])
+        //     ->setCellValue('C' . $row_startx, $valu['tgl_uangkeluar'])
+        //     ->setCellValue('D' . $row_startx, $valu['qty'])
+        //     ->setCellValue('E' . $row_startx, $valu['harga_per_item'])
+        //     ->setCellValue('F' . $row_startx, $valu['total_harga_item']);
+        //
+        //     $spreadsheet->getActiveSheet()->getStyle('A' . $row_startx)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('B' . $row_startx)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('C' . $row_startx)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('D' . $row_startx)->applyFromArray($style);
+		// 	$spreadsheet->getActiveSheet()->getStyle('E' . $row_startx)->applyFromArray($style);
+        //     $spreadsheet->getActiveSheet()->getStyle('F' . $row_startx)->applyFromArray($style);
+		// 	$row_startx++;
+		// 	$countx++;
+		// }
+        //
+        //
+		// header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		// header('Content-Disposition: attachment;filename="Laporan Shift FO.xlsx"');
+		// header('Cache-Control: max-age=0');
+		// header('Cache-Control: max-age=1');
+		// header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+		// header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+		// header('Cache-Control: cache, must-revalidate');
+		// header('Pragma: public');
+        //
+		// $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+		// $writer->save('php://output');
+		// exit;
     }
 }

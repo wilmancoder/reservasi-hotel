@@ -75,8 +75,8 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         $identity->sign_in   = $petugas['sign_in'];
 
 
-        // $identity->start_date   = \app\components\Logic::ambilJamshift();
-        // $identity->end_date     = $shift['end_date'];
+        $identity->start_date   = $shift['start_date'];
+        $identity->end_date     = $shift['end_date'];
         $identity->range_date   = $shift['range_date'];
 
 

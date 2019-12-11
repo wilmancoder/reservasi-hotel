@@ -56,24 +56,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <script type="text/javascript">
 
-// function format ( d ) {
-// // `d` is the original data object for the row
-// return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
-//     '<tr>'+
-//         '<td>Checkin:</td>'+
-//         '<td>'+d.checkin+'</td>'+
-//     '</tr>'+
-//     '<tr>'+
-//         '<td>Checkout:</td>'+
-//         '<td>'+d.checkout+'</td>'+
-//     '</tr>'+
-//     '<tr>'+
-//         '<td>Lama Menginap:</td>'+
-//         '<td>'+d.durasi+'</td>'+
-//     '</tr>'+
-// '</table>';
-// }
-
     var t = null;
     $(document).ready(function () {
 

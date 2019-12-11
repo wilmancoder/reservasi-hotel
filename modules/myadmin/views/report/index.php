@@ -66,24 +66,30 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                         ]); ?>
                         <div class="col-md-4">
                             <div class="form-group required">
-                                <?= $form->field($model, 'startdate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                <?= $form->field($model, 'startdate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','data-target' => 'start','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group required">
-                                <?= $form->field($model, 'enddate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                <?= $form->field($model, 'enddate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','data-target' => 'end','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <label class="control-label labelcari">Cari</label>
                             <div class="form-group">
                                 <?= Html::button('<i class="fa fa-search" aria-hidden="true"></i> Cari', ['class' => 'btn btn-success btn-block', 'onclick' => 'reportpreview()']) ?>
                             </div>
                         </div>
+                        <div class="col-md-1">
+                            <label class="control-label labelcari">Reset</label>
+                            <div class="form-group">
+                                <?= Html::button('<i class="fa fa-refresh" aria-hidden="true"></i> Reset', ['class' => 'btn btn-warning btn-block', 'id' => 'idreset']) ?>
+                            </div>
+                        </div>
                         <div class="col-md-2">
                             <label class="control-label labeldownload">Download</label>
                             <div class="form-group">
-                                <?= Html::button('<i class="fa fa-download" aria-hidden="true"></i> Download', ['class' => 'btn btn-primary btn-block', 'onclick' => 'reportdownload()']) ?>
+                                <?= Html::button('<i class="fa fa-download" aria-hidden="true"></i> Download', ['class' => 'btn btn-primary btn-block', 'onclick' => 'reportdownload("excel", this)']) ?>
                             </div>
                         </div>
                         <?php ActiveForm::end(); ?>
@@ -219,24 +225,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
 </div>
 <script type="text/javascript">
 
-// function format ( d ) {
-// // `d` is the original data object for the row
-// return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
-//     '<tr>'+
-//         '<td>Checkin:</td>'+
-//         '<td>'+d.checkin+'</td>'+
-//     '</tr>'+
-//     '<tr>'+
-//         '<td>Checkout:</td>'+
-//         '<td>'+d.checkout+'</td>'+
-//     '</tr>'+
-//     '<tr>'+
-//         '<td>Lama Menginap:</td>'+
-//         '<td>'+d.durasi+'</td>'+
-//     '</tr>'+
-// '</table>';
-// }
-
+    var sessionidharga = <?= $getsessionharga ?>;
     var t = null;
     var tt = null;
     var restemp = 0;
@@ -690,84 +679,63 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
         });
     }
 
-    // function reportFoPengeluaran(posting)
-    // {
-    //     tt.destroy();
-    //
-    //     tt = $('#tbl_laporan_pengeluaran').DataTable({
-    //         "processing": true,
-    //         "serverSide": true,
-    //         "ordering": false,
-    //         "paging": false,
-    //         "info": false,
-    //         "searching": false,
-    //         columnDefs: [
-    //             { width: '5%', targets: 0 },
-    //             { width: '40%', targets: 1 },
-    //             { width: '15%', targets: 2 },
-    //             {
-    //                 width: '20%', targets: 3,
-    //                 targets: 3,
-    //                 className: 'dt-body-right'
-    //             },
-    //             {
-    //                 width: '20%', targets: 4,
-    //                 targets: 4,
-    //                 className: 'dt-body-right'
-    //             },
-    //         ],
-    //         "ajax": {
-    //             "type": 'GET',
-    //             "dataType": "JSON",
-    //             "url": "<?//=\Yii::$app->getUrlManager()->createUrl("myadmin/report/getdatareportfopengeluaran");?>?posting="+posting,
-    //         },
-    //         "columns": [
-    //              {"data": "no"},
-    //              {"data": "item"},
-    //              {"data": "qty"},
-    //              {"data": "harga_per_item"},
-    //              {"data": "total_harga_item"}
-    //         ],
-    //         "footerCallback": function ( row, data, start, end, display ) {
-    //             var api = this.api(), data;
-    //
-    //             // Remove the formatting to get integer data for summation
-    //             var intVal = function ( i ) {
-    //                 return typeof i === 'string' ?
-    //                     i.replace(/[\$.]/g, '')*1 :
-    //                     typeof i === 'number' ?
-    //                         i : 0;
-    //             };
-    //
-    //             // Total over all pages
-    //             total = api
-    //                 .column( 4 )
-    //                 .data()
-    //                 .reduce( function (a, b) {
-    //                     return intVal(a) + intVal(b);
-    //                 }, 0 );
-    //
-    //             // Total over this page
-    //             pageTotal = api
-    //                 .column( 4, { page: 'current'} )
-    //                 .data()
-    //                 .reduce( function (a, b) {
-    //                     return intVal(a) + intVal(b);
-    //                 }, 0 );
-    //
-    //             // Update footer
-    //             $( api.column( 4 ).footer() ).html(
-    //                 '  Rp.'+ total +''
-    //             );
-    //
-    //             var convert = toRupiah(total);
-    //
-    //             $('label#tot_pengeluaran').text('  Rp. '+ convert +'');
-    //             $('th#ttl_pengeluaran').text('  Rp. '+ convert +'');
-    //
-    //             $('#tmppengeluaran').val(total);
-    //         }
-    //     });
-    //
-    // }
+    function reportdownload(type, el){
+        if(type == 'excel') {
+            $(el).html('loading...').addClass('disabled');
+
+    		const formData = new FormData();
+
+            $('.form-tanggal').each(function(k, v) {
+                formData.append($(v).data('target'), $(v).val());
+            });
+
+            // var csrfToken = $('meta[name="csrf-token"]').attr("content");
+            // formData.append('_csrf', csrfToken);
+
+            $.ajax({
+                url: '<?php echo Url::toRoute(['report/downloadreportfo']); ?>',
+                method: 'post',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(res) {
+                     swal('Berhasil', 'dokumen berhasil didownload', 'success');
+                    window.location = '<?=\Yii::$app->getUrlManager()->createUrl(['/download'])?>/' + res.filename;
+                },
+                error: function(err) {
+                    swal('Gagal', 'dokumen gagal didownload, gunakan downloader bawaan browser', 'error');
+                }
+            })
+
+        //     fetch('<?php echo Url::toRoute(['report/downloadreportfo']); ?>', {
+    	// 		method: 'post',
+    	// 		body: formData
+	    //     })
+    	// 		// .then(resp => resp.blob())
+    	// 		// .then(resp => {
+        //             console.log(resp);
+        //             // swal('Sukses', 'ok', 'success');
+        //             // window.location = '<?=\Yii::$app->getUrlManager()->createUrl(['web/download'])?>' + resp.filename;
+    	// 			// var today = new Date();
+        //             //
+    	// 			// const url = window.URL.createObjectURL(blob);
+    	// 			// const a = document.createElement('a');
+    	// 			// a.style.display = 'none';
+    	// 			// a.href = url;
+    	// 			// a.download = `report shift ${today.getDate()}-${today.getMonth()}-${today.getFullYear()}.xlsx`;
+    	// 			// document.body.appendChild(a);
+    	// 			// a.click();
+    	// 			// window.URL.revokeObjectURL(url);
+    	// 			// swal('Berhasil', 'dokumen berhasil didownload', 'success');
+        //             // $(el).html('Download').removeClass('disabled');
+        //
+    	// 		})
+    	// 		.catch(() => swal('Gagal', 'dokumen gagal didownload, gunakan downloader bawaan browser', 'error'));
+        }
+    }
+
+    $(document).on('click','#idreset',function(){
+        window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/report/index'])?>?idharga="+sessionidharga;
+    });
+
 </script>
