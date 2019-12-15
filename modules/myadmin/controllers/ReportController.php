@@ -446,15 +446,37 @@ class ReportController extends \yii\web\Controller
         $filename = 'write-' . date('Y-m-d') . '.xls';
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
+        $roleuser = Yii::$app->user->identity->role;
         $post = Yii::$app->request->post();
+        // var_dump($post);exit;
         $poststartdate = $post['start'];
+        $date1=date_create($poststartdate);
+        $resStartdate = date_format($date1,"d-m-Y");
+
         $postenddate = $post['end'];
+        $date2=date_create($postenddate);
+        $resEnddate = date_format($date2,"d-m-Y");
+
+        $postshift = !empty($post['shift']) ? $post['shift'] : "";
+
+        $pilihshift = !empty($postshift) ? $postshift : "";
+        $modShift = MShift::find()->where(['id' => $pilihshift])->asArray()->one();
+        $resNmshift = $modShift['nm_shift'];
+        $resStartshift = $modShift['start_date'];
+        $resEndshift = $modShift['end_date'];
+        $formattimestart = date('H:i:s', strtotime($resStartshift));
+        $formattimeend = date('H:i:s', strtotime($resEndshift));
+
         if( !empty($poststartdate) && !empty($postenddate) ){
-            $getPosting = $poststartdate.','.$postenddate;
+            if(!empty($pilihshift)) {
+                $getPosting = $poststartdate.','.$postenddate.','.$pilihshift;
+            } else {
+                $getPosting = $poststartdate.','.$postenddate;
+            }
         } else {
             $getPosting = 'all';
         }
+
         $getidpetugas = \Yii::$app->user->identity->id_petugas;
         $getiduser = \Yii::$app->user->identity->id_user;
         $getnmfo = \Yii::$app->user->identity->nama;
@@ -471,21 +493,49 @@ class ReportController extends \yii\web\Controller
         // var_dump($data);exit;
 
         $htmlDetail = '
-        <table>
-            <tr>
-                <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.$poststartdate.' s/d '.$postenddate.'</strong></h3></td>
-            </tr>';
-            if($getPosting != 'all') {
-                $htmlDetail .= '
-                <tr>
-                    <td colspan=11 style="text-align: center;"></td>
-                </tr>';
+        <table>';
+            if($roleuser == '1') {
+                if($getPosting == 'all') {
+                    $htmlDetail .='
+                    <tr>
+                        <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.date('d-m-Y').'</strong></h3></td>
+                    </tr>
+                    <tr>
+                        <td colspan=11 style="text-align: center;"><h5>'.$getshift.' ('.$getstartdate.' - '.$getenddate.')</h5></td>
+                    </tr>
+                    ';
+                } else {
+                    $htmlDetail .='
+                    <tr>
+                        <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.date('d-m-Y').'</strong></h3></td>
+                    </tr>
+                    <tr>
+                        <td colspan=11 style="text-align: center;"><h5>'.$resNmshift.' ('.$formattimestart.' - '.$formattimeend.')</h5></td>
+                    </tr>
+                    ';
+                }
             } else {
-                $htmlDetail .= '
+                $htmlDetail .='
                 <tr>
-                    <td colspan=11 style="text-align: center;"><h5>'.$getshift.' ('.$getstartdate.' - '.$getenddate.')</h5></td>
-                </tr>';
+                    <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.$resStartdate.' s/d '.$resEnddate.'</strong></h3></td>
+                </tr>
+                <tr>
+                    <td colspan=11 style="text-align: center;"><h5>'.$resNmshift.' ('.$formattimestart.' - '.$formattimeend.')</h5></td>
+                </tr>
+                ';
             }
+
+            // if($getPosting != 'all') {
+            //     $htmlDetail .= '
+            //     <tr>
+            //         <td colspan=11 style="text-align: center;"></td>
+            //     </tr>';
+            // } else {
+            //     $htmlDetail .= '
+            //     <tr>
+            //         <td colspan=11 style="text-align: center;"><h5>'.$resNmshift.' ('.$formattimestart.' - '.$formattimeend.')</h5></td>
+            //     </tr>';
+            // }
         $htmlDetail .= '
         </table>
         <table border=1px>

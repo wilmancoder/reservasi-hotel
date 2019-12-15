@@ -359,35 +359,67 @@ class Logic extends Component
         }
     }
 
-    public static function downloadReportpetugas($getPosting='',$getidpetugas,$getiduser)
+    public static function downloadReportpetugas($getPosting,$getidpetugas,$getiduser)
     {
         if($getPosting != 'all'){
             $exp = explode(',',$getPosting);
             $param1 = $exp[0];
             $param2 = $exp[1];
+            $param3 = !empty($exp[2]) ? $exp[2] : "";
 
-            $model = (new \yii\db\Query())
-            ->select(['a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk'])
-            ->from('histori_summarytamu a')
-            ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
-            ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')
-            ->join('INNER JOIN', 'm_mapping_pembayaran d', 'd.id = b.id_mapping_pembayaran')
-            ->join('INNER JOIN', 'm_metode_pembayaran e', 'e.id = d.id_metode_pembayaran')
-            ->join('INNER JOIN', 'm_jenis_pembayaran f', 'f.id = d.id_jenis_pembayaran')
-            ->join('LEFT JOIN', 'm_mapping_harga g', 'g.id = c.id_mapping_harga')
-            ->join('INNER JOIN', 'm_type h', 'h.id = g.id_type')
-            ->join('INNER JOIN', 'summary_ttamu i', 'i.id_transaksi_tamu = a.id_transaksi_tamu')
-            ->join('INNER JOIN', 'biodata_tamu j', 'j.id = b.id_biodata_tamu')
-            ->join('INNER JOIN', 't_petugas k', 'k.id = a.id_petugas')
-            ->join('INNER JOIN', 'users l', 'l.id = k.id_user')
-            ->join('INNER JOIN', 'm_shift m', 'm.id = k.id_shift')
-            ->where('a.tgl_uangmasuk BETWEEN :param1 AND :param2', [':param1' => $param1, 'param2' => $param2])
-            ->andWhere('a.id_user = :id_user', [':id_user' => $getiduser])
-            // ->groupBy('b.id_biodata_tamu')
-            ->orderBy(['a.id_transaksi_tamu' => SORT_ASC])
-            ->all();
+            if(empty($param3)) {
+                $model = (new \yii\db\Query())
+                ->select(['a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk'])
+                ->from('histori_summarytamu a')
+                ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
+                ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')
+                ->join('INNER JOIN', 'm_mapping_pembayaran d', 'd.id = b.id_mapping_pembayaran')
+                ->join('INNER JOIN', 'm_metode_pembayaran e', 'e.id = d.id_metode_pembayaran')
+                ->join('INNER JOIN', 'm_jenis_pembayaran f', 'f.id = d.id_jenis_pembayaran')
+                ->join('LEFT JOIN', 'm_mapping_harga g', 'g.id = c.id_mapping_harga')
+                ->join('INNER JOIN', 'm_type h', 'h.id = g.id_type')
+                ->join('INNER JOIN', 'summary_ttamu i', 'i.id_transaksi_tamu = a.id_transaksi_tamu')
+                ->join('INNER JOIN', 'biodata_tamu j', 'j.id = b.id_biodata_tamu')
+                ->join('INNER JOIN', 't_petugas k', 'k.id = a.id_petugas')
+                ->join('INNER JOIN', 'users l', 'l.id = k.id_user')
+                ->join('INNER JOIN', 'm_shift m', 'm.id = k.id_shift')
+                ->where('a.tgl_uangmasuk BETWEEN :param1 AND :param2', [':param1' => $param1, 'param2' => $param2])
+                ->andWhere('a.id_user = :id_user', [':id_user' => $getiduser])
+                // ->groupBy('b.id_biodata_tamu')
+                ->orderBy(['a.id_transaksi_tamu' => SORT_ASC])
+                ->all();
 
-            return $model;
+                return $model;
+            } else {
+                // echo"masuk2";exit;
+                $cekshift = TPetugas::find()->where(['id_shift' => $param3])->asArray()->all();
+                foreach ($cekshift as $key => $value) {
+                    $result[] = $value['id'];
+                }
+                $impshift = implode(",",$result);
+                $model = (new \yii\db\Query())
+                ->select(['a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk'])
+                ->from('histori_summarytamu a')
+                ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
+                ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')
+                ->join('INNER JOIN', 'm_mapping_pembayaran d', 'd.id = b.id_mapping_pembayaran')
+                ->join('INNER JOIN', 'm_metode_pembayaran e', 'e.id = d.id_metode_pembayaran')
+                ->join('INNER JOIN', 'm_jenis_pembayaran f', 'f.id = d.id_jenis_pembayaran')
+                ->join('LEFT JOIN', 'm_mapping_harga g', 'g.id = c.id_mapping_harga')
+                ->join('INNER JOIN', 'm_type h', 'h.id = g.id_type')
+                ->join('INNER JOIN', 'summary_ttamu i', 'i.id_transaksi_tamu = a.id_transaksi_tamu')
+                ->join('INNER JOIN', 'biodata_tamu j', 'j.id = b.id_biodata_tamu')
+                ->join('INNER JOIN', 't_petugas k', 'k.id = a.id_petugas')
+                ->join('INNER JOIN', 'users l', 'l.id = k.id_user')
+                ->join('INNER JOIN', 'm_shift m', 'm.id = k.id_shift')
+                ->where('a.tgl_uangmasuk BETWEEN :param1 AND :param2', [':param1' => $param1, 'param2' => $param2])
+                ->andWhere('a.id_petugas IN('.$impshift.')')
+                // ->groupBy('b.id_biodata_tamu')
+                ->orderBy(['a.id_transaksi_tamu' => SORT_ASC])
+                ->all();
+
+                return $model;
+            }
         } else {
             $model = (new \yii\db\Query())
             ->select(['a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk'])

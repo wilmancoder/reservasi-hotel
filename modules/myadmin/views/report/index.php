@@ -92,7 +92,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                                 </div>
                             </div>
                             <div class="col-md-2">
-                                <?= $form->field($model, 'id_shift')->dropDownList($listShift, ['class' => 'form-control pilih validate[required]']); ?>
+                                <?= $form->field($model, 'id_shift')->dropDownList($listShift, ['class' => 'form-control pilih validate[required]','data-target' => 'shift']); ?>
                             </div>
                         <?php } ?>
                         <div class="col-md-1">
@@ -763,8 +763,12 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
             $(el).html('loading...').addClass('disabled');
 
     		const formData = new FormData();
-
+            
             $('.form-tanggal').each(function(k, v) {
+                formData.append($(v).data('target'), $(v).val());
+            });
+
+            $('.pilih').each(function(k, v) {
                 formData.append($(v).data('target'), $(v).val());
             });
 
