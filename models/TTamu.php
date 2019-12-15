@@ -24,7 +24,7 @@ use Yii;
  */
 class TTamu extends \yii\db\ActiveRecord
 {
-    public $namatamu, $identitas,$alamat,$list_kamar,$nomor_identitas, $nomor_kontak, $hargaperkamar, $subtotalkamar, $startdate, $enddate,$no_kartu_debit;
+    public $namatamu, $identitas,$alamat,$list_kamar,$nomor_identitas, $nomor_kontak, $hargaperkamar, $subtotalkamar, $startdate, $enddate,$no_kartu_debit,$id_shift;
     /**
      * {@inheritdoc}
      */
@@ -67,7 +67,8 @@ class TTamu extends \yii\db\ActiveRecord
             'created_date_cekout' => 'Created Date Cekout',
             'created_by_cekout' => 'Created By Cekout',
             'hargaperkamar' => 'Harga Kamar',
-            'subtotalkamar' => 'SubTotal'
+            'subtotalkamar' => 'SubTotal',
+            'id_shift' => 'Shift'
         ];
     }
 }

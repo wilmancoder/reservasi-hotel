@@ -403,7 +403,7 @@ class RoomsController extends \yii\web\Controller
              if (Yii::$app->request->post()) {
                  // $getid = $_GET;
                  $post = @$_POST['bayarpelunasan'];
-                //  var_dump($_POST);exit;
+                 // var_dump($_POST['sisa']);exit;
 
                 $cekbiodatatamu =  TTamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->one();
 
@@ -411,7 +411,7 @@ class RoomsController extends \yii\web\Controller
                     foreach ($_POST['id_tamu'] as $key ) {
                         // var_dump($key);
                         $modelTransaksitamu =  TTamu::find()->where(['id' => $key])->one();
-                        $modelTransaksitamu['status'] = "0";
+                        $modelTransaksitamu['status'] = 0;
                         $modelTransaksitamu['created_date_cekout'] = date('Y-m-d H:i:s');
                         $modelTransaksitamu->save();
                     }
@@ -437,6 +437,7 @@ class RoomsController extends \yii\web\Controller
                 $modelHistoriSummaryttamu = new HistoriSummarytamu();
                 $modelHistoriSummaryttamu->id_transaksi_tamu = $cekbiodatatamu['id_biodata_tamu'];
                 $modelHistoriSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
+                $modelHistoriSummaryttamu->id_user = Yii::$app->user->identity->id_user;
                 if( (!empty($_POST['dp']) && !empty($_POST['sisa'])) ){
                     $modelHistoriSummaryttamu->pembayaran = "SISA";
                     $modelHistoriSummaryttamu->status_pembayaran = "LUNAS";
@@ -663,7 +664,7 @@ class RoomsController extends \yii\web\Controller
 
         $idbio = $ambilDatatamu[0]['id_biodata_tamu'];
         $idttamu = $idbio.",".$tipe;
-        // var_dump($idttamu);exit;
+        // var_dump($idbio);exit;
         // $mapPembayaran = MMappingPembayaran::find()->where(['id_metode_pembayaran' => $tipe, 'id_jenis_pembayaran' => 2])->one();
         $model = TTamu::find()->where(['id' => $id])->one();
 
@@ -710,9 +711,16 @@ class RoomsController extends \yii\web\Controller
             }
             $model2->total_harga =  (string)(((int)$model2->total_harga + $_POST['TTamu']['subtotalkamar'])- $model->harga);
             $model2->sisa = (string)((int)$model2->total_harga - $model2->dp);
-            $model2->save();
+            if($model2->save()){
+                if( (!empty($model2->sisa)) && ($model2->total_bayar < $model2->total_harga) ){
+                    // echo"masuk1";exit;
+                    TTamu::updateAll(['id_mapping_pembayaran' => '3' ], ['id_biodata_tamu' => $idbio]);
+                } else {
+                    // echo"masuk2";exit;
+                    TTamu::updateAll(['id_mapping_pembayaran' => $hasilcek ], ['id_biodata_tamu' => $ambilDatatamu[0]['id_biodata_tamu']]);
+                }
+            }
         }
-        TTamu::updateAll(['id_mapping_pembayaran' => $hasilcek ], ['id_biodata_tamu' => $ambilDatatamu[0]['id_biodata_tamu']]);
         MMappingKamar::updateAll(['status' => 'tersedia', ], ['nomor_kamar' => $ambilDatatamu[0]['nomor_kamar']]);
         $hasil = array(
             'status' => "success",

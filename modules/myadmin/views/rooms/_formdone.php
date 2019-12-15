@@ -291,7 +291,7 @@ use yii\helpers\Html;
                             </div>
                         </div>
                     <?php } ?>
-                    <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" disabled = "disabled" class="form-control" value="<?= $totalhargasummary?>">
+                    <input type="text" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
                 </div>
             </div>
 

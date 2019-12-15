@@ -401,11 +401,11 @@ use yii\helpers\Html;
                     swal(result.header, result.message, result.status);
                     // alert(result.idtamu); return false;
                     if (result.status == "success") {
-                        $('#modalPilihkamarId').modal('hide');
-                        var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
-                        var title = "Form Check-out";
-                        showModalRooms(url,title);
-                        // window.location = "<?//=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
+                        // $('#modalPilihkamarId').modal('hide');
+                        // var url = "<?php //echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
+                        // var title = "Form Check-out";
+                        // showModalRooms(url,title);
+                        window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
                     }
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
@@ -449,11 +449,11 @@ use yii\helpers\Html;
                     swal(result.header, result.message, result.status);
 
                     if (result.status == "success") {
-                        $('#modalPilihkamarId').modal('hide');
-                        var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
-                        var title = "Form Check-out";
-                        showModalRooms(url,title);
-                        // window.location = "<?//=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
+                        // $('#modalPilihkamarId').modal('hide');
+                        // var url = "<?php //echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
+                        // var title = "Form Check-out";
+                        // showModalRooms(url,title);
+                        window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
                     }
                 },
                 error: function (xhr, ajaxOptions, thrownError) {

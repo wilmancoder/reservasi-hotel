@@ -33,11 +33,16 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
         <?php
             $timestart = $modelShift['start_date'];
             $timeend   = $modelShift['end_date'];
-            $formattimestart = date('H:i', strtotime($timestart));
-            $formattimeend = date('H:i', strtotime($timeend));
+            $formattimestart = date('H:i:s', strtotime($timestart));
+            $formattimeend = date('H:i:s', strtotime($timeend));
         ?>
-        <label class="control-label"><h3 class="title">Laporan Pendapatan dan Pengeluaran Tanggal <u><?= date('d-m-Y')?></u></h3></label>
-        <p><label class="control-label labelshift"><?= $modelShift['nm_shift']?> : &nbsp;&nbsp;&nbsp;<?= $formattimestart?> - <?= $formattimeend?></label></p>
+        <?php if($roleuser == '1') { ?>
+            <label class="control-label"><h3 class="title">Laporan Pendapatan dan Pengeluaran Tanggal <u><span id="id-postdate"><?= date('d-m-Y')?></span></u></h3></label>
+            <p><label class="control-label labelshift"><span id="id-shiftnm"><?= $modelShift['nm_shift']?> :</span> &nbsp;&nbsp;&nbsp;<span id="id-shiftjam"><?= $formattimestart?> - <?= $formattimeend?></span></label></p>
+        <?php } else { ?>
+            <label class="control-label"><h3 class="title">Laporan Pendapatan dan Pengeluaran Tanggal <u><span id="id-postdate"><?= date('d-m-Y')?></span></u></h3></label>
+            <p><label class="control-label labelshift"><span id="id-nmshift"><?= $modelShift['nm_shift']?></span> : &nbsp;&nbsp;&nbsp;<span id="id-jamshift"><?= $formattimestart?> - <?= $formattimeend?></span></label></p>
+        <?php } ?>
 
     </div>
     <div class="row">
@@ -64,16 +69,32 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                                 // 'novalidate' => 'novalidate'
                             ]
                         ]); ?>
-                        <div class="col-md-4">
-                            <div class="form-group required">
-                                <?= $form->field($model, 'startdate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','data-target' => 'start','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                        <?php if($roleuser == '1') { ?>
+                            <div class="col-md-4">
+                                <div class="form-group required">
+                                    <?= $form->field($model, 'startdate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','data-target' => 'start','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group required">
-                                <?= $form->field($model, 'enddate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','data-target' => 'end','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                            <div class="col-md-4">
+                                <div class="form-group required">
+                                    <?= $form->field($model, 'enddate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','data-target' => 'end','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                </div>
                             </div>
-                        </div>
+                        <?php } else { ?>
+                            <div class="col-md-3">
+                                <div class="form-group required">
+                                    <?= $form->field($model, 'startdate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','data-target' => 'start','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group required">
+                                    <?= $form->field($model, 'enddate')->textInput(['maxlength' => true, 'class' => 'form-control form-tanggal','data-target' => 'end','placeholder' => 'Klik disini ...', 'autocomplete' => 'off']) ?>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <?= $form->field($model, 'id_shift')->dropDownList($listShift, ['class' => 'form-control pilih validate[required]']); ?>
+                            </div>
+                        <?php } ?>
                         <div class="col-md-1">
                             <label class="control-label labelcari">Cari</label>
                             <div class="form-group">
@@ -187,9 +208,15 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                                 <div class="form-group">
                                     <label class="control-label"> <?= $user['nama']?></label>
                                 </div>
-                                <div class="form-group">
-                                    <label class="control-label"> Petugas FO</label>
-                                </div>
+                                <?php if($roleuser == '1') { ?>
+                                    <div class="form-group">
+                                        <label class="control-label"> Petugas FO</label>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="form-group">
+                                        <label class="control-label"> Back Office</label>
+                                    </div>
+                                <?php } ?>
                             </div>
                         </div>
                     </div>
@@ -226,17 +253,28 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
 <script type="text/javascript">
 
     var sessionidharga = <?= $getsessionharga ?>;
+    var cekrole = <?= $roleuser ?>;
     var t = null;
     var tt = null;
     var restemp = 0;
     $(document).ready(function () {
-
+        formattingFirstDate();
+        formattingSecondDate();
+        $(".pilih").select2();
         // var ttlstr = grandtotalsetor(pendapatantemp,pengeluarantemp);
         // $('label#jmlsetor').text(ttlstr);
         $('.form-tanggal').datepicker({
             format: 'yyyy-mm-dd',
             autoclose: true
         });
+
+        if(cekrole != 1) {
+            $('#ttamu-startdate').val(formattingFirstDate());
+            $('#ttamu-enddate').val(formattingSecondDate());
+        } else {
+            $('#ttamu-startdate').val("");
+            $('#ttamu-enddate').val("");
+        }
         // alert(pendapatan); return false;
         t = $('#tbl_laporan_pendapatan').DataTable();
         pendapatan_preview();
@@ -246,6 +284,33 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
 
 
     });
+
+    function formattingFirstDate(){
+        var d = new Date();
+
+        var month = d.getMonth()+1;
+        var day = d.getDate();
+
+        var output = d.getFullYear() + '-' +
+            ((''+month).length<2 ? '0' : '') + month + '-' +
+            ((''+day).length<2 ? '0' : '') + day;
+
+        return output;
+    }
+
+    function formattingSecondDate(cekShift){
+        // alert(cekShift); return false;
+        var d = new Date();
+
+        var month = d.getMonth()+1;
+        var day = d.getDate();
+
+        var output = d.getFullYear() + '-' +
+            ((''+month).length<2 ? '0' : '') + month + '-' +
+            ((''+day).length<2 ? '0' : '') + day;
+
+        return output;
+    }
 
     function pendapatan_preview()
     {
@@ -500,6 +565,20 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
             success: function (result) {
                 if(result.status == 'success'){
                     var posting = result.joinposting;
+                    // alert(posting); return false;
+                    var postdate = result.resStartdate+' s/d '+result.resEnddate;
+                    var nmshift = result.resNmshift;
+                    var jamshift = result.resStartshift+' - '+result.resEndshift;
+                    // alert(postdate);
+                    if(cekrole != 1) {
+                        $('#id-postdate').html(postdate);
+                        $('#id-nmshift').html(nmshift);
+                        $('#id-jamshift').html(jamshift);
+                    } else {
+                        $('#id-postdate').html(postdate);
+                        $('#id-shiftnm').hide();
+                        $('#id-shiftjam').hide();
+                    }
                     // alert(posting); return false;
                     reportFo(posting);
                     // reportFoPengeluaran(posting);

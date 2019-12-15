@@ -14,6 +14,7 @@ use app\models\MShift;
 use app\models\TPengeluaranPetugas;
 use app\models\SummaryTtamu;
 use app\models\TTamu;
+use yii\helpers\ArrayHelper;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -70,12 +71,17 @@ class ReportController extends \yii\web\Controller
         $petugas = Yii::$app->user->identity->id_petugas;
         $idshift = Yii::$app->user->identity->id_shift;
         $iduser = Yii::$app->user->identity->id_user;
+        $roleuser = Yii::$app->user->identity->role;
+
         $modelShift = MShift::find()->where(['id'=>$idshift])->asArray()->one();
         $Summarytamupendapatan = Logic::grandtotalPendapatan($petugas);
         $Summarytamupengeluaran = Logic::grandtotalPengeluaran($petugas);
         $resultGrandtotal = $Summarytamupendapatan - $Summarytamupengeluaran;
         $namapetugas = TPetugas::find()->where(['id_user' => $iduser])->orderBy(['id' => SORT_DESC])->asArray()->one();
         $user = Users::find()->where(['id' => $namapetugas['id_user']])->asArray()->one();
+
+        $mShift=MShift::find()->where('id NOT IN(4)')->all();
+        $listShift=ArrayHelper::map($mShift,'id','nm_shift');
         // var_dump($user['nama']);exit;
         return $this->render('index', [
             'idpetugas' => $petugas,
@@ -85,7 +91,9 @@ class ReportController extends \yii\web\Controller
             'resultGrandtotal' => $resultGrandtotal,
             'user' => $user,
             'model' => $model,
-            'getsessionharga' => $getsessionharga
+            'getsessionharga' => $getsessionharga,
+            'roleuser' => $roleuser,
+            'listShift' => $listShift
         ]);
     }
 
@@ -126,11 +134,29 @@ class ReportController extends \yii\web\Controller
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = Yii::$app->request->post();
+        // var_dump($post);exit;
         $ambilPosting = $post['TTamu'];
+
         $poststartdate = $ambilPosting['startdate'];
+        $date1=date_create($poststartdate);
+        $resStartdate = date_format($date1,"d-m-Y");
+
         $postenddate = $ambilPosting['enddate'];
+        $date2=date_create($postenddate);
+        $resEnddate = date_format($date2,"d-m-Y");
+
+        $pilihshift = !empty($ambilPosting['id_shift']) ? $ambilPosting['id_shift'] : "";
+        $modShift = MShift::find()->where(['id' => $pilihshift])->asArray()->one();
+        $resNmshift = $modShift['nm_shift'];
+        $resStartshift = $modShift['start_date'];
+        $resEndshift = $modShift['end_date'];
+
         if( !empty($poststartdate) && !empty($postenddate) ){
-            $joinposting = $poststartdate.','.$postenddate;
+            if(!empty($pilihshift)) {
+                $joinposting = $poststartdate.','.$postenddate.','.$pilihshift;
+            } else {
+                $joinposting = $poststartdate.','.$postenddate;
+            }
         } else {
             $joinposting = 'all';
         }
@@ -139,7 +165,13 @@ class ReportController extends \yii\web\Controller
 
             $hasil = array(
                 'status' => "success",
-                'joinposting' => $joinposting
+                'joinposting' => $joinposting,
+                'resStartdate' => $resStartdate,
+                'resEnddate' => $resEnddate,
+                'pilihshift' => $pilihshift,
+                'resNmshift' => $resNmshift,
+                'resStartshift' => $resStartshift,
+                'resEndshift' => $resEndshift
             );
         }
         echo json_encode($hasil);
@@ -233,7 +265,7 @@ class ReportController extends \yii\web\Controller
         $getiduser = \Yii::$app->user->identity->id_user;
 
         $data = \app\components\Logic::reportPetugaspengeluaran($getPosting,$getidpetugas,$getiduser);
-
+        // var_dump($data);exit;
         $row = array();
         $i = 0;
         $no = 1;
@@ -257,7 +289,9 @@ class ReportController extends \yii\web\Controller
         if(Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;
-            $data = \app\components\Logic::reportFo($idpetugas);
+            $param1 = date('Y-m-d');
+            $param2 = date('Y-m-d');
+            $data = \app\components\Logic::reportFo($idpetugas,$param1,$param2);
             $row = array();
             $i = 0;
             $no = 1;
@@ -291,7 +325,9 @@ class ReportController extends \yii\web\Controller
         if(Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;
-            $data = TPengeluaranPetugas::find()->where(['id_petugas' => $idpetugas])->asArray()->all();
+            $param1 = date('Y-m-d');
+            $param2 = date('Y-m-d');
+            $data = \app\components\Logic::reportFopengeluaran($idpetugas,$param1,$param2);
             $row = array();
             $i = 0;
             $no = 1;
