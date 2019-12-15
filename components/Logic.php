@@ -205,14 +205,23 @@ class Logic extends Component
 
     public static function reportFopengeluaran($idpetugas,$param1,$param2)
     {
-        $model = (new \yii\db\Query())
+        if(!empty($idpetugas)) {
+            $model = (new \yii\db\Query())
             ->select(['a.id', 'a.tgl_uangkeluar', 'a.id_user', 'a.item', 'a.qty', 'a.harga_per_item', 'a.total_harga_item'])
             ->from('t_pengeluaran_petugas a')
             ->where('a.tgl_uangkeluar BETWEEN :param1 AND :param2', [':param1' => $param1, 'param2' => $param2])
             ->andWhere('a.id_petugas = :id_petugas', [':id_petugas' => $idpetugas])
             ->orderBy(['a.id' => SORT_ASC])
             ->all();
-        return $model;
+            return $model;
+        } else {
+            $model = (new \yii\db\Query())
+            ->select(['a.id', 'a.tgl_uangkeluar', 'a.id_user', 'a.item', 'a.qty', 'a.harga_per_item', 'a.total_harga_item'])
+            ->from('t_pengeluaran_petugas a')
+            ->orderBy(['a.id' => SORT_ASC])
+            ->all();
+            return $model;
+        }
 
     }
 
@@ -240,6 +249,7 @@ class Logic extends Component
 
     public static function reportAll($getPosting)
     {
+        // var_dump($getPosting);exit;
         if($getPosting != 'all'){
             $exp = explode(',',$getPosting);
             $param1 = $exp[0];
@@ -495,6 +505,36 @@ class Logic extends Component
         }
     }
 
+    public static function reportPetugaspengeluaranspec($getPosting)
+    {
+        if($getPosting != 'all'){
+            $exp = explode(',',$getPosting);
+            $param1 = $exp[0];
+            $param2 = $exp[1];
+
+
+            $model = (new \yii\db\Query())
+            ->select(['a.id', 'a.tgl_uangkeluar', 'a.id_user', 'a.item', 'a.qty', 'a.harga_per_item', 'a.total_harga_item'])
+            ->from('t_pengeluaran_petugas a')
+            ->where('a.tgl_uangkeluar BETWEEN :param1 AND :param2', [':param1' => $param1, 'param2' => $param2])
+            // ->andWhere('a.id_user = :id_user', [':id_user' => $getiduser])
+            ->orderBy(['a.id' => SORT_ASC])
+            ->all();
+
+            return $model;
+
+        } else {
+            $model = (new \yii\db\Query())
+            ->select(['a.id', 'a.tgl_uangkeluar', 'a.id_user', 'a.item', 'a.qty', 'a.harga_per_item', 'a.total_harga_item'])
+            ->from('t_pengeluaran_petugas a')
+            // ->where('a.id_petugas = :id_petugas', [':id_petugas' => $getidpetugas])
+            ->orderBy(['a.id' => SORT_ASC])
+            ->all();
+
+            return $model;
+        }
+    }
+
     public static function detailreportFo($idtranstamu)
     {
         $model = (new \yii\db\Query())
@@ -537,21 +577,39 @@ class Logic extends Component
 
     public static function grandtotalPendapatan($petugas)
     {
-        $model = (new \yii\db\Query())
-        ->from('histori_summarytamu a')
-        ->where('a.id_petugas = :idpetugas', [':idpetugas' => $petugas]);
-        $sum = $model->sum('jml_uangmasuk');
+        if(!empty($petugas)) {
+            $model = (new \yii\db\Query())
+            ->from('histori_summarytamu a')
+            ->where('a.id_petugas = :idpetugas', [':idpetugas' => $petugas]);
+            $sum = $model->sum('jml_uangmasuk');
 
-        return $sum;
+            return $sum;
+        } else {
+            $model = (new \yii\db\Query())
+            ->from('histori_summarytamu a');
+            // ->where('a.id_petugas = :idpetugas', [':idpetugas' => $petugas]);
+            $sum = $model->sum('jml_uangmasuk');
+
+            return $sum;
+        }
     }
     public static function grandtotalPengeluaran($petugas)
     {
-        $model = (new \yii\db\Query())
-        ->from('t_pengeluaran_petugas a')
-        ->where('a.id_petugas = :idpetugas', [':idpetugas' => $petugas]);
-        $sum = $model->sum('total_harga_item');
+        if(!empty($petugas)) {
+            $model = (new \yii\db\Query())
+            ->from('t_pengeluaran_petugas a')
+            ->where('a.id_petugas = :idpetugas', [':idpetugas' => $petugas]);
+            $sum = $model->sum('total_harga_item');
 
-        return $sum;
+            return $sum;
+        } else {
+            $model = (new \yii\db\Query())
+            ->from('t_pengeluaran_petugas a');
+            // ->where('a.id_petugas = :idpetugas', [':idpetugas' => $petugas]);
+            $sum = $model->sum('total_harga_item');
+
+            return $sum;
+        }
     }
 
     public static function jamKerja($idshift){

@@ -100,9 +100,24 @@ class ReportController extends \yii\web\Controller
     public function actionIndexall()
     {
         $model = new TTamu();
+        $idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : 1;
+        $session = Yii::$app->session;
+        $session->set('idharga', $idharga);
+        $getsessionharga = $session->get('idharga');
+
+        $petugas = '';
+
+        $Summarytamupendapatan = Logic::grandtotalPendapatan($petugas);
+        $Summarytamupengeluaran = Logic::grandtotalPengeluaran($petugas);
+        $resultGrandtotal = $Summarytamupendapatan - $Summarytamupengeluaran;
+
         return $this->render('indexAll', [
             'model' => $model,
-            'posting'=>'all'
+            'posting'=>'all',
+            'getsessionharga' => $getsessionharga,
+            'Summarytamupendapatan' => $Summarytamupendapatan,
+            'Summarytamupengeluaran' => $Summarytamupengeluaran,
+            'resultGrandtotal' => $resultGrandtotal
         ]);
     }
 
@@ -179,24 +194,12 @@ class ReportController extends \yii\web\Controller
     }
 
     public function actionGetdatareportall() {
-        // if(Yii::$app->request->isAjax)
-        // {
+        if(Yii::$app->request->isAjax)
+        {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             $get = Yii::$app->request->get();
             $getPosting = $get['posting'];
-            // var_dump($getPosting);exit;
-            // if($getPosting != 'all') {
-            //
-            //     $exp = explode(',',$getPosting);
-            //     $param1 = $exp[0];
-            //     $param2 = $exp[1];
-            // } else {
-            //     $param1 = '0000-00-00';
-            //     $param2 = '0000-00-00';
-            // }
-            // var_dump($getPosting);
-            // var_dump($param2);
-            // exit;
+
             $data = \app\components\Logic::reportAll($getPosting);
             // var_dump($data);exit;
             $row = array();
@@ -221,7 +224,7 @@ class ReportController extends \yii\web\Controller
             $hasil['data'] = $row;
                 // var_dump($hasil);exit();
             return $hasil;
-        // }
+        }
     }
 
     public function actionGetdatareportfo() {
@@ -285,6 +288,32 @@ class ReportController extends \yii\web\Controller
         return $hasil;
     }
 
+    public function actionGetdatareportfopengeluaranspec() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $get = Yii::$app->request->get();
+        $getPosting = $get['posting'];
+
+        $data = \app\components\Logic::reportPetugaspengeluaranspec($getPosting);
+        // var_dump($data);exit;
+        $row = array();
+        $i = 0;
+        $no = 1;
+        foreach ($data as $idx => $value) {
+            foreach ($value as $key => $val) {
+                $row[$i][$key] = $val;
+            }
+            $row[$i]['no'] = $no++;
+            $row[$i]['item'] = $value['item'];
+            $row[$i]['qty'] = $value['qty'];
+            $row[$i]['harga_per_item'] = \app\components\Logic::formatNumber($value['harga_per_item'], 0);
+            $row[$i]['total_harga_item'] = \app\components\Logic::formatNumber($value['total_harga_item'], 0);
+
+            $i++;
+        }
+        $hasil['data'] = $row;
+        return $hasil;
+    }
+
     public function actionGetdatapendapatan($idpetugas) {
         if(Yii::$app->request->isAjax)
         {
@@ -325,8 +354,8 @@ class ReportController extends \yii\web\Controller
         if(Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;
-            $param1 = date('Y-m-d');
-            $param2 = date('Y-m-d');
+            $param1 = '';
+            $param2 = '';
             $data = \app\components\Logic::reportFopengeluaran($idpetugas,$param1,$param2);
             $row = array();
             $i = 0;
