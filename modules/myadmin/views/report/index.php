@@ -778,8 +778,10 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                 contentType: false,
                 processData: false,
                 success: function(res) {
-                     swal('Berhasil', 'dokumen berhasil didownload', 'success');
-                    window.location = '<?=\Yii::$app->getUrlManager()->createUrl(['/download'])?>/' + res.filename;
+                     swal('Berhasil', 'dokumen berhasil didownload', 'success').then((ya) => {
+                        $(el).html('<i class="fa fa-download" aria-hidden="true"></i> Download').removeClass('disabled');
+                        window.location = '<?=\Yii::$app->getUrlManager()->createUrl(['/download'])?>/' + res.filename;
+                     });
                 },
                 error: function(err) {
                     swal('Gagal', 'dokumen gagal didownload, gunakan downloader bawaan browser', 'error');
