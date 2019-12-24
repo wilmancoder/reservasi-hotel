@@ -160,11 +160,11 @@ $this->params['breadcrumbs'][] = $this->title;
         // } );
     }
 
-    function detail(idtranstamu) {
-         var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/report/detsubtotal']);?>?idtranstamu=" + idtranstamu;
-         var title = "Detail Subtotal";
-         showModal(url, title);
-     }
+    // function detail(idtranstamu) {
+    //      var url = "<?php //echo \Yii::$app->getUrlManager()->createUrl(['myadmin/report/detsubtotal']);?>?idtranstamu=" + idtranstamu;
+    //      var title = "Detail Data Tamu";
+    //      showModal(url, title);
+    //  }
 
      function showModal(url, title) {
          $("#modalDetailTitle").empty();

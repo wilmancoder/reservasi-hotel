@@ -319,11 +319,11 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
         // table.destroy();
         t = $('#tbl_laporan_pendapatan').DataTable({
             "processing": true,
-            // "serverSide": true,
-            // "ordering": false,
-            // "paging": false,
-            // "info": false,
-            // "searching": false,
+            "serverSide": true,
+            "ordering": false,
+            "paging": false,
+            "info": false,
+            "searching": false,
             columnDefs: [
                 { width: '5%', targets: 0 },
                 { width: '5%', targets: 1 },
@@ -596,11 +596,11 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
 
         t = $('#tbl_laporan_pendapatan').DataTable({
             "processing": true,
-            // "serverSide": true,
-            "ordering": true,
-            // "paging": true,
-            // "info": false,
-            "searching": true,
+            "serverSide": true,
+            "ordering": false,
+            "paging": false,
+            "info": false,
+            "searching": false,
             columnDefs: [
                 { width: '5%', targets: 0 },
                 { width: '5%', targets: 1 },
@@ -763,7 +763,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
             $(el).html('loading...').addClass('disabled');
 
     		const formData = new FormData();
-            
+
             $('.form-tanggal').each(function(k, v) {
                 formData.append($(v).data('target'), $(v).val());
             });

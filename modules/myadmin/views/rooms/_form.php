@@ -297,18 +297,26 @@ use yii\helpers\Html;
                         <div class="col-md-6">
                             <label class="control-label" style="font-size:15px;">Jenis Pembayaran</label>
                             <div class="row mright-rdio">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label class="container">Pembayaran Penuh
-                                          <input type="radio" checked="checked" name="TTamu[radio]" class="idradio" value="lunas">
+                                        <label class="container">Lunas
+                                          <input type="radio" checked="checked" name="TTamu[radio]" id="aydi" class="idradio" value="lunas">
                                           <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="container">Sebagian
+                                            <input type="radio" name="TTamu[radio]" class="idradio" value="sebagian">
+                                            <span class="checkmark"></span>
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="container">Pembayaran Sebagian
-                                            <input type="radio" name="TTamu[radio]" class="idradio" value="sebagian">
+                                        <label class="container">Belum Bayar
+                                            <input type="radio" name="TTamu[radio]" class="idradio" value="belumbayar">
                                             <span class="checkmark"></span>
                                         </label>
                                     </div>
@@ -440,8 +448,19 @@ use yii\helpers\Html;
         $('#garis'+valueT).remove();
         $('#kolomrole'+valueT).remove();
         $('#remove_role'+valueT).remove();
-        $('#summaryttamu-dp').val(0);
-        $('#summaryttamu-dp').number(true);
+        // $('#summaryttamu-dp').val(0);
+        // $('#summaryttamu-dp').number(true);
+
+        $('#aydi').trigger("click", function() {
+            // $('#summaryttamu-dp').val($('#summaryttamu-total_harga').val());
+            $('#summaryttamu-dp').val(0);
+            $('#summaryttamu-dp').number(true);
+            $('#iddp').hide();
+            $('.field-summaryttamu-total_harga').show();
+            $('#summaryttamu-sisa').val(0);
+            // total();
+        })
+
         // $('#summaryttamu-sisa').val( $('#summaryttamu-dp').val() );
         total();
     }
@@ -472,6 +491,8 @@ use yii\helpers\Html;
 
     function setDefault()
     {
+        var valueT = document.getElementById("comcounter").innerHTML;
+        valueT = Number(valueT) + 1;
         var setdefault = 0;
         var gethargaawal = <?= $ambilharga?>;
         $('#summaryttamu-total_bayar').val(gethargaawal);
@@ -483,8 +504,8 @@ use yii\helpers\Html;
         $('#summaryttamu-dp').val(0);
         $('#summaryttamu-dp').number( true );
 
-        $('#ttamu-subtotalkamar"'+valueT+'"').val(setdefault);
-        $('#ttamu-durasi"'+valueT+'"').val(setdefault);
+        $('#ttamu-subtotalkamar'+valueT).val(setdefault);
+        $('#ttamu-durasi'+valueT).val(setdefault);
     }
 
     function addForm() {
@@ -602,9 +623,27 @@ use yii\helpers\Html;
                 });
                 return false;
 
+            } else if($('#firstDate0').val()==''){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Tanggal Checkin Tamu Wajib Diisi.',
+                    icon: "info",
+                    dangerMode: true,
+                }).then((ya) => {
+                    $('#firstDate0').focus();
+                });
+                return false;
+            } else if($('#secondDate0').val()==''){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Tanggal Checkout Tamu Wajib Diisi.',
+                    icon: "info",
+                    dangerMode: true,
+                }).then((ya) => {
+                    $('#secondDate0').focus();
+                });
+                return false;
             } else {
-                // return false;
-
 
                 swal({
                     title: "Konfirmasi",
@@ -676,7 +715,15 @@ use yii\helpers\Html;
 
     $(document).on('change','.secondDate',function(event){
         event.preventDefault();
+        $('#aydi').trigger("click", function() {
+            $('#summaryttamu-dp').val($('#summaryttamu-total_harga').val());
+            $('#iddp').hide();
+            $('.field-summaryttamu-total_harga').show();
+            $('#summaryttamu-sisa').val(0);
+            total();
+        })
         var urutan = $(this).attr('urutan');
+        // $('#idradio').attr('checked',true);
         $('#summaryttamu-dp').val(0);
         $('#summaryttamu-dp').number(true);
         field_kamar(urutan,cekShift);
@@ -732,19 +779,28 @@ use yii\helpers\Html;
                 var val = $(this).val();
                 console.log(val);
                 if(val == "lunas") {
-                    $('#summaryttamu-dp').val($('#summaryttamu-total_harga').val());
+                    // $('#summaryttamu-dp').val($('#summaryttamu-total_harga').val());
+                    $('#summaryttamu-dp').val(0);
+                    $('#summaryttamu-dp').number( true );
                     $('#iddp').hide();
                     $('.field-summaryttamu-total_harga').show();
                     $('#summaryttamu-sisa').val(0);
                     total();
-                }
-                else{
+                } else if(val == "sebagian"){
                     $('.field-summaryttamu-total_harga').hide();
+                    $('#summaryttamu-total_bayar').val($('#summaryttamu-total_harga').val());
                     $('#summaryttamu-dp').val(0);
                     $('#summaryttamu-dp').number( true );
                     $('#summaryttamu-dp').focus();
                     // $('#summaryttamu-sisa').val( $('#summaryttamu-total_bayar').val() )
                     $('#iddp').show();
+                } else {
+                    $('#summaryttamu-total_bayar').val(0);
+                    $('#summaryttamu-total_bayar').number( true );
+                    $('#iddp').hide();
+                    $('#summaryttamu-sisa').val($('#summaryttamu-total_harga').val());
+                    $('.field-summaryttamu-total_harga').show();
+                    // $('#summaryttamu-total_harga').val($('#summaryttamu-total_harga').val());
                 }
             }
     });

@@ -2,6 +2,7 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 // var_dump($ambilDatatamu);exit;
 ?>
 <style type="text/css">
@@ -15,6 +16,15 @@ use yii\helpers\Html;
         text-align: center;
         padding-top: 10px;
     } */
+    #idjmlbed {
+        text-align: center;
+    }
+    #titlebed {
+        color: white;
+    }
+    #totalbed {
+        font-weight: bold;
+    }
     #ttamu-bayar {
         font-size: 20px;
         font-weight: bold;
@@ -203,6 +213,68 @@ use yii\helpers\Html;
 
             <div class="box box-warning">
                 <div class="box-body">
+                    <?php if(empty($cektbed)) { ?>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                      <input type="checkbox" name="nmextrabed" class="clextrabed" value="extrabed">
+                                      <span>Ceklist jika tamu ingin menambah kasur <strong>(Extra Bed)</strong>.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="display:none;" id='divbed'>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">Harga per Kasur :</label>
+                                    <input type="text" name="nmhrgbed" class="form-control clhrgbed" id="idhrgbed" value="<?= "Rp. " . \app\components\Logic::formatNumber($resultbed, 0)?>" disabled="true">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">Jumlah Kasur :</label>
+                                    <input type="number" name="nmjmlbed" class="form-control cljmlbed numberinput" id="idjmlbed" value="1" disabled="true">
+                                </div>
+                            </div>
+                            <div class="col-md-4" style="text-align:right;">
+                                <div class="form-group">
+                                    <label class="control-label" id="titlebed">Total</label>
+                                    <p id="totalbed"><?= !empty($cektbed) ? "Rp. " . \app\components\Logic::formatNumber($cektbed['harga_bed'], 0) :  "Rp. " . \app\components\Logic::formatNumber($resultbed, 0) ?></p>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-left:2px;">
+                                <div class="col-md-12">
+                                    <?=Html::button('<i class="fa fa-floppy-o" aria-hidden="true"></i> Save',['class' => 'btn btn-success', 'onclick' => 'savebed('.$idbiodata.','.$idkamar.','.$tipe.')', 'id' => 'idsavebed']) ?>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" name="fixextrabed" id="fixextrabed" disabled = "disabled" class="form-control" value="<?= $resultbed?>">
+                    <?php } else { ?>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">Harga per Kasur :</label>
+                                    <input type="text" name="nmhrgbed" class="form-control clhrgbed" id="idhrgbed" value="<?= "Rp. " . \app\components\Logic::formatNumber($resultbed, 0)?>" disabled="true">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">Jumlah Kasur :</label>
+                                    <input type="number" name="nmjmlbed" class="form-control cljmlbed numberinput" id="idjmlbed" value="<?= $cektbed['qty_bed']?>" disabled="true">
+                                </div>
+                            </div>
+                            <div class="col-md-4" style="text-align:right;">
+                                <div class="form-group">
+                                    <label class="control-label" id="titlebed">Total</label>
+                                    <p id="totalbed"><?= !empty($cektbed) ? "Rp. " . \app\components\Logic::formatNumber($cektbed['harga_bed'], 0) :  "Rp. " . \app\components\Logic::formatNumber($resultbed, 0) ?></p>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+
+            <div class="box box-warning">
+                <div class="box-body">
                     <div class='row'>
                         <div class="col-md-6">
                             <div id="box-confirm">
@@ -263,15 +335,16 @@ use yii\helpers\Html;
                         <?php } ?>
                         <div class="col-md-4">
                             <div class="form-group required">
-                                <input type="text" class="form-control" name="sisa" value="Rp. <?= \app\components\Logic::formatNumber($sisasummary, 0)?>" readonly='true'>
+                                <input type="text" class="form-control" name="sisa" id="totsisa" value="Rp. <?= \app\components\Logic::formatNumber($sisasummary, 0)?>" readonly='true'>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group required">
-                                <input type="text" class="form-control" name="totalharga" value="Rp. <?= \app\components\Logic::formatNumber($totalhargasummary, 0)?>" readonly='true'>
+                                <input type="text" class="form-control" name="totalharga" id="totharga" value="Rp. <?= \app\components\Logic::formatNumber($totalhargasummary, 0)?>" readonly='true'>
                             </div>
                         </div>
                     </div>
+
                     <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
                         <div class="row" style="display:none">
                             <div class="col-md-6">
@@ -291,7 +364,7 @@ use yii\helpers\Html;
                             </div>
                         </div>
                     <?php } ?>
-                    <input type="text" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
+                    <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
                 </div>
             </div>
 
@@ -299,9 +372,9 @@ use yii\helpers\Html;
             <div class="row">
                 <div class="col-md-12">
                     <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
-                        <?=Html::button('<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkout',['class' => 'btn btn-success pull-right', 'onclick' => 'savecekout('.$idbiodata.')', 'id' => 'idcekout']) ?>
+                        <?=Html::button('<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkout',['class' => 'btn btn-success pull-right', 'onclick' => 'savecekout('.$idbiodata.','.$tipe.')', 'id' => 'idcekout']) ?>
                     <?php } else {?>
-                        <?=Html::button('<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkout',['class' => 'btn btn-success pull-right', 'onclick' => 'savecekout('.$idbiodata.')', 'id' => 'idcekout', 'disabled' => 'disabled']) ?>
+                        <?=Html::button('<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkout',['class' => 'btn btn-success pull-right', 'onclick' => 'savecekout('.$idbiodata.','.$tipe.')', 'id' => 'idcekout', 'disabled' => 'disabled']) ?>
                     <?php } ?>
                     <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
                 </div>
@@ -344,34 +417,115 @@ use yii\helpers\Html;
     }
 
     $(document).ready(function () {
+        // var defaultHargabed = <?//= $resultbed?>;
+        // var convertDefaultHargabed = toRupiah(defaultHargabed);
+        // $('#totalbed').text('Rp. '+ convertDefaultHargabed +'');
+        $('#idjmlbed').css("font-weight", "bold");
+        $(document).on('change','.idpelunasan',function(){
+            if ($(this).is(':checked')) {
+                $('#idcekout').prop('disabled', false);
+                $('#bayarpelunasan').prop('disabled', false);
+            }
+            else{
+                $('#idcekout').prop('disabled', true);
+                $('#bayarpelunasan').prop('disabled', true);
+            }
+        });
 
-    $(document).on('change','.idpelunasan',function(){
-        var urutan = $(this).attr('urutan');
-        if ($(this).is(':checked')) {
-            $('#idcekout').prop('disabled', false);
-            $('#bayarpelunasan').prop('disabled', false);
-        }
-        else{
-            $('#idcekout').prop('disabled', true);
-            $('#bayarpelunasan').prop('disabled', true);
-        }
-    });
+        $(document).on('change','.clextrabed',function(){
+            var hasilsisa = 0;
+            var ambilsisa = <?= $sisasummary?>;
+            var satuanbed = $('#fixextrabed').val();
+            var jmlbed = $('#idjmlbed').val();
+            var hargabed = parseInt(satuanbed) * parseInt(jmlbed);
+            var convertHargabed = toRupiah(hargabed);
 
 
-    $(document).on('change','.cek_kamar',function(){
-        var urutan = $(this).attr('urutan');
-        if ($(this).is(':checked')) {
-            $('#id-'+urutan).trigger('click');
-        }
-        else{
-            $('#id-'+urutan).trigger('click');
-        }
-    });
+            var ambiltotharga = <?= $totalhargasummary?>;
+            hasilsisa = parseInt(ambilsisa) + parseInt(hargabed);
+            hasiltotharga = parseInt(ambiltotharga) + parseInt(hargabed);
+            var convertHasilsisa = toRupiah(hasilsisa);
+            var convertHasiltotharga = toRupiah(hasiltotharga);
+            var convertAmbilsisa = toRupiah(ambilsisa);
+            var convertAmbiltotharga = toRupiah(ambiltotharga);
+
+            if ($(this).is(':checked')) {
+                $('#totsisa').val('Rp. '+ convertHasilsisa +'');
+                $('#totharga').val('Rp. '+ convertHasiltotharga +'');
+                $('#totalbed').text('Rp. '+ convertHargabed +'');
+                $('#fixextrabed').prop('disabled', false);
+                $('#idjmlbed').prop('disabled', false);
+                $('#divbed').show();
+            }
+            else{
+                $('#idjmlbed').val(1);
+                $('#totalbed').text('Rp. '+ convertHargabed +'');
+                $('#totsisa').val('Rp. '+ convertAmbilsisa +'');
+                $('#totharga').val('Rp. '+ convertAmbiltotharga +'');
+                $('#fixextrabed').prop('disabled', true);
+                $('#idjmlbed').prop('disabled', true);
+                $('#divbed').hide();
+            }
+        });
+
+        $(document).on('change','#idjmlbed',function(){
+            var hasilsisa = 0;
+            var ambilsisa = <?= $sisasummary?>;
+            var satuanbed = $('#fixextrabed').val();
+            var jmlbed = $('#idjmlbed').val();
+            var hargabed = parseInt(satuanbed) * parseInt(jmlbed);
+            var convertHargabed = toRupiah(hargabed);
+
+            var ambiltotharga = <?= $totalhargasummary?>;
+            hasilsisa = parseInt(ambilsisa) + parseInt(hargabed);
+            hasiltotharga = parseInt(ambiltotharga) + parseInt(hargabed);
+            var convertHasilsisa = toRupiah(hasilsisa);
+            var convertHasiltotharga = toRupiah(hasiltotharga);
+            var convertAmbilsisa = toRupiah(ambilsisa);
+            var convertAmbiltotharga = toRupiah(ambiltotharga);
+
+            $('#totsisa').val('Rp. '+ convertHasilsisa +'');
+            $('#totharga').val('Rp. '+ convertHasiltotharga +'');
+            $('#totalbed').text('Rp. '+ convertHargabed +'');
+            $('#fixextrabed').prop('disabled', false);
+        });
+
+        $(document).on('keyup','#idjmlbed',function(){
+            var hasilsisa = 0;
+            var ambilsisa = <?= $sisasummary?>;
+            var satuanbed = $('#fixextrabed').val();
+            var jmlbed = $('#idjmlbed').val();
+            var hargabed = parseInt(satuanbed) * parseInt(jmlbed);
+            var convertHargabed = toRupiah(hargabed);
+
+            var ambiltotharga = <?= $totalhargasummary?>;
+            hasilsisa = parseInt(ambilsisa) + parseInt(hargabed);
+            hasiltotharga = parseInt(ambiltotharga) + parseInt(hargabed);
+            var convertHasilsisa = toRupiah(hasilsisa);
+            var convertHasiltotharga = toRupiah(hasiltotharga);
+            var convertAmbilsisa = toRupiah(ambilsisa);
+            var convertAmbiltotharga = toRupiah(ambiltotharga);
+
+            $('#totsisa').val('Rp. '+ convertHasilsisa +'');
+            $('#totharga').val('Rp. '+ convertHasiltotharga +'');
+            $('#totalbed').text('Rp. '+ convertHargabed +'');
+            $('#fixextrabed').prop('disabled', false);
+        });
+
+        $(document).on('change','.cek_kamar',function(){
+            var urutan = $(this).attr('urutan');
+            if ($(this).is(':checked')) {
+                $('#id-'+urutan).trigger('click');
+            }
+            else{
+                $('#id-'+urutan).trigger('click');
+            }
+        });
 
 
-    $(".select").select2({
-        placeholder: "Pilih Kamar ...",
-    });
+        $(".select").select2({
+            placeholder: "Pilih Kamar ...",
+        });
 
         $('input.numberinput').bind('keypress', function (e) {
             return (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57) && e.which != 46) ? false : true;
@@ -415,9 +569,6 @@ use yii\helpers\Html;
             prosesharga(hasil, jmlkamar, idterpilihresult);
         });
 
-
-        // setDefault();
-        manageSelect();
         manageMetodePembayaran();
     });
 
@@ -449,7 +600,7 @@ use yii\helpers\Html;
     {
         // Start check radio button
         var val = $("input[name='radionm']:checked").val();
-        console.log(val);
+        // console.log(val);
         $('.radioid').on('click', function() {
             // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
             if( $(this).is(":checked") ){
@@ -562,7 +713,118 @@ use yii\helpers\Html;
         showModalPilihkamar(url,title);
     }
 
-    function savecekout(idbiodata) {
+    function showModalRooms(url,title)
+      {
+          $("#modalRoomsTitle").empty();
+          $("#modalRoomsTitle").html(title);
+
+          $("#modalRoomsBody").empty();
+          $("#modalRoomsBody").html("Loading ...");
+          $("#modalRoomsBody").load(url);
+
+          $('#modalRoomsId').modal({backdrop: 'static', keyboard: false});
+          $("#modalRoomsId").modal("show");
+          return false;
+    }
+
+    function savebed(idbiodata,idkamar,tipe) {
+
+        var hasilsisa = 0;
+        var hasiltotharga = 0;
+        var nmjmlbed = $('#idjmlbed').val();
+        var ambilsisa = <?= $sisasummary?>;
+        var satuanbed = $('#fixextrabed').val();
+        var jmlbed = $('#idjmlbed').val();
+        var hargabed = parseInt(satuanbed) * parseInt(jmlbed);
+        var convertHargabed = toRupiah(hargabed);
+
+        var ambiltotharga = <?= $totalhargasummary?>;
+        hasilsisa = parseInt(ambilsisa) + parseInt(hargabed);
+        hasiltotharga = parseInt(ambiltotharga) + parseInt(hargabed);
+        var convertHasilsisa = toRupiah(hasilsisa);
+        var convertHasiltotharga = toRupiah(hasiltotharga);
+
+        {
+            swal({
+                title: "Konfirmasi",
+                text: "Anda yakin akan memproses extrabed ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((ya) => {
+                if (ya) {
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        contentType: false,
+                        processData: false,
+                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/simpanbed'])?>?idbiodata="+idbiodata+"&idkamar="+idkamar+"&tipe="+tipe+"&nmjmlbed="+nmjmlbed+"&hargabed="+hargabed+"&hasilsisa="+hasilsisa+"&hasiltotharga="+hasiltotharga,
+                        beforeSend: function () {
+                            swal({
+                                title: 'Harap Tunggu',
+                                text: "Sedang memproses extrabed",
+                                icon: 'info',
+                                buttons: {
+                                    cancel: false,
+                                    confirm: false,
+                                },
+                                closeOnClickOutside: false,
+                                onOpen: function () {
+                                    swal.showLoading()
+                                },
+                                closeOnEsc: false,
+                            });
+                        },
+                        complete: function () {
+                            swal.close()
+                        },
+                        success: function (result) {
+
+                            swal(result.header, result.message, result.status);
+
+                            if (result.status == "success") {
+                                // $('#modalRoomsId').on('hidden.bs.modal', function (e) {
+                                    $.ajax({
+                                        url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
+                                        beforeSend: function(data, v) {
+                                            $('#modalRoomsId #modalRoomsTitle').html('Form Check-out');
+                                            $('#modalRoomsId #modalRoomsBody').html('Loading ...');
+                                        },
+                                        error: function(data, v){
+                                            $('#modalRoomsId #modalRoomsBody').html('Terjadi kesalahan..');
+                                        },
+                                        success: function(data, v){
+                                            $('#modalRoomsId #modalRoomsBody').html(data);
+                                        }
+                                    });
+
+                                    $('#modalRoomsId').modal({
+                                        backdrop: 'static',
+                                        keyboard: false
+                                    });
+                                // });
+
+
+                                // var url = "<?//= \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
+                                // var title = "Form Check-out";
+                                // showModalRooms(url,title);
+
+                                // $('#modalRoomsId').modal('hide');
+                                // window.location = "<?//=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+result.setharga;
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            swal("Error!", "Terdapat Kesalahan saat memproses check-in!", "error");
+                        }
+                    });
+                } else {
+                    // swal("Informasi", "Dokumen Tidak Dihapus", "info");
+                }
+            });
+        }
+    }
+
+    function savecekout(idbiodata,tipe) {
         {
             var statuschecked = 0;
 
@@ -598,7 +860,7 @@ use yii\helpers\Html;
                         dataType: "json",
                         contentType: false,
                         processData: false,
-                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/simpancekout'])?>?idbiodata="+idbiodata,
+                        url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/simpancekout'])?>?idbiodata="+idbiodata+"&tipe="+tipe,
                         beforeSend: function () {
                             swal({
                                 title: 'Harap Tunggu',

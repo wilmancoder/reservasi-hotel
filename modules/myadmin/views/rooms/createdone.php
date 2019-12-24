@@ -10,7 +10,10 @@
     <?= $this->render('_formdone', [
         'ambilDatatamu' => $ambilDatatamu,
         'idbiodata' => $idbiodata,
-        'tipe' => $tipe
+        'idkamar' =>$idkamar,
+        'tipe' => $tipe,
+        'cektbed' => $cektbed,
+        'resultbed' => $resultbed
     ]) ?>
 
 </div>

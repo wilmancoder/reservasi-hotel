@@ -354,8 +354,8 @@ class ReportController extends \yii\web\Controller
         if(Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;
-            $param1 = '';
-            $param2 = '';
+            $param1 = !empty(date('Y-m-d')) ? date('Y-m-d') : '';
+            $param2 = !empty(date('Y-m-d')) ? date('Y-m-d') : '';
             $data = \app\components\Logic::reportFopengeluaran($idpetugas,$param1,$param2);
             $row = array();
             $i = 0;
@@ -519,40 +519,44 @@ class ReportController extends \yii\web\Controller
         $data = \app\components\Logic::downloadReportpetugas($getPosting,$getidpetugas,$getiduser);
         $data2 = \app\components\Logic::reportPetugas($getPosting,$getidpetugas,$getiduser);
         $data3 = \app\components\Logic::reportPetugaspengeluaran($getPosting,$getidpetugas,$getiduser);
-        // var_dump($data);exit;
+        // var_dump($data2);exit;
 
-        $htmlDetail = '
-        <table>';
-            if($roleuser == '1') {
-                if($getPosting == 'all') {
-                    $htmlDetail .='
+        if($roleuser == '1') {
+            if($getPosting == 'all') {
+                $htmlDetail = '
+                    <table>
                     <tr>
                         <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.date('d-m-Y').'</strong></h3></td>
                     </tr>
                     <tr>
                         <td colspan=11 style="text-align: center;"><h5>'.$getshift.' ('.$getstartdate.' - '.$getenddate.')</h5></td>
                     </tr>
+                    </table>
                     ';
-                } else {
-                    $htmlDetail .='
+            } else {
+                $htmlDetail ='
+                    <table>
                     <tr>
                         <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.date('d-m-Y').'</strong></h3></td>
                     </tr>
                     <tr>
                         <td colspan=11 style="text-align: center;"><h5>'.$resNmshift.' ('.$formattimestart.' - '.$formattimeend.')</h5></td>
                     </tr>
+                    </table>
                     ';
                 }
-            } else {
-                $htmlDetail .='
-                <tr>
-                    <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.$resStartdate.' s/d '.$resEnddate.'</strong></h3></td>
-                </tr>
-                <tr>
-                    <td colspan=11 style="text-align: center;"><h5>'.$resNmshift.' ('.$formattimestart.' - '.$formattimeend.')</h5></td>
-                </tr>
-                ';
-            }
+        } else {
+            $htmlDetail ='
+            <table>
+            <tr>
+                <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.$resStartdate.' s/d '.$resEnddate.'</strong></h3></td>
+            </tr>
+            <tr>
+                <td colspan=11 style="text-align: center;"><h5>'.$resNmshift.' ('.$formattimestart.' - '.$formattimeend.')</h5></td>
+            </tr>
+            </table>
+            ';
+        }
 
             // if($getPosting != 'all') {
             //     $htmlDetail .= '
@@ -566,7 +570,6 @@ class ReportController extends \yii\web\Controller
             //     </tr>';
             // }
         $htmlDetail .= '
-        </table>
         <table border=1px>
             <thead>
                 <tr>
@@ -763,8 +766,9 @@ class ReportController extends \yii\web\Controller
 
 
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Html();
+        libxml_use_internal_errors(true);
         $spreadsheet = $reader->loadFromString($htmlDetail.$htmlPendapatan.$htmlPengeluaran.$htmlFooter);
-
+        // var_dump($spreadsheet);exit;
 
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
         $writer->save($path.$filename);

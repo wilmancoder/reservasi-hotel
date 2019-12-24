@@ -868,6 +868,7 @@ class Logic extends Component
             $hasil[] = $value['checkout'];
             $formathasil[] = date("Y-m-d",strtotime($value['checkout']. "-1 days"));
         }
+
         if(!empty($formathasil)) {
             $result = array_values(array_filter($formathasil, function($v){
                 return $v == date('Y-m-d');
@@ -876,21 +877,26 @@ class Logic extends Component
             return 0;
         }
 
+        $format = [];
         foreach ($result as $keyz => $val) {
+            $format[0] =  $val;
             $format[] = date("Y-m-d",strtotime($val. "+1 days"));
         }
+        $impformat = "'" .implode("','", $format). "'";
+
         if(isset($format)){
 
             $modelCheckout = (new \yii\db\Query())
             ->select(['COUNT(*) AS total'])
             ->from('t_tamu')
-            ->where(['checkout' =>$format])
+            ->where('checkout IN('.$impformat.')')
+            ->andWhere(['status' => 1])
+            // ->where(['checkout' =>$format])
             // ->where(['>=','checkin', $curdate])
             ->all();
         } else {
             $modelCheckout = 0;
         }
-
 
         return $modelCheckout;
     }
