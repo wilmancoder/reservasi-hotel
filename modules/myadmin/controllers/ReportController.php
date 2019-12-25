@@ -18,6 +18,8 @@ use yii\helpers\ArrayHelper;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use app\models\TBed;
+use app\models\MMappingHarga;
 
 class ReportController extends \yii\web\Controller
 {
@@ -314,7 +316,7 @@ class ReportController extends \yii\web\Controller
         return $hasil;
     }
 
-    public function actionGetdatapendapatan($idpetugas) {
+    public function actionGetdatapendapatan($idpetugas,$idharga) {
         if(Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;
@@ -337,7 +339,7 @@ class ReportController extends \yii\web\Controller
                 $row[$i]['jml_uangmasuk'] = \app\components\Logic::formatNumber($value['jml_uangmasuk'], 0);
 
                 $row[$i]['fungsi'] = "
-                <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Data Tamu' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
+                <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\",\"".$idharga."\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Data Tamu' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
                 ";
 
                 $i++;
@@ -381,9 +383,20 @@ class ReportController extends \yii\web\Controller
         }
     }
 
-    public function actionDetsubtotal($idtranstamu) {
+    public function actionDetsubtotal($idtranstamu,$idharga) {
+        $hargabed = MMappingHarga::find()->where(['id_kategori_harga' => $idharga, 'id_type' => 5])->asArray()->one();
+        $resultbed = $hargabed['harga'];
+
+        $cektbed = TBed::find()->where([
+            'id_biodata_tamu' => $idtranstamu
+        ])
+        ->asArray()
+        ->one();
+
         return $this->renderPartial('detailsubtotal', [
-        'idtranstamu' => $idtranstamu
+        'idtranstamu' => $idtranstamu,
+        'cektbed' => $cektbed,
+        'resultbed' => $resultbed
         ]);
     }
     public function actionCreatepengeluaran($idpetugas) {
@@ -463,7 +476,210 @@ class ReportController extends \yii\web\Controller
         }
     }
 
-    public function actionDownloadreportfo() {
+    public function actionDownloadreportall()
+    {
+        $path = Yii::getAlias('@app') .
+                DIRECTORY_SEPARATOR .
+                'web' .
+                DIRECTORY_SEPARATOR .
+                'download' .
+                DIRECTORY_SEPARATOR;
+
+        $filename = 'report_all-' . date('Y-m-d') . '.xls';
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $roleuser = Yii::$app->user->identity->role;
+        $post = Yii::$app->request->post();
+        $poststartdate = $post['start'];
+        $date1=date_create($poststartdate);
+        $resStartdate = date_format($date1,"d-m-Y");
+
+        $postenddate = $post['end'];
+        $date2=date_create($postenddate);
+        $resEnddate = date_format($date2,"d-m-Y");
+
+        if( !empty($poststartdate) && !empty($postenddate) ){
+            if(!empty($pilihshift)) {
+                $getPosting = $poststartdate.','.$postenddate.','.$pilihshift;
+            } else {
+                $getPosting = $poststartdate.','.$postenddate;
+            }
+        } else {
+            $getPosting = 'all';
+        }
+        $getidpetugas = \Yii::$app->user->identity->id_petugas;
+        $getiduser = \Yii::$app->user->identity->id_user;
+        // var_dump($getPosting);exit;
+
+        $data = \app\components\Logic::reportAll($getPosting);
+        $data3 = \app\components\Logic::reportPetugaspengeluaranspec($getPosting);
+
+        if($roleuser == '2') {
+            $htmlDetail ='
+            <table>
+            <tr>
+                <td colspan=6 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.$resStartdate.' s/d '.$resEnddate.'</strong></h3></td>
+            </tr>
+            <tr>
+                <td colspan=6 style="text-align: center;"></td>
+            </tr>
+            </table>
+            ';
+
+            $htmlPendapatan = '
+            <table>
+                <tr>
+                    <td colspan=6 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN</strong></h3></td>
+                </tr>
+                <tr>
+                    <td colspan=6 style="text-align: center;"></td>
+                </tr>
+            </table>
+            <table border=1px>
+                <thead>
+                    <tr>
+                        <td style="width: 5px; text-align: center;">NO</td>
+                        <td style="width: 25px; text-align: center;">NAMA PETUGAS</td>
+                        <td style="width: 10px; text-align: center;">JENIS PEMBAYARAN</td>
+                        <td style="width: 10px; text-align: center;">STATUS PEMBAYARAN</td>
+                        <td style="width: 20px; text-align: center;">TGL.UANG MASUK</td>
+                        <td style="width: 20px; text-align: center;">JML.UANG MASUK</td>
+                    </tr>
+                </thead>
+                <tbody>';
+                $no=1;
+                $totaluangmasuk=0;
+                foreach ($data as $key => $val) {
+                $htmlPendapatan .='<tr>
+                        <td>'.$no.'</td>
+                        <td>'.$val['nama_petugas'].'</td>
+                        <td>'.$val['pembayaran'].'</td>
+                        <td>'.$val['status_pembayaran'].'</td>
+                        <td>'.$val['tgl_uangmasuk'].'</td>
+                        <td>'.$val['jml_uangmasuk'].'</td>
+                    </tr>';
+                    $no++;
+
+                    $totaluangmasuk += $val['jml_uangmasuk'];
+                }
+            $htmlPendapatan .= '
+                </tbody>
+                    <tr>
+                        <td colspan=5 style="text-align: right;"><h3><strong>Total Uang Masuk :</strong></h3></td>
+                        <td style="text-align: right;"><h3><strong>'.$totaluangmasuk.'</strong></h3></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+            </table>';
+
+            $htmlPengeluaran = '
+            <table>
+                <tr>
+                    <td colspan=6 style="text-align: center;"><h3><strong>LAPORAN PENGELUARAN</strong></h3></td>
+                </tr>
+                <tr>
+                    <td colspan=6 style="text-align: center;"></td>
+                </tr>
+            </table>
+            <table border=1px>
+                <thead>
+                    <tr>
+                        <td style="width: 5px; text-align: center;">NO</td>
+                        <td style="width: 25px; text-align: center;">NAMA ITEM</td>
+                        <td style="width: 20px; text-align: center;">TGL.UANG KELUAR</td>
+                        <td style="width: 20px; text-align: center;">QUANTITY</td>
+                        <td style="width: 10px; text-align: center;">HARGA PER ITEM</td>
+                        <td style="width: 20px; text-align: center;">TOTAL HARGA ITEM</td>
+                    </tr>
+                </thead>
+                <tbody>';
+                $no=1;
+                $totaluangkeluar=0;
+                foreach ($data3 as $key => $valu) {
+                $htmlPengeluaran .='<tr>
+                        <td>'.$no.'</td>
+                        <td>'.$valu['item'].'</td>
+                        <td>'.$valu['tgl_uangkeluar'].'</td>
+                        <td>'.$valu['qty'].'</td>
+                        <td>'.$valu['harga_per_item'].'</td>
+                        <td>'.$valu['total_harga_item'].'</td>
+                    </tr>';
+                    $no++;
+
+                    $totaluangkeluar += $valu['total_harga_item'];
+                }
+            $htmlPengeluaran .= '
+                </tbody>
+                    <tr>
+                        <td colspan=5 style="text-align: right;"><h3><strong>Total Uang Keluar :</strong></h3></td>
+                        <td style="text-align: right;"><h3><strong>'.$totaluangkeluar.'</strong></h3></td>
+                    </tr>
+            </table>';
+            $totalsisa=0;
+            $totalsisa = $totaluangmasuk - $totaluangkeluar;
+
+            $htmlFooter = '
+            <table>
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </table>
+            <table border=1px>
+                <tr>
+                    <td></td>
+                    <td>Jumlah Total Pendapatan</td>
+                    <td>Rp. '.$totaluangmasuk.'</td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Jumlah Total Pengeluaran</td>
+                    <td>Rp. '.$totaluangkeluar.'</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><strong>Total Bersih</strong></td>
+                    <td><strong>Rp. '.$totalsisa.'</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;">Back Office</td>
+                </tr>
+            </table>';
+
+
+
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Html();
+            libxml_use_internal_errors(true);
+            $spreadsheet = $reader->loadFromString($htmlDetail.$htmlPendapatan.$htmlPengeluaran.$htmlFooter);
+            // var_dump($spreadsheet);exit;
+
+            $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
+            $writer->save($path.$filename);
+
+
+            return [
+                'success' => true,
+                'message' => 'Report excel berhasil digenerate',
+                'filename' => $filename
+            ];
+            exit;
+        }
+    }
+
+    public function actionDownloadreportfo()
+    {
 
         $path = Yii::getAlias('@app') .
                 DIRECTORY_SEPARATOR .
@@ -472,7 +688,7 @@ class ReportController extends \yii\web\Controller
                 'download' .
                 DIRECTORY_SEPARATOR;
 
-        $filename = 'write-' . date('Y-m-d') . '.xls';
+        $filename = 'report_shift_fo-' . date('Y-m-d') . '.xls';
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $roleuser = Yii::$app->user->identity->role;
@@ -490,11 +706,13 @@ class ReportController extends \yii\web\Controller
 
         $pilihshift = !empty($postshift) ? $postshift : "";
         $modShift = MShift::find()->where(['id' => $pilihshift])->asArray()->one();
-        $resNmshift = $modShift['nm_shift'];
-        $resStartshift = $modShift['start_date'];
-        $resEndshift = $modShift['end_date'];
+        $resNmshift = !empty($modShift['nm_shift']) ? $modShift['nm_shift'] : "";
+        $resStartshift = !empty($modShift['start_date']) ? $modShift['start_date'] : "00:00:00";
+        $resEndshift = !empty($modShift['end_date']) ? $modShift['end_date'] : "00:00:00";
         $formattimestart = date('H:i:s', strtotime($resStartshift));
+        $resFormattimestart = !empty($formattimestart) ? $formattimestart : "00:00:00";
         $formattimeend = date('H:i:s', strtotime($resEndshift));
+        $resFormattimeend = !empty($formattimeend) ? $formattimeend : "00:00:00";
 
         if( !empty($poststartdate) && !empty($postenddate) ){
             if(!empty($pilihshift)) {
@@ -517,7 +735,7 @@ class ReportController extends \yii\web\Controller
 
 
         $data = \app\components\Logic::downloadReportpetugas($getPosting,$getidpetugas,$getiduser);
-        $data2 = \app\components\Logic::reportPetugas($getPosting,$getidpetugas,$getiduser);
+        $data2 = \app\components\Logic::reportPetugasnew($getPosting,$getidpetugas,$getiduser);
         $data3 = \app\components\Logic::reportPetugaspengeluaran($getPosting,$getidpetugas,$getiduser);
         // var_dump($data2);exit;
 
@@ -540,7 +758,7 @@ class ReportController extends \yii\web\Controller
                         <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN DAN PENGELUARAN. TANGGAL '.date('d-m-Y').'</strong></h3></td>
                     </tr>
                     <tr>
-                        <td colspan=11 style="text-align: center;"><h5>'.$resNmshift.' ('.$formattimestart.' - '.$formattimeend.')</h5></td>
+                        <td colspan=11 style="text-align: center;"><h5>'.$resNmshift.' ('.$resFormattimestart.' - '.$resFormattimeend.')</h5></td>
                     </tr>
                     </table>
                     ';
@@ -584,9 +802,9 @@ class ReportController extends \yii\web\Controller
                     <td style="width: 15px; text-align: center;" rowspan=2>KETERANGAN</td>
                 </tr>
                 <tr>
-                    <td style="width: 20px; text-align: center;">NOMOR KAMAR</td>
-                    <td style="width: 20px; text-align: center;">TYPE KAMAR</td>
-                    <td style="width: 28px; text-align: center;">HARGA KAMAR</td>
+                    <td style="width: 10px; text-align: center;">NO.KAMAR</td>
+                    <td style="width: 25px; text-align: center;">TYPE</td>
+                    <td style="width: 25px; text-align: center;">HARGA</td>
                 </tr>
             </thead>
             <tbody>';
@@ -606,6 +824,7 @@ class ReportController extends \yii\web\Controller
                         <td>'.$value['metode_pembayaran'].'</td>
                     </tr>';
                     $no++;
+
                 }
             $htmlDetail .= '</tbody>
         </table>
@@ -630,12 +849,21 @@ class ReportController extends \yii\web\Controller
         <table border=1px>
             <thead>
                 <tr>
-                    <td style="width: 5px; text-align: center;">NO</td>
-                    <td style="width: 25px; text-align: center;">NAMA TAMU</td>
-                    <td style="width: 20px; text-align: center;" colspan=3>KATEGORI PEMBAYARAN</td>
-                    <td style="width: 20px; text-align: center;" colspan=3>STATUS PEMBAYARAN</td>
-                    <td style="width: 10px; text-align: center;" colspan=2>TOTAL TAGIHAN</td>
-                    <td style="width: 20px; text-align: center;">JML.UANG DITERIMA</td>
+                    <td style="width: 5px; text-align: center;" rowspan=2>NO</td>
+                    <td style="width: 25px; text-align: center;" rowspan=2>NAMA TAMU</td>
+                    <td style="width: 10px; text-align: center;" rowspan=2>PEMBAYARAN</td>
+                    <td style="width: 10px; text-align: center;" rowspan=2>STS.PEMBAYARAN</td>
+                    <td colspan=3 style="text-align: center;">DETAIL RINCIAN TAGIHAN</td>
+                    <td colspan=2 style="text-align: center;">DETAIL PEMBAYARAN</td>
+                    <td style="width: 20px; text-align: center;" rowspan=2>TGL.UANG DITERIMA</td>
+                    <td style="width: 20px; text-align: center;" rowspan=2>JML.UANG DITERIMA</td>
+                </tr>
+                <tr>
+                    <td style="width: 10px; text-align: center;">TTL.KAMAR</td>
+                    <td style="width: 25px; text-align: center;">TTL.EXTRABED</td>
+                    <td style="width: 25px; text-align: center;">TTL.KESELURUHAN</td>
+                    <td style="width: 10px; text-align: center;">BAYAR TAGIHAN</td>
+                    <td style="width: 10px; text-align: center;">SISA TAGIHAN</td>
                 </tr>
             </thead>
             <tbody>';
@@ -645,14 +873,19 @@ class ReportController extends \yii\web\Controller
             $htmlPendapatan .='<tr>
                     <td>'.$no.'</td>
                     <td>'.$val['nama_tamu'].'</td>
-                    <td colspan=3>'.$val['jenis_pembayaran'].'</td>
-                    <td colspan=3>'.$val['status_pembayaran'].'</td>
-                    <td colspan=2>'.$val['subtotal'].'</td>
-                    <td>'.$val['jml_uangmasuk'].'</td>
+                    <td>'.$val['pembayaran'].'</td>
+                    <td>'.$val['status_pembayaran'].'</td>
+                    <td>'.$val['total_sewakamar'].'</td>
+                    <td>'.$val['total_hargabed'].'</td>
+                    <td>'.$val['total_keseluruhan'].'</td>
+                    <td>'.$val['pembayaran_tagihan'].'</td>
+                    <td>'.$val['sisa_tagihan'].'</td>
+                    <td>'.$val['tgl_uang_diterima'].'</td>
+                    <td>'.$val['jml_uang_diterima'].'</td>
                 </tr>';
                 $no++;
 
-                $totaluangmasuk += $val['jml_uangmasuk'];
+                $totaluangmasuk += $val['jml_uang_diterima'];
             }
         $htmlPendapatan .= '
             </tbody>

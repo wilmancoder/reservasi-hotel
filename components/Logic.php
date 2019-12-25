@@ -145,7 +145,7 @@ class Logic extends Component
     public static function dataTamu($idbiodata)
     {
         $model = (new \yii\db\Query())
-            ->select(['a.id', 'a.id_biodata_tamu', 'a.checkin', 'a.checkout', 'a.durasi', 'a.harga as subtotal', 'a.no_kartu_debit', 'a.status', 'b.nama as namatamu', 'b.identitas', 'b.nomor_identitas', 'b.alamat', 'c.nomor_kamar', 'f.jenis', 'e.metode', 'g.harga', 'h.dp as summary_dp', 'h.sisa as summary_sisa', 'h.total_harga', 'h.total_bayar'])
+            ->select(['a.id', 'a.id_mapping_kamar', 'a.id_biodata_tamu', 'a.checkin', 'a.checkout', 'a.durasi', 'a.harga as subtotal', 'a.no_kartu_debit', 'a.status', 'b.nama as namatamu', 'b.identitas', 'b.nomor_identitas', 'b.alamat', 'c.nomor_kamar', 'f.jenis', 'e.metode', 'g.harga', 'h.dp as summary_dp', 'h.sisa as summary_sisa', 'h.total_harga', 'h.total_bayar'])
             ->from('t_tamu a')
             ->join('LEFT JOIN', 'biodata_tamu b', 'b.id = a.id_biodata_tamu')
             ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = a.id_mapping_kamar')
@@ -156,6 +156,24 @@ class Logic extends Component
             ->join('LEFT JOIN', 'summary_ttamu h', 'h.id_transaksi_tamu = a.id_biodata_tamu')
             ->where(['a.id_biodata_tamu' => $idbiodata])
             ->all();
+
+        return $model;
+    }
+
+    public static function dataTamusatuan($idbiodata)
+    {
+        $model = (new \yii\db\Query())
+            ->select(['a.id', 'a.id_mapping_kamar', 'a.id_biodata_tamu', 'a.checkin', 'a.checkout', 'a.durasi', 'a.harga as subtotal', 'a.no_kartu_debit', 'a.status', 'b.nama as namatamu', 'b.identitas', 'b.nomor_identitas', 'b.alamat', 'c.nomor_kamar', 'f.jenis', 'e.metode', 'g.harga', 'h.dp as summary_dp', 'h.sisa as summary_sisa', 'h.total_harga', 'h.total_bayar'])
+            ->from('t_tamu a')
+            ->join('LEFT JOIN', 'biodata_tamu b', 'b.id = a.id_biodata_tamu')
+            ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = a.id_mapping_kamar')
+            ->join('INNER JOIN', 'm_mapping_pembayaran d', 'd.id = a.id_mapping_pembayaran')
+            ->join('INNER JOIN', 'm_metode_pembayaran e', 'e.id = d.id_metode_pembayaran')
+            ->join('INNER JOIN', 'm_jenis_pembayaran f', 'f.id = d.id_jenis_pembayaran')
+            ->join('LEFT JOIN', 'm_mapping_harga g', 'g.id = c.id_mapping_harga')
+            ->join('LEFT JOIN', 'summary_ttamu h', 'h.id_transaksi_tamu = a.id_biodata_tamu')
+            ->where(['a.id_biodata_tamu' => $idbiodata])
+            ->one();
 
         return $model;
     }
@@ -182,7 +200,7 @@ class Logic extends Component
     public static function reportFo($idpetugas,$param1,$param2)
     {
         $model = (new \yii\db\Query())
-        ->select(['a.tgl_uangmasuk', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk'])
+        ->select(['a.tgl_uangmasuk', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk', 'a.pembayaran', 'a.status_pembayaran'])
         ->from('histori_summarytamu a')
         ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
         ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')
@@ -249,7 +267,6 @@ class Logic extends Component
 
     public static function reportAll($getPosting)
     {
-        // var_dump($getPosting);exit;
         if($getPosting != 'all'){
             $exp = explode(',',$getPosting);
             $param1 = $exp[0];
@@ -274,6 +291,128 @@ class Logic extends Component
             ->all();
 
             return $model;
+        }
+    }
+
+    public static function reportPetugasnew($getPosting,$getidpetugas,$getiduser)
+    {
+        $connection = Yii::$app->get('db');
+        if($getPosting != 'all'){
+            // echo"masuk1";exit;
+            $exp = explode(',',$getPosting);
+            $param1 = $exp[0];
+            $param2 = $exp[1];
+            $param3 = !empty($exp[2]) ? $exp[2] : "";
+
+            if(empty($param3)) {
+                $sql1 = '
+                SELECT d.nama AS nama_tamu,
+                    a.pembayaran,
+                    a.status_pembayaran,
+                    (SUM(IFNULL(ttl_kamar.harga,0))) AS total_sewakamar,
+                    IFNULL(e.harga_bed,0) AS total_hargabed,
+                    (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) AS total_keseluruhan,
+                    b.jml_uangmasuk AS pembayaran_tagihan,
+                    ( (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) - b.jml_uangmasuk ) AS sisa_tagihan,
+                    a.tgl_uangmasuk AS tgl_uang_diterima,
+                    IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima
+                FROM histori_summarytamu a
+                LEFT JOIN t_tamu ttl_kamar ON ttl_kamar.id_biodata_tamu = a.id_transaksi_tamu
+                LEFT JOIN (
+                    SELECT id_transaksi_tamu, jml_uangmasuk
+                    FROM histori_summarytamu
+                    WHERE pembayaran IN(\'PENUH\',\'DP\')
+                ) AS b ON b.id_transaksi_tamu = a.id_transaksi_tamu
+                INNER JOIN summary_ttamu c ON c.id_transaksi_tamu = a.id_transaksi_tamu
+                INNER JOIN biodata_tamu d ON d.id = ttl_kamar.id_biodata_tamu
+                LEFT JOIN t_bed e ON e.id_biodata_tamu = a.id_transaksi_tamu
+                WHERE a.tgl_uangmasuk BETWEEN :param1 AND :param2 AND a.id_user = :id_user
+                GROUP BY ttl_kamar.id_biodata_tamu
+                ORDER BY a.id_transaksi_tamu ASC
+                ';
+
+                $command1 = $connection->createCommand($sql1);
+                $command1->bindValue(":param1", $param1);
+                $command1->bindValue(":param2", $param2);
+                $command1->bindValue(":id_user", $getiduser);
+                $result1 = $command1->queryAll();
+
+                return $result1;
+            } else {
+
+                $cekshift = TPetugas::find()->where(['id_shift' => $param3])->asArray()->all();
+                foreach ($cekshift as $key => $value) {
+                    $result[] = $value['id'];
+                }
+                $impshift = implode(",",$result);
+
+                $sql2 = '
+                SELECT d.nama AS nama_tamu,
+                    a.pembayaran,
+                    a.status_pembayaran,
+                    (SUM(IFNULL(ttl_kamar.harga,0))) AS total_sewakamar,
+                    IFNULL(e.harga_bed,0) AS total_hargabed,
+                    (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) AS total_keseluruhan,
+                    b.jml_uangmasuk AS pembayaran_tagihan,
+                    ( (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) - b.jml_uangmasuk ) AS sisa_tagihan,
+                    a.tgl_uangmasuk AS tgl_uang_diterima,
+                    IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima
+                FROM histori_summarytamu a
+                LEFT JOIN t_tamu ttl_kamar ON ttl_kamar.id_biodata_tamu = a.id_transaksi_tamu
+                LEFT JOIN (
+                    SELECT id_transaksi_tamu, jml_uangmasuk
+                    FROM histori_summarytamu
+                    WHERE pembayaran IN(\'PENUH\',\'DP\')
+                ) AS b ON b.id_transaksi_tamu = a.id_transaksi_tamu
+                INNER JOIN summary_ttamu c ON c.id_transaksi_tamu = a.id_transaksi_tamu
+                INNER JOIN biodata_tamu d ON d.id = ttl_kamar.id_biodata_tamu
+                LEFT JOIN t_bed e ON e.id_biodata_tamu = a.id_transaksi_tamu
+                WHERE a.tgl_uangmasuk BETWEEN :param1 AND :param2 AND a.id_petugas IN('.$impshift.')
+                GROUP BY ttl_kamar.id_biodata_tamu
+                ORDER BY a.id_transaksi_tamu ASC
+                ';
+
+                $command2 = $connection->createCommand($sql2);
+                $command2->bindValue(":param1", $param1);
+                $command2->bindValue(":param2", $param2);
+                $result2 = $command2->queryAll();
+
+                return $result2;
+            }
+        } else {
+            // echo"masuk2";exit;
+            $sql3 = '
+            SELECT d.nama AS nama_tamu,
+                a.pembayaran,
+                a.status_pembayaran,
+                (SUM(IFNULL(ttl_kamar.harga,0))) AS total_sewakamar,
+                IFNULL(e.harga_bed,0) AS total_hargabed,
+                (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) AS total_keseluruhan,
+                b.jml_uangmasuk AS pembayaran_tagihan,
+                ( (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) - b.jml_uangmasuk ) AS sisa_tagihan,
+                a.tgl_uangmasuk AS tgl_uang_diterima,
+                IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima
+            FROM histori_summarytamu a
+            LEFT JOIN t_tamu ttl_kamar ON ttl_kamar.id_biodata_tamu = a.id_transaksi_tamu
+            LEFT JOIN (
+                SELECT id_transaksi_tamu, jml_uangmasuk
+                FROM histori_summarytamu
+                WHERE pembayaran IN(\'PENUH\',\'DP\')
+            ) AS b ON b.id_transaksi_tamu = a.id_transaksi_tamu
+            INNER JOIN summary_ttamu c ON c.id_transaksi_tamu = a.id_transaksi_tamu
+            INNER JOIN biodata_tamu d ON d.id = ttl_kamar.id_biodata_tamu
+            LEFT JOIN t_bed e ON e.id_biodata_tamu = a.id_transaksi_tamu
+            WHERE a.id_petugas = :id_petugas AND a.id_user = :id_user
+            GROUP BY ttl_kamar.id_biodata_tamu
+            ORDER BY a.id_transaksi_tamu ASC
+            ';
+
+            $command3 = $connection->createCommand($sql3);
+            $command3->bindValue(":id_petugas", $getidpetugas);
+            $command3->bindValue(":id_user", $getiduser);
+            $result3 = $command3->queryAll();
+
+            return $result3;
         }
     }
 

@@ -9,6 +9,7 @@
 
     <?= $this->render('_formdone', [
         'ambilDatatamu' => $ambilDatatamu,
+        'ambilDatatamusatuan' => $ambilDatatamusatuan,
         'idbiodata' => $idbiodata,
         'idkamar' =>$idkamar,
         'tipe' => $tipe,

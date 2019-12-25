@@ -2,6 +2,7 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 ?>
 <style type="text/css">
@@ -369,6 +370,7 @@ use yii\helpers\Html;
         $('#btn-durasi').click(function(){
             var id = $('#id-kamar').val();
             var tipe = $('#tipe').val();
+            var idkamar = <?= $idkamar?>;
             var hari = $('#jumah_hari').val();
             var katharga = $('#katharga').val();
             if ($('.claddhalf').is(':checked')) {
@@ -380,7 +382,7 @@ use yii\helpers\Html;
             $.ajax({
                 type: "GET",
                 dataType :'json',
-                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/tambahdurasi'])?>?id="+id+'&tipe='+tipe+'&hari='+hari+'&katharga='+katharga+'&flag='+flag,
+                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/tambahdurasi'])?>?id="+id+'&tipe='+tipe+'&hari='+hari+'&katharga='+katharga+'&flag='+flag+'&idkamar='+idkamar,
                 beforeSend: function () {
                     swal({
                         title: 'Harap Tunggu',
@@ -401,11 +403,27 @@ use yii\helpers\Html;
                     swal(result.header, result.message, result.status);
                     // alert(result.idtamu); return false;
                     if (result.status == "success") {
-                        // $('#modalPilihkamarId').modal('hide');
-                        // var url = "<?php //echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
-                        // var title = "Form Check-out";
-                        // showModalRooms(url,title);
-                        window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
+                        $('#modalPilihkamarId').modal('hide');
+                        $.ajax({
+                            url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
+                            beforeSend: function(data, v) {
+                                $('#modalRoomsId #modalRoomsTitle').html('Form Check');
+                                $('#modalRoomsId #modalRoomsBody').html('Loading ...');
+                            },
+                            error: function(data, v){
+                                $('#modalRoomsId #modalRoomsBody').html('Terjadi kesalahan..');
+                            },
+                            success: function(data, v){
+                                $('#modalRoomsId #modalRoomsBody').html(data);
+                            }
+                        });
+
+                        $('#modalRoomsId').modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        });
+
+                        // window.location = "<?//=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
                     }
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
@@ -416,7 +434,9 @@ use yii\helpers\Html;
 
         $('#btn-ganti').click(function(){
             var id = $('#id-kamar').val();
+            var idkamar = <?= $idkamar?>;
             var tipe = $('#tipe').val();
+            var newkamar = $('#gantikamar-id').val();
             var _data = new FormData($("#form-ganti")[0]);
             $.ajax({
                 type: "POST",
@@ -424,7 +444,7 @@ use yii\helpers\Html;
                 dataType: "json",
                 contentType: false,
                 processData: false,
-                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/gantikamar'])?>?id="+id+'&tipe='+tipe,
+                url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/gantikamar'])?>?id="+id+'&idkamar='+idkamar+'&tipe='+tipe+'&newkamar='+newkamar,
                 beforeSend: function () {
                     swal({
                         title: 'Harap Tunggu',
@@ -449,11 +469,27 @@ use yii\helpers\Html;
                     swal(result.header, result.message, result.status);
 
                     if (result.status == "success") {
-                        // $('#modalPilihkamarId').modal('hide');
-                        // var url = "<?php //echo \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
-                        // var title = "Form Check-out";
-                        // showModalRooms(url,title);
-                        window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
+                        $('#modalPilihkamarId').modal('hide');
+                        $.ajax({
+                            url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
+                            beforeSend: function(data, v) {
+                                $('#modalRoomsId #modalRoomsTitle').html('Form Check');
+                                $('#modalRoomsId #modalRoomsBody').html('Loading ...');
+                            },
+                            error: function(data, v){
+                                $('#modalRoomsId #modalRoomsBody').html('Terjadi kesalahan..');
+                            },
+                            success: function(data, v){
+                                $('#modalRoomsId #modalRoomsBody').html(data);
+                            }
+                        });
+
+                        $('#modalRoomsId').modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        });
+
+                        // window.location = "<?//=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+tipe;
                     }
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -462,19 +498,6 @@ use yii\helpers\Html;
             });
         });
 
-        function showModalRooms(url,title)
-          {
-              $("#modalRoomsTitle").empty();
-              $("#modalRoomsTitle").html(title);
-
-              $("#modalRoomsBody").empty();
-              $("#modalRoomsBody").html("Loading ...");
-              $("#modalRoomsBody").load(url);
-
-              $('#modalRoomsId').modal({backdrop: 'static', keyboard: false});
-              $("#modalRoomsId").modal("show");
-              return false;
-        }
 
         formattingFirstDate();
         formattingSecondDate();
@@ -491,14 +514,14 @@ use yii\helpers\Html;
         });
 
 
-        $('#ttamu-hargaperkamar0').val(ambilhargaperkamar);
+        // $('#ttamu-hargaperkamar0').val(ambilhargaperkamar);
         $('#firstDate0').val(formattingFirstDate());
         $('#secondDate0').val(formattingSecondDate());
         $('#ttamu-durasi0').val(1);
-        $('#ttamu-subtotalkamar0').val(ambilhargaperkamar);
+        // $('#ttamu-subtotalkamar0').val(ambilhargaperkamar);
 
 
-        setDefault();
+        // setDefault();
     });
 
     $(document).on('change','.claddhalf',function(){
@@ -703,16 +726,16 @@ use yii\helpers\Html;
         return output;
     }
 
-    function delRec(valueT){
-        vv--;
-        $('#garis'+valueT).remove();
-        $('#kolomrole'+valueT).remove();
-        $('#remove_role'+valueT).remove();
-        $('#summaryttamu-dp').val(0);
-        $('#summaryttamu-dp').number(true);
-        // $('#summaryttamu-sisa').val( $('#summaryttamu-dp').val() );
-        total();
-    }
+    // function delRec(valueT){
+    //     vv--;
+    //     $('#garis'+valueT).remove();
+    //     $('#kolomrole'+valueT).remove();
+    //     $('#remove_role'+valueT).remove();
+    //     $('#summaryttamu-dp').val(0);
+    //     $('#summaryttamu-dp').number(true);
+    //     // $('#summaryttamu-sisa').val( $('#summaryttamu-dp').val() );
+    //     total();
+    // }
 
     function hitungDurasi(id=null)
     {
@@ -724,21 +747,21 @@ use yii\helpers\Html;
         return diffDays;
     }
 
-    function setDefault()
-    {
-        var setdefault = 0;
-        $('#summaryttamu-total_bayar').val(gethargaawal);
-        $('#summaryttamu-total_bayar').number( true );
-        $('#summaryttamu-total_harga').val(gethargaawal);
-        $('#summaryttamu-total_harga').number( true );
-        $('#summaryttamu-sisa').val(setdefault);
-        $('#summaryttamu-sisa').number( true );
-        $('#summaryttamu-dp').val(0);
-        $('#summaryttamu-dp').number( true );
-
-        $('#ttamu-subtotalkamar"'+valueT+'"').val(setdefault);
-        $('#ttamu-durasi"'+valueT+'"').val(setdefault);
-    }
+    // function setDefault()
+    // {
+    //     var setdefault = 0;
+    //     // $('#summaryttamu-total_bayar').val(gethargaawal);
+    //     $('#summaryttamu-total_bayar').number( true );
+    //     // $('#summaryttamu-total_harga').val(gethargaawal);
+    //     $('#summaryttamu-total_harga').number( true );
+    //     $('#summaryttamu-sisa').val(setdefault);
+    //     $('#summaryttamu-sisa').number( true );
+    //     $('#summaryttamu-dp').val(0);
+    //     $('#summaryttamu-dp').number( true );
+    //
+    //     $('#ttamu-subtotalkamar"'+valueT+'"').val(setdefault);
+    //     $('#ttamu-durasi"'+valueT+'"').val(setdefault);
+    // }
 
 
     function savecekin(id) {

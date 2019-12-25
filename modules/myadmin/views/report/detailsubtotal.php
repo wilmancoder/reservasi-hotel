@@ -9,7 +9,10 @@ $this->title = 'Detail Subtotal';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <style type="text/css">
-
+#titlebed {
+    color: white;
+    padding-bottom: 8px;
+}
 </style>
 <div class="report-index">
     <!-- <h1 class="title"><i class="fa fa-list" aria-hidden="true"></i> <?//= Html::encode($this->title) ?></h1><br> -->
@@ -47,20 +50,54 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
     </div>
+    <br/>
+    <h5 class="title">Extra Bed</h5>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Harga per Kasur :</label>
+                <input type="text" name="nmhrgbed" class="form-control" value="<?= "Rp. " . \app\components\Logic::formatNumber($resultbed, 0)?>" disabled="true">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Jumlah Kasur :</label>
+                <input type="text" name="nmjmlbed" class="form-control" value="<?= $cektbed['qty_bed']?>" disabled="true">
+            </div>
+        </div>
+        <div class="col-md-4" style="text-align:right;">
+            <div class="form-group">
+                <label class="control-label" id="titlebed">Total</label>
+                <p id="totalbed" style="padding-right: 28px;"><?= !empty($cektbed) ? "Rp. " . \app\components\Logic::formatNumber($cektbed['harga_bed'], 0) :  "Rp. " . \app\components\Logic::formatNumber($resultbed, 0) ?></p>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    <div class="row">
+        <div class="col-md-8">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-md-6">
+                    Grand Total :
+                </div>
+                <div class="col-md-6" style="text-align: right; padding-right:42px;">
+                    <span id="grtot">Rp. 10.000.000</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
-
     var t = null;
     $(document).ready(function () {
 
         t = $('#tbl_detail_subtotal').DataTable();
          items_preview();
+
 
 
     });
@@ -138,8 +175,14 @@ $this->params['breadcrumbs'][] = $this->title;
                      '  Rp.'+ total +''
                  );
                  var convert = toRupiah(total);
-
                  $('th#grandtotal').text('  Rp. '+ convert +'');
+
+                 var totbed = $('#totalbed').text();
+                 var subs = totbed.substring(4);
+                 restotbed = subs.split('.').join("");
+                 var grandtot = parseInt(total) + parseInt(restotbed);
+                 console.log(grandtot);
+                 $('span#grtot').text('  Rp. '+ grandtot +'');
             }
         });
 

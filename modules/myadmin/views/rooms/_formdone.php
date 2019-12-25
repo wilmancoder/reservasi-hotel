@@ -84,7 +84,7 @@ use yii\helpers\Url;
                         <div id="information">
                             <p>
                                 <span class="field">Nama Tamu</span>
-                                <span class="value"><?=$ambilDatatamu[0]['namatamu']?></span>
+                                <span class="value"><?=$ambilDatatamusatuan['namatamu']?></span>
                             </p>
                         </div>
                     </div>
@@ -94,7 +94,7 @@ use yii\helpers\Url;
                         <div id="information">
                             <p>
                                 <span class="field">Identitas</span>
-                                <span class="value"><?=$ambilDatatamu[0]['identitas']?></span>
+                                <span class="value"><?=$ambilDatatamusatuan['identitas']?></span>
                             </p>
                         </div>
                     </div>
@@ -106,7 +106,7 @@ use yii\helpers\Url;
                         <div id="information">
                             <p>
                                 <span class="field">Alamat</span>
-                                <span class="value"><?=$ambilDatatamu[0]['alamat']?></span>
+                                <span class="value"><?=$ambilDatatamusatuan['alamat']?></span>
                             </p>
                         </div>
                     </div>
@@ -116,7 +116,7 @@ use yii\helpers\Url;
                         <div id="information">
                             <p>
                                 <span class="field">Nomor Identitas</span>
-                                <span class="value"><?=$ambilDatatamu[0]['nomor_identitas']?></span>
+                                <span class="value"><?=$ambilDatatamusatuan['nomor_identitas']?></span>
                             </p>
                         </div>
                     </div>
@@ -150,8 +150,8 @@ use yii\helpers\Url;
                     foreach ($ambilDatatamu as $key => $value) {
                         if($value['status'] == 1){
                             $ck = "<input type='checkbox' name='nomor_kamar[]' class='cek_kamar' urutan='".$value['id']."' value='".$value['nomor_kamar']."'>
-                            <input type='checkbox' style='display:none' name='id_tamu[]' value='".$value['id']."' id='id-".$value['id']."'>
-                            <a onclick='settingsList(".$value['id'].",".$tipe.")' style='cursor:pointer;' class='text-primary'><i class='fa fa-cogs'></i></a>
+                            <input type='hidden' disabled='true' class='form-control' name='id_tamu[]' value='".$value['id']."' id='id-".$value['id']."'>
+                            <a onclick='settingsList(".$value['id'].",".$value['id_mapping_kamar'].",".$tipe.")' style='cursor:pointer;' class='text-primary'><i class='fa fa-cogs'></i></a>
                             ";
                         }
                         else{
@@ -187,7 +187,7 @@ use yii\helpers\Url;
                                 </div>
                                 <div class='col-md-2'>
                                     <div class='form-group required'>
-                                        <input type='text' class='form-control' name='subtotal' value='"."Rp. " . \app\components\Logic::formatNumber($value['subtotal'], 0)."' disabled='true'>
+                                        <input type='text' class='form-control clsubtotal' name='subtotal' value='"."Rp. " . \app\components\Logic::formatNumber($value['subtotal'], 0)."' disabled='true'>
                                     </div>
                                 </div>
                             </div>
@@ -204,7 +204,7 @@ use yii\helpers\Url;
                     ?>
                     <div class="row pull-right">
                         <div class='col-md-12'>
-                            <label class="control-label"><?= "Rp. " . \app\components\Logic::formatNumber($totalhargasummary, 0)?></label>
+                            <label class="control-label"><?= "Rp. " . \app\components\Logic::formatNumber($grandtotal, 0)?></label>
                         </div>
                     </div>
                     <!-- <hr> -->
@@ -247,7 +247,7 @@ use yii\helpers\Url;
                                 </div>
                             </div>
                         </div>
-                        <input type="text" name="fixextrabed" id="fixextrabed" disabled = "disabled" class="form-control" value="<?= $resultbed?>">
+                        <input type="hidden" name="fixextrabed" id="fixextrabed" disabled = "disabled" class="form-control" value="<?= $resultbed?>">
                     <?php } else { ?>
                         <div class="row">
                             <div class="col-md-4">
@@ -281,7 +281,7 @@ use yii\helpers\Url;
                                 <div id="information">
                                     <p>
                                         <span class="field">Jenis Pembayaran</span>
-                                        <span class="value"><?=$ambilDatatamu[0]['jenis']?></span>
+                                        <span class="value"><?=$ambilDatatamusatuan['jenis']?></span>
                                     </p>
                                 </div>
                             </div>
@@ -291,7 +291,7 @@ use yii\helpers\Url;
                                 <div id="information">
                                     <p>
                                         <span class="field">Metode Pembayaran</span>
-                                        <span class="value"><?=$ambilDatatamu[0]['metode']?></span>
+                                        <span class="value"><?=$ambilDatatamusatuan['metode']?></span>
                                     </p>
                                 </div>
                             </div>
@@ -303,46 +303,62 @@ use yii\helpers\Url;
             <div class="box box-warning">
                 <div class="box-body">
                     <div class='row'>
-                        <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
+                        <?php if($jenisPembayaran == "lunas"  && $sisasummary == 0) { ?>
                             <div class='col-md-4'>
                                 <label class="control-label">Bayar</label>
                             </div>
-                        <?php } else {?>
+                            <div class='col-md-4'>
+                                <label class="control-label">Sisa</label>
+                            </div>
+                            <div class='col-md-4'>
+                                <label class="control-label">Total Harga</label>
+                            </div>
+                        <?php } else if( ($jenisPembayaran == "sebagian" || $jenisPembayaran == "belumbayar")  && $sisasummary != 0){?>
                             <div class='col-md-4'>
                                 <label class="control-label">DP</label>
                             </div>
+                            <div class='col-md-4'>
+                                <label class="control-label">Sisa</label>
+                            </div>
+                            <div class='col-md-4'>
+                                <label class="control-label">Total Harga</label>
+                            </div>
                         <?php } ?>
-                        <div class='col-md-4'>
-                            <label class="control-label">Sisa</label>
-                        </div>
-                        <div class='col-md-4'>
-                            <label class="control-label">Total Harga</label>
-                        </div>
                     </div>
                     <div class="row">
-                        <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
+                        <?php if($jenisPembayaran == "lunas"  && $sisasummary == 0) { ?>
                             <div class="col-md-4">
                                 <div class="form-group required">
                                     <input type="text" class="form-control" name="bayar" value="Rp. <?= \app\components\Logic::formatNumber($totalbayarsummary, 0)?>" readonly='true'>
                                 </div>
                             </div>
-                        <?php } else {?>
+                            <div class="col-md-4">
+                                <div class="form-group required">
+                                    <input type="text" class="form-control" name="sisa" id="totsisa" value="Rp. <?= \app\components\Logic::formatNumber($sisasummary, 0)?>" readonly='true'>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group required">
+                                    <input type="text" class="form-control" name="totalharga" id="totharga" value="Rp. <?= \app\components\Logic::formatNumber($totalhargasummary, 0)?>" readonly='true'>
+                                </div>
+                            </div>
+                        <?php } else if( ($jenisPembayaran == "sebagian" || $jenisPembayaran == "belumbayar")  && $sisasummary != 0){?>
                             <div class="col-md-4">
                                 <div class="form-group required">
                                     <input type="text" class="form-control" name="dp" value="Rp. <?= \app\components\Logic::formatNumber($dpsummary, 0)?>" readonly='true'>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group required">
+                                    <input type="text" class="form-control" name="sisa" id="totsisa" value="Rp. <?= \app\components\Logic::formatNumber($sisasummary, 0)?>" readonly='true'>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group required">
+                                    <input type="text" class="form-control" name="totalharga" id="totharga" value="Rp. <?= \app\components\Logic::formatNumber($totalhargasummary, 0)?>" readonly='true'>
+                                </div>
+                            </div>
                         <?php } ?>
-                        <div class="col-md-4">
-                            <div class="form-group required">
-                                <input type="text" class="form-control" name="sisa" id="totsisa" value="Rp. <?= \app\components\Logic::formatNumber($sisasummary, 0)?>" readonly='true'>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group required">
-                                <input type="text" class="form-control" name="totalharga" id="totharga" value="Rp. <?= \app\components\Logic::formatNumber($totalhargasummary, 0)?>" readonly='true'>
-                            </div>
-                        </div>
                     </div>
 
                     <?php if($jenisPembayaran == "lunas"  || $sisasummary == 0) { ?>
@@ -354,7 +370,8 @@ use yii\helpers\Url;
                                 </div>
                             </div>
                         </div>
-                    <?php } else {?>
+                        <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" disabled = "true" class="form-control" value="<?= $totalhargasummary?>">
+                    <?php } else if( ($jenisPembayaran == "sebagian" || $jenisPembayaran == "belumbayar")  && $sisasummary != 0) {?>
                         <div class="row" style="display:block">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -363,8 +380,8 @@ use yii\helpers\Url;
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
                     <?php } ?>
-                    <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
                 </div>
             </div>
 
@@ -401,10 +418,10 @@ use yii\helpers\Url;
 </div>
 <script type="text/javascript">
 
-    function settingsList(id,tipe){
+    function settingsList(id,idkamar,tipe){
         $.ajax({
             type: "GET",
-            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/setkamar'])?>?id="+id+'&tipe='+tipe,
+            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/setkamar'])?>?id="+id+'&idkamar='+idkamar+'&tipe='+tipe,
             success: function(data) {
                 $('#modalPilihkamarBody').html(data);
                 $('#modalPilihkamarId').modal({backdrop: 'static', keyboard: false});
@@ -417,6 +434,7 @@ use yii\helpers\Url;
     }
 
     $(document).ready(function () {
+
         // var defaultHargabed = <?//= $resultbed?>;
         // var convertDefaultHargabed = toRupiah(defaultHargabed);
         // $('#totalbed').text('Rp. '+ convertDefaultHargabed +'');
@@ -515,10 +533,12 @@ use yii\helpers\Url;
         $(document).on('change','.cek_kamar',function(){
             var urutan = $(this).attr('urutan');
             if ($(this).is(':checked')) {
-                $('#id-'+urutan).trigger('click');
+                // $('#id-'+urutan).trigger('click');
+                $('#id-'+urutan).attr('disabled',false);
             }
             else{
-                $('#id-'+urutan).trigger('click');
+                // $('#id-'+urutan).trigger('click');
+                $('#id-'+urutan).attr('disabled',true);
             }
         });
 
@@ -783,11 +803,11 @@ use yii\helpers\Url;
                             swal(result.header, result.message, result.status);
 
                             if (result.status == "success") {
-                                // $('#modalRoomsId').on('hidden.bs.modal', function (e) {
+                                // $('#modalPilihkamarId').on('hidden.bs.modal', function (e) {
                                     $.ajax({
                                         url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
                                         beforeSend: function(data, v) {
-                                            $('#modalRoomsId #modalRoomsTitle').html('Form Check-out');
+                                            $('#modalRoomsId #modalRoomsTitle').html('Form Check');
                                             $('#modalRoomsId #modalRoomsBody').html('Loading ...');
                                         },
                                         error: function(data, v){

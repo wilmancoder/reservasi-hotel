@@ -125,8 +125,8 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                                     <th>#</th>
                                      <th>No.</th>
                                      <th>Nama Tamu</th>
-                                     <th>Jenis Pembayaran</th>
-                                     <th>Metode Pembayaran</th>
+                                     <th>Pembayaran</th>
+                                     <th>Status Pembayaran</th>
                                      <th>Tgl. Uang Masuk</th>
                                      <th>Jumlah Uang Masuk</th>
                                 </tr>
@@ -173,20 +173,46 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                     </div>
                     <br><br>
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label class="control-label">Jumlah Total Pendapatan</label>
-                                    <!-- <input type="text" id="tmppendapatan" value="<?//= $Summarytamupendapatan?>" class="form-control"> -->
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-3" style="margin-left:12px;">
+                                    <div class="form-group">
+                                        <label class="control-label">Jumlah Total Pendapatan</label>
+                                        <!-- <input type="text" id="tmppendapatan" value="<?//= $Summarytamupendapatan?>" class="form-control"> -->
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="control-label">Jumlah Total Pengeluaran</label>
-                                    <!-- <input type="text" id="tmppengeluaran" value="<?//= $Summarytamupengeluaran?>" class="form-control"> -->
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label title"><strong> Jumlah Disetor</strong</label>
+                                <div class="col-md-2" style="margin-left:12px;">
+                                    <div class="form-group">
+                                        <label class="control-label" id="tot_pendapatan">Rp. &nbsp;<?= \app\components\Logic::formatNumber(!empty($Summarytamupendapatan) ? $Summarytamupendapatan : 0)?></label>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-3" style="margin-left:12px;">
+                                    <div class="form-group">
+                                        <label class="control-label">Jumlah Total Pengeluaran</label>
+                                        <!-- <input type="text" id="tmppengeluaran" value="<?//= $Summarytamupengeluaran?>" class="form-control"> -->
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="margin-left:12px;">
+                                    <div class="form-group">
+                                        <label class="control-label" id="tot_pengeluaran">Rp. &nbsp;<?= \app\components\Logic::formatNumber(!empty($Summarytamupengeluaran) ? $Summarytamupengeluaran : 0)?></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3" style="margin-left:12px;">
+                                    <div class="form-group">
+                                        <label class="control-label title"><strong> Jumlah Disetor</strong</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="margin-left:12px;">
+                                    <div class="form-group">
+                                        <label class="control-label title" id="jmlsetor"><strong>Rp. &nbsp;<?= \app\components\Logic::formatNumber(!empty($resultGrandtotal) ? $resultGrandtotal : 0)?></strong></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php /*
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="control-label" id="tot_pendapatan">Rp. &nbsp;<?= \app\components\Logic::formatNumber(!empty($Summarytamupendapatan) ? $Summarytamupendapatan : 0)?></label>
@@ -203,20 +229,45 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                                     <label class="control-label title" id="jmlsetor"><strong>Rp. &nbsp;<?= \app\components\Logic::formatNumber(!empty($resultGrandtotal) ? $resultGrandtotal : 0)?></strong></label>
                                 </div>
                             </div>
+                            */ ?>
+                        </div>
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+
                             <div class="col-md-4"></div>
-                            <div class="col-md-2 pull-right">
-                                <div class="form-group">
-                                    <label class="control-label"> <?= $user['nama']?></label>
+
+                            <div class="row" style="text-align:right;">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="control-label"> <?= $user['nama']?></label>
+                                    </div>
                                 </div>
-                                <?php if($roleuser == '1') { ?>
+                            </div>
+
+                            <div class="col-md-4"></div>
+
+                            <div class="row" style="text-align:right;">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label class="control-label"> Petugas FO</label>
+                                        <label class="control-label"></label>
                                     </div>
-                                <?php } else { ?>
-                                    <div class="form-group">
-                                        <label class="control-label"> Back Office</label>
-                                    </div>
-                                <?php } ?>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4"></div>
+
+                            <div class="row" style="text-align:right;">
+                                <div class="col-md-4">
+                                    <?php if($roleuser == '1') { ?>
+                                        <div class="form-group">
+                                            <label class="control-label"> Petugas FO</label>
+                                        </div>
+                                    <?php } else { ?>
+                                        <div class="form-group">
+                                            <label class="control-label"> Back Office</label>
+                                        </div>
+                                    <?php } ?>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -316,6 +367,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
     {
         t.destroy();
         var idpetugas = <?= $idpetugas?>;
+        var idharga = <?= $getsessionharga?>;
         // table.destroy();
         t = $('#tbl_laporan_pendapatan').DataTable({
             "processing": true,
@@ -337,7 +389,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                     className: 'dt-body-right'
                 },
             ],
-            "ajax": '<?=\Yii::$app->getUrlManager()->createUrl("myadmin/report/getdatapendapatan");?>?idpetugas='+idpetugas,
+            "ajax": '<?=\Yii::$app->getUrlManager()->createUrl("myadmin/report/getdatapendapatan");?>?idpetugas='+idpetugas+'&idharga='+idharga,
             "columns": [
                 // {
                 //     "className": 'details-control',
@@ -352,8 +404,8 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                 },
                  {"data": "no"},
                  {"data": "nama_tamu"},
-                 {"data": "jenis_pembayaran"},
-                 {"data": "metode_pembayaran"},
+                 {"data": "pembayaran"},
+                 {"data": "status_pembayaran"},
                  {"data": "tgl_uangmasuk"},
                  {"data": "jml_uangmasuk"}
              ],
@@ -471,8 +523,8 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
         }
         });
     }
-    function detail(idtranstamu) {
-         var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/report/detsubtotal']);?>?idtranstamu=" + idtranstamu;
+    function detail(idtranstamu,idharga) {
+         var url = "<?php echo \Yii::$app->getUrlManager()->createUrl(['myadmin/report/detsubtotal']);?>?idtranstamu=" + idtranstamu + "&idharga="+idharga;
          var title = "<h5 class='title'>Detail Data Tamu</h5>";
          showModal(url, title);
     }
@@ -753,7 +805,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                 $('#tmppengeluaran').val(totaly);
                 var resFinal = totalx-totaly;
                 var convertresFinal = toRupiah(resFinal);
-                $('label#jmlsetor').text('  Rp. '+ convertresFinal +'')
+                $('label#jmlsetor').text('  Rp. '+ convertresFinal +'');
             }
         });
     }
@@ -772,9 +824,6 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                 formData.append($(v).data('target'), $(v).val());
             });
 
-            // var csrfToken = $('meta[name="csrf-token"]').attr("content");
-            // formData.append('_csrf', csrfToken);
-
             $.ajax({
                 url: '<?php echo Url::toRoute(['report/downloadreportfo']); ?>',
                 method: 'post',
@@ -791,31 +840,6 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                     swal('Gagal', 'dokumen gagal didownload, gunakan downloader bawaan browser', 'error');
                 }
             })
-
-        //     fetch('<?php echo Url::toRoute(['report/downloadreportfo']); ?>', {
-    	// 		method: 'post',
-    	// 		body: formData
-	    //     })
-    	// 		// .then(resp => resp.blob())
-    	// 		// .then(resp => {
-        //             console.log(resp);
-        //             // swal('Sukses', 'ok', 'success');
-        //             // window.location = '<?=\Yii::$app->getUrlManager()->createUrl(['web/download'])?>' + resp.filename;
-    	// 			// var today = new Date();
-        //             //
-    	// 			// const url = window.URL.createObjectURL(blob);
-    	// 			// const a = document.createElement('a');
-    	// 			// a.style.display = 'none';
-    	// 			// a.href = url;
-    	// 			// a.download = `report shift ${today.getDate()}-${today.getMonth()}-${today.getFullYear()}.xlsx`;
-    	// 			// document.body.appendChild(a);
-    	// 			// a.click();
-    	// 			// window.URL.revokeObjectURL(url);
-    	// 			// swal('Berhasil', 'dokumen berhasil didownload', 'success');
-        //             // $(el).html('Download').removeClass('disabled');
-        //
-    	// 		})
-    	// 		.catch(() => swal('Gagal', 'dokumen gagal didownload, gunakan downloader bawaan browser', 'error'));
         }
     }
 

@@ -80,12 +80,12 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                                 <?= Html::button('<i class="fa fa-refresh" aria-hidden="true"></i> Reset', ['class' => 'btn btn-warning btn-block', 'id' => 'idreset']) ?>
                             </div>
                         </div>
-                        <!-- <div class="col-md-2">
+                        <div class="col-md-2">
                             <label class="control-label labeldownload">Download</label>
                             <div class="form-group">
-                                <?//= Html::button('<i class="fa fa-download" aria-hidden="true"></i> Download', ['class' => 'btn btn-primary btn-block', 'onclick' => 'reportdownload("excel", this)']) ?>
+                                <?= Html::button('<i class="fa fa-download" aria-hidden="true"></i> Download', ['class' => 'btn btn-primary btn-block', 'onclick' => 'reportdownloadall("excel", this)']) ?>
                             </div>
-                        </div> -->
+                        </div>
                         <?php ActiveForm::end(); ?>
                     </div>
                     <div class="box-header with-border">
@@ -116,10 +116,6 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                     </div>
                     <hr><br>
 
-                    <!-- <div class="box-header with-border">
-                        <label class="control-label labelshift">Laporan Pengeluaran</label>
-                        <?//= Html::a('<i class="fa fa-plus"></i> Tambah Pengeluaran', 'javascript:addpengeluaran()', ['class' => 'btn btn-default pull-right tombol']) ?>
-                    </div> -->
                     <div class="box-body table-responsive">
                         <table id="tbl_laporan_pengeluaran" class="table table-striped table-bordered" style="width:100%">
                             <thead>
@@ -709,7 +705,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
         });
     }
 
-    function reportdownload(type, el){
+    function reportdownloadall(type, el){
         if(type == 'excel') {
             $(el).html('loading...').addClass('disabled');
 
@@ -723,11 +719,8 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                 formData.append($(v).data('target'), $(v).val());
             });
 
-            // var csrfToken = $('meta[name="csrf-token"]').attr("content");
-            // formData.append('_csrf', csrfToken);
-
             $.ajax({
-                url: '<?php echo Url::toRoute(['report/downloadreportfo']); ?>',
+                url: '<?php echo Url::toRoute(['report/downloadreportall']); ?>',
                 method: 'post',
                 data: formData,
                 contentType: false,
@@ -742,31 +735,6 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                     swal('Gagal', 'dokumen gagal didownload, gunakan downloader bawaan browser', 'error');
                 }
             })
-
-        //     fetch('<?php //echo Url::toRoute(['report/downloadreportfo']); ?>', {
-    	// 		method: 'post',
-    	// 		body: formData
-	    //     })
-    	// 		// .then(resp => resp.blob())
-    	// 		// .then(resp => {
-        //             console.log(resp);
-        //             // swal('Sukses', 'ok', 'success');
-        //             // window.location = '<?//=\Yii::$app->getUrlManager()->createUrl(['web/download'])?>' + resp.filename;
-    	// 			// var today = new Date();
-        //             //
-    	// 			// const url = window.URL.createObjectURL(blob);
-    	// 			// const a = document.createElement('a');
-    	// 			// a.style.display = 'none';
-    	// 			// a.href = url;
-    	// 			// a.download = `report shift ${today.getDate()}-${today.getMonth()}-${today.getFullYear()}.xlsx`;
-    	// 			// document.body.appendChild(a);
-    	// 			// a.click();
-    	// 			// window.URL.revokeObjectURL(url);
-    	// 			// swal('Berhasil', 'dokumen berhasil didownload', 'success');
-        //             // $(el).html('Download').removeClass('disabled');
-        //
-    	// 		})
-    	// 		.catch(() => swal('Gagal', 'dokumen gagal didownload, gunakan downloader bawaan browser', 'error'));
         }
     }
 
