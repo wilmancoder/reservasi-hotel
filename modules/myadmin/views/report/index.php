@@ -129,6 +129,7 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                                      <th>Status Pembayaran</th>
                                      <th>Tgl. Uang Masuk</th>
                                      <th>Jumlah Uang Masuk</th>
+                                     <th>Keterangan</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -379,15 +380,16 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
             columnDefs: [
                 { width: '5%', targets: 0 },
                 { width: '5%', targets: 1 },
-                { width: '25%', targets: 2 },
-                { width: '15%', targets: 3 },
-                { width: '20%', targets: 4 },
+                { width: '20%', targets: 2 },
+                { width: '10%', targets: 3 },
+                { width: '10%', targets: 4 },
                 { width: '15%', targets: 5 },
                 {
                     width: '15%', targets: 6,
                     targets: 6,
                     className: 'dt-body-right'
                 },
+                { width: '20%', targets: 7 },
             ],
             "ajax": '<?=\Yii::$app->getUrlManager()->createUrl("myadmin/report/getdatapendapatan");?>?idpetugas='+idpetugas+'&idharga='+idharga,
             "columns": [
@@ -407,7 +409,8 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                  {"data": "pembayaran"},
                  {"data": "status_pembayaran"},
                  {"data": "tgl_uangmasuk"},
-                 {"data": "jml_uangmasuk"}
+                 {"data": "jml_uangmasuk"},
+                 {"data": "keterangan"}
              ],
              "footerCallback": function ( row, data, start, end, display ) {
              var api = this.api(), data;
@@ -656,15 +659,16 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
             columnDefs: [
                 { width: '5%', targets: 0 },
                 { width: '5%', targets: 1 },
-                { width: '25%', targets: 2 },
-                { width: '15%', targets: 3 },
-                { width: '20%', targets: 4 },
+                { width: '20%', targets: 2 },
+                { width: '10%', targets: 3 },
+                { width: '10%', targets: 4 },
                 { width: '15%', targets: 5 },
                 {
                     width: '15%', targets: 6,
                     targets: 6,
                     className: 'dt-body-right'
                 },
+                { width: '20%', targets: 7 },
             ],
             "ajax": {
                 "type": 'GET',
@@ -682,7 +686,8 @@ background: url('https://datatables.net/examples/resources/details_close.png') n
                 {"data": "jenis_pembayaran"},
                 {"data": "metode_pembayaran"},
                 {"data": "tgl_uangmasuk"},
-                {"data": "jml_uangmasuk"}
+                {"data": "jml_uangmasuk"},
+                {"data": "keterangan"}
              ],
             "footerCallback": function ( row, data, start, end, display ) {
                 var api = this.api(), data;

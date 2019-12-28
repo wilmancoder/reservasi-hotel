@@ -15,6 +15,7 @@ use Yii;
  * @property string $status_pembayaran
  * @property string $tgl_uangmasuk
  * @property string $jml_uangmasuk
+ * @property string $keterangan
  */
 class HistoriSummarytamu extends \yii\db\ActiveRecord
 {
@@ -34,6 +35,7 @@ class HistoriSummarytamu extends \yii\db\ActiveRecord
         return [
             [['id_transaksi_tamu', 'id_petugas', 'id_user'], 'integer'],
             [['tgl_uangmasuk'], 'safe'],
+            [['keterangan'], 'string'],
             [['pembayaran', 'status_pembayaran', 'jml_uangmasuk'], 'string', 'max' => 100],
         ];
     }
@@ -52,6 +54,7 @@ class HistoriSummarytamu extends \yii\db\ActiveRecord
             'status_pembayaran' => 'Status Pembayaran',
             'tgl_uangmasuk' => 'Tgl Uangmasuk',
             'jml_uangmasuk' => 'Jml Uangmasuk',
+            'keterangan' => 'Keterangan',
         ];
     }
 }

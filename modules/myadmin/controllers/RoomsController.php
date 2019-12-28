@@ -20,6 +20,7 @@ use app\models\SummaryTtamu;
 use app\models\MMappingHarga;
 use app\models\HistoriSummarytamu;
 use app\models\TBed;
+use app\models\MKategoriHarga;
 
 class RoomsController extends \yii\web\Controller
 {
@@ -386,6 +387,7 @@ class RoomsController extends \yii\web\Controller
 
     public function actionCreatedone($idttamu){
         // var_dump($idttamu);exit;
+        $model = new HistoriSummarytamu();
         $exp = explode(",",$idttamu);
         $que1 = MMappingKamar::find()->where(['id'=>$exp[0]])->asArray()->one();
         // var_dump($que1);exit;
@@ -402,7 +404,8 @@ class RoomsController extends \yii\web\Controller
         $ambilDatatamusatuan = Logic::dataTamusatuan($idbiodata);
         // echo"<pre>";
         // print_r($ambilDatatamusatuan);exit;
-        $hargabed = MMappingHarga::find()->where(['id_kategori_harga' => $exp[1], 'id_type' => 5])->asArray()->one();
+        $cekKatHarga = MKategoriHarga::find()->where(['id' => $exp[1]])->asArray()->one();
+        $hargabed = MMappingHarga::find()->where(['id_kategori_harga' => $cekKatHarga['id'], 'id_type' => 5])->asArray()->one();
         $resultbed = $hargabed['harga'];
 
         $cektbed = TBed::find()->where([
@@ -417,7 +420,8 @@ class RoomsController extends \yii\web\Controller
             'idkamar' =>$exp[0],
             'tipe' => $exp[1],
             'cektbed' => $cektbed,
-            'resultbed' => $resultbed
+            'resultbed' => $resultbed,
+            'model' => $model
         ]);
     }
      public function actionSimpancekout($idbiodata,$tipe)
@@ -427,13 +431,18 @@ class RoomsController extends \yii\web\Controller
          $transaction = Yii::$app->db->beginTransaction();
          try {
              if (Yii::$app->request->post()) {
-                 // $getid = $_GET;
-                 $post = @$_POST['bayarpelunasan'];
-                 // var_dump($_POST);exit;
+                 $request = Yii::$app->request;
+                 $postpelunasan = $request->post();
+                 $byrlunas = $postpelunasan['bayarpelunasan'];
+                 $hisKet = $postpelunasan['HistoriSummarytamu']['keterangan'];
 
                 $cekbiodatatamu =  TTamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->one();
                 $cektamu = Ttamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->all();
-
+                $cekhistoryTamu = HistoriSummarytamu::find()->where(['id_transaksi_tamu' => $idbiodata])->asArray()->one();
+                // var_dump($cekhistoryTamu);exit;
+                $ceksummaryTamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $idbiodata])->one();
+                $resCeksummaryTamu = $ceksummaryTamu['sisa'];
+                // var_dump($resCeksummaryTamu);exit;
                 if(!empty($cektamu)) {
                     foreach ($cektamu as $value) {
                         $modelTtamu = Ttamu::find()->where(['id' => $value['id']])->one();
@@ -462,29 +471,59 @@ class RoomsController extends \yii\web\Controller
                         }
                     }
                 }
-                if(!empty($_POST['bayarpelunasan'])){
-                     $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
-                     $modelSummaryttamu->total_bayar = $_POST['bayarpelunasan'];
-                     $modelSummaryttamu->sisa = 0;
-                     $modelSummaryttamu->dp = 0;
-                     $modelSummaryttamu->save(false);
+                if($cekhistoryTamu > 0){
+                    // echo"test1";exit;
+                    if($resCeksummaryTamu != 0){
+                        // echo"masuk1";exit;
+                        $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
+                        $modelSummaryttamu->total_bayar = $byrlunas;
+                        $modelSummaryttamu->sisa = 0;
+                        $modelSummaryttamu->dp = 0;
+                        $modelSummaryttamu->save(false);
 
-                    $modelHistoriSummaryttamu = new HistoriSummarytamu();
-                    $modelHistoriSummaryttamu->id_transaksi_tamu = $cekbiodatatamu['id_biodata_tamu'];
-                    $modelHistoriSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
-                    $modelHistoriSummaryttamu->id_user = Yii::$app->user->identity->id_user;
-                    if( (!empty($_POST['dp']) && !empty($_POST['sisa'])) ){
-                        $modelHistoriSummaryttamu->pembayaran = "SISA";
-                        $modelHistoriSummaryttamu->status_pembayaran = "LUNAS";
+                        $modelHistoriSummaryttamu = new HistoriSummarytamu();
+                        $modelHistoriSummaryttamu->id_transaksi_tamu = $cekbiodatatamu['id_biodata_tamu'];
+                        $modelHistoriSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
+                        $modelHistoriSummaryttamu->id_user = Yii::$app->user->identity->id_user;
+                        if( (!empty($_POST['dp']) && !empty($_POST['sisa'])) ){
+                            $modelHistoriSummaryttamu->pembayaran = "SISA";
+                            $modelHistoriSummaryttamu->status_pembayaran = "LUNAS";
+                        } else {
+                            $modelHistoriSummaryttamu->pembayaran = "PENUH";
+                            $modelHistoriSummaryttamu->status_pembayaran = "LUNAS";
+                        }
+                        $modelHistoriSummaryttamu->tgl_uangmasuk = date('Y-m-d');
+                        $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeRpTitik($_POST['sisa']);
+                        $modelHistoriSummaryttamu->keterangan = $hisKet;
+                        $modelHistoriSummaryttamu->save(false);
                     } else {
-                        $modelHistoriSummaryttamu->pembayaran = "PENUH";
-                        $modelHistoriSummaryttamu->status_pembayaran = "LUNAS";
+                        // echo"masuk2";exit;
+                        $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
+                        $modelSummaryttamu->total_bayar = $byrlunas;
+                        $modelSummaryttamu->sisa = 0;
+                        $modelSummaryttamu->dp = 0;
+                        $modelSummaryttamu->save(false);
+
+                       $modelHistoriSummaryttamu = HistoriSummarytamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
+                       $modelHistoriSummaryttamu->keterangan = $hisKet;
+                       $modelHistoriSummaryttamu->save(false);
                     }
-                    $modelHistoriSummaryttamu->tgl_uangmasuk = date('Y-m-d');
-                    $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeRpTitik($_POST['sisa']);
-                    $modelHistoriSummaryttamu->save(false);
 
                 }
+                // else {
+                //     // echo"test2";exit;
+                //     $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
+                //     $modelSummaryttamu->total_bayar = $byrlunas;
+                //     $modelSummaryttamu->sisa = 0;
+                //     $modelSummaryttamu->dp = 0;
+                //     $modelSummaryttamu->save(false);
+                //
+                //    $modelHistoriSummaryttamu = HistoriSummarytamu::find()->where(['id_transaksi_tamu' => $_POST['id_biodata_tamu']])->one();
+                //    $modelHistoriSummaryttamu->keterangan = $hisKet;
+                //    $modelHistoriSummaryttamu->save(false);
+                // }
+
+
                 //  foreach ($cekbiodatatamu as $key => $value) {
                 //      $modelTransaksitamu =  TTamu::find()->where(['id' => $value['id']])->one();
                 //      $modelTransaksitamu['status'] = "0";
@@ -809,6 +848,7 @@ class RoomsController extends \yii\web\Controller
                 if($hasilsisa != $ceksisa) {
                     $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $idbiodata])->one();
                     $modelSummaryttamu->total_bayar = 0;
+                    $modelSummaryttamu->dp = $hasiltotharga - $hasilsisa;
                     $modelSummaryttamu->total_harga = $hasiltotharga;
                     $modelSummaryttamu->sisa = $hasilsisa;
                     // $modelSummaryttamu->dp = $cekTotBayar;

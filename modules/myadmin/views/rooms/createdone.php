@@ -14,7 +14,8 @@
         'idkamar' =>$idkamar,
         'tipe' => $tipe,
         'cektbed' => $cektbed,
-        'resultbed' => $resultbed
+        'resultbed' => $resultbed,
+        'model' => $model
     ]) ?>
 
 </div>

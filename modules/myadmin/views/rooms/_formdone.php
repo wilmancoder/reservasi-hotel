@@ -370,7 +370,7 @@ use yii\helpers\Url;
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" disabled = "true" class="form-control" value="<?= $totalhargasummary?>">
+                        <input type="text" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
                     <?php } else if( ($jenisPembayaran == "sebagian" || $jenisPembayaran == "belumbayar")  && $sisasummary != 0) {?>
                         <div class="row" style="display:block">
                             <div class="col-md-6">
@@ -380,8 +380,15 @@ use yii\helpers\Url;
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
+                        <input type="text" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
                     <?php } ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group required">
+                                <?= $form->field($model, 'keterangan')->textarea(['maxlength' => true, 'rows' => '5', 'class' => 'form-control', 'placeholder' => 'Masukkan keterangan (opsional)']); ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

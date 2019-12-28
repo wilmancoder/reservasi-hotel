@@ -337,6 +337,7 @@ class ReportController extends \yii\web\Controller
                 $row[$i]['metode_pembayaran'] = $value['metode_pembayaran'];
                 $row[$i]['tgl_uangmasuk'] = $value['tgl_uangmasuk'];
                 $row[$i]['jml_uangmasuk'] = \app\components\Logic::formatNumber($value['jml_uangmasuk'], 0);
+                $row[$i]['keterangan'] = $value['keterangan'];
 
                 $row[$i]['fungsi'] = "
                 <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\",\"".$idharga."\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Data Tamu' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>

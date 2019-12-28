@@ -200,7 +200,7 @@ class Logic extends Component
     public static function reportFo($idpetugas,$param1,$param2)
     {
         $model = (new \yii\db\Query())
-        ->select(['a.tgl_uangmasuk', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk', 'a.pembayaran', 'a.status_pembayaran'])
+        ->select(['a.tgl_uangmasuk', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'a.keterangan', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'a.jml_uangmasuk', 'a.pembayaran', 'a.status_pembayaran'])
         ->from('histori_summarytamu a')
         ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
         ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')
