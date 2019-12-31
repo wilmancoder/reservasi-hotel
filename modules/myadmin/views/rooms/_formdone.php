@@ -767,18 +767,18 @@ use yii\helpers\Url;
                                     $.ajax({
                                         url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
                                         beforeSend: function(data, v) {
-                                            $('#modalRoomsId #modalRoomsTitle').html('Form Check');
-                                            $('#modalRoomsId #modalRoomsBody').html('Loading ...');
+                                            $('#modalRoomsIdReview #modalRoomsTitleReview').html('Form Checkout');
+                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html('Loading ...');
                                         },
                                         error: function(data, v){
-                                            $('#modalRoomsId #modalRoomsBody').html('Terjadi kesalahan..');
+                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html('Terjadi kesalahan..');
                                         },
                                         success: function(data, v){
-                                            $('#modalRoomsId #modalRoomsBody').html(data);
+                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html(data);
                                         }
                                     });
 
-                                    $('#modalRoomsId').modal({
+                                    $('#modalRoomsIdReview').modal({
                                         backdrop: 'static',
                                         keyboard: false
                                     });

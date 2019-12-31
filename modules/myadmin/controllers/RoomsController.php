@@ -898,7 +898,7 @@ class RoomsController extends \yii\web\Controller
                 echo json_encode($hasil);
                 die();
             } else {
-                $modelTbed->errors;
+                $modelTbed->errors();
             }
 
         }
