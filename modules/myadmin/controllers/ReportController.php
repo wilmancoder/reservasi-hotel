@@ -151,8 +151,8 @@ class ReportController extends \yii\web\Controller
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = Yii::$app->request->post();
-        // var_dump($post);exit;
         $ambilPosting = $post['TTamu'];
+        // var_dump($ambilPosting);exit;
 
         $poststartdate = $ambilPosting['startdate'];
         $date1=date_create($poststartdate);
@@ -233,6 +233,7 @@ class ReportController extends \yii\web\Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $get = Yii::$app->request->get();
         $getPosting = $get['posting'];
+        // var_dump($getPosting);exit;
         $getidpetugas = \Yii::$app->user->identity->id_petugas;
         $getiduser = \Yii::$app->user->identity->id_user;
 
@@ -320,8 +321,10 @@ class ReportController extends \yii\web\Controller
         if(Yii::$app->request->isAjax)
         {
             \Yii::$app->response->format = Response::FORMAT_JSON;
-            $param1 = date('Y-m-d');
-            $param2 = date('Y-m-d');
+            $srcparam1 = date('Y-m-d');
+            $srcparam2 = date('Y-m-d');
+            $param1 = !empty($srcparam1) ? $srcparam1 : '0000-00-00';
+            $param2 = !empty($srcparam2) ? $srcparam2 : '0000-00-00';
             $data = \app\components\Logic::reportFo($idpetugas,$param1,$param2);
             $row = array();
             $i = 0;
@@ -331,6 +334,9 @@ class ReportController extends \yii\web\Controller
                 foreach ($value as $key => $val) {
                     $row[$i][$key] = $val;
                 }
+                $row[$i]['fungsi'] = "
+                <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\",\"".$idharga."\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Data Tamu' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
+                ";
                 $row[$i]['no'] = $no++;
                 $row[$i]['nama_tamu'] = $value['nama_tamu'];
                 $row[$i]['jenis_pembayaran'] = $value['jenis_pembayaran'];
@@ -338,10 +344,6 @@ class ReportController extends \yii\web\Controller
                 $row[$i]['tgl_uangmasuk'] = $value['tgl_uangmasuk'];
                 $row[$i]['jml_uangmasuk'] = \app\components\Logic::formatNumber($value['jml_uangmasuk'], 0);
                 $row[$i]['keterangan'] = $value['keterangan'];
-
-                $row[$i]['fungsi'] = "
-                <button onclick='detail(\"" . $value['id_transaksi_tamu'] . "\",\"".$idharga."\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Data Tamu' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
-                ";
 
                 $i++;
                 // $no++;
@@ -841,10 +843,10 @@ class ReportController extends \yii\web\Controller
         $htmlPendapatan = '
         <table>
             <tr>
-                <td colspan=11 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN</strong></h3></td>
+                <td colspan=12 style="text-align: center;"><h3><strong>LAPORAN PENDAPATAN</strong></h3></td>
             </tr>
             <tr>
-                <td colspan=11 style="text-align: center;"></td>
+                <td colspan=12 style="text-align: center;"></td>
             </tr>
         </table>
         <table border=1px>
@@ -858,6 +860,7 @@ class ReportController extends \yii\web\Controller
                     <td colspan=2 style="text-align: center;">DETAIL PEMBAYARAN</td>
                     <td style="width: 20px; text-align: center;" rowspan=2>TGL.UANG DITERIMA</td>
                     <td style="width: 20px; text-align: center;" rowspan=2>JML.UANG DITERIMA</td>
+                    <td style="width: 20px; text-align: center;" rowspan=2>KETERANGAN</td>
                 </tr>
                 <tr>
                     <td style="width: 10px; text-align: center;">TTL.KAMAR</td>
@@ -883,6 +886,7 @@ class ReportController extends \yii\web\Controller
                     <td>'.$val['sisa_tagihan'].'</td>
                     <td>'.$val['tgl_uang_diterima'].'</td>
                     <td>'.$val['jml_uang_diterima'].'</td>
+                    <td>'.$val['keterangan'].'</td>
                 </tr>';
                 $no++;
 

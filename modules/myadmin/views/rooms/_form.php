@@ -2,6 +2,7 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 ?>
 <style type="text/css">
@@ -371,7 +372,7 @@ use yii\helpers\Html;
 
             <div class="row">
                 <div class="col-md-12">
-                    <?=Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkin'  : '<i class="fa fa-pencil" aria-hidden="true"></i> Update',$model->isNewRecord ? 'javascript:savecekin("'.$id.'")':'javascript:updatecekin("'.$id.'")',['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-primary pull-right']) ?>
+                    <?=Html::a($model->isNewRecord ? '<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkin'  : '<i class="fa fa-pencil" aria-hidden="true"></i> Update',$model->isNewRecord ? 'javascript:savecekin("'.$joinid.'")':'javascript:updatecekin("'.$id.'")',['class' => $model->isNewRecord ? 'btn btn-success pull-right' : 'btn btn-primary pull-right']) ?>
                     <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
                     <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
                 </div>
@@ -590,7 +591,7 @@ use yii\helpers\Html;
     }
 
 
-    function savecekin(id) {
+    function savecekin(joinid) {
         {
             if($('#ttamu-namatamu').val()==''){
                 swal({
@@ -660,7 +661,7 @@ use yii\helpers\Html;
                             dataType: "json",
                             contentType: false,
                             processData: false,
-                            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/create'])?>?id="+id,
+                            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/create'])?>?id="+joinid,
                             beforeSend: function () {
                                 swal({
                                     title: 'Harap Tunggu',
@@ -685,7 +686,27 @@ use yii\helpers\Html;
                                 swal(result.header, result.message, result.status);
 
                                 if (result.status == "success") {
-                                    window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+result.setharga;
+                                    $('#modalRoomsId').modal('hide');
+                                    $.ajax({
+                                        url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.joinid,
+                                        beforeSend: function(data, v) {
+                                            $('#modalRoomsIdReview #modalRoomsTitleReview').html('Form Checkout');
+                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html('Loading ...');
+                                        },
+                                        error: function(data, v){
+                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html('Terjadi kesalahan..');
+                                        },
+                                        success: function(data, v){
+                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html(data);
+                                        }
+                                    });
+
+                                    $('#modalRoomsIdReview').modal({
+                                        backdrop: 'static',
+                                        keyboard: false
+                                    });
+
+                                    // window.location = "<?//=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+result.setharga;
                                 }
                             },
                             error: function (xhr, ajaxOptions, thrownError) {

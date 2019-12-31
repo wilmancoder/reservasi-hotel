@@ -6,6 +6,7 @@ use yii\helpers\Url;
 // var_dump($ambilDatatamu);exit;
 ?>
 <style type="text/css">
+    .modal { overflow-y: scroll; }
     .geserkanan {
         margin-right: 5px;
     }
@@ -370,7 +371,7 @@ use yii\helpers\Url;
                                 </div>
                             </div>
                         </div>
-                        <input type="text" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
+                        <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
                     <?php } else if( ($jenisPembayaran == "sebagian" || $jenisPembayaran == "belumbayar")  && $sisasummary != 0) {?>
                         <div class="row" style="display:block">
                             <div class="col-md-6">
@@ -380,7 +381,7 @@ use yii\helpers\Url;
                                 </div>
                             </div>
                         </div>
-                        <input type="text" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
+                        <input type="hidden" name="bayarpelunasan" id="bayarpelunasan" readonly = "true" class="form-control" value="<?= $totalhargasummary?>">
                     <?php } ?>
                     <div class="row">
                         <div class="col-md-12">
@@ -400,7 +401,7 @@ use yii\helpers\Url;
                     <?php } else {?>
                         <?=Html::button('<i class="fa fa-floppy-o" aria-hidden="true"></i> Checkout',['class' => 'btn btn-success pull-right', 'onclick' => 'savecekout('.$idbiodata.','.$tipe.')', 'id' => 'idcekout', 'disabled' => 'disabled']) ?>
                     <?php } ?>
-                    <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal']) ?>
+                    <?= Html::button('<i class="fa fa-times" aria-hidden="true"></i> Close', ['class' => 'btn btn-danger pull-right geserkanan', 'data-dismiss' => 'modal', 'id' => 'idclose']) ?>
                 </div>
             </div>
             <?php ActiveForm::end(); ?>
@@ -424,8 +425,11 @@ use yii\helpers\Url;
   </div>
 </div>
 <script type="text/javascript">
-
+    var sessionidharga = <?= $getsessionharga ?>;
     function settingsList(id,idkamar,tipe){
+        // var cektotsisa = $('#totsisa').val();
+        // var subtotsisa = cektotsisa.substring(4);
+        // alert(subtotsisa); return false;
         $.ajax({
             type: "GET",
             url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/setkamar'])?>?id="+id+'&idkamar='+idkamar+'&tipe='+tipe,
@@ -646,57 +650,6 @@ use yii\helpers\Url;
         // End check radio button
     }
 
-    // function manageSelect()
-    // {
-    //     // Start checkbox
-    //     // var val = $("input[name='pelunasan']:checked").val();
-    //     // console.log(val); return false;
-    //     $( "input[type=checkbox]" ).on('click', function() {
-    //         // event.preventDefault();
-    //         // var changebrowse = $($('.input-group-append').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-    //         if( $('.idpelunasan').is(":checked") ){
-    //             var val = $(this).val();
-    //             // console.log(val); return false;
-    //             if(val == "pelunasan") {
-    //                 $('#idcekout').prop('disabled', false);
-    //                 // $('#bayarpelunasan').prop('disabled', false);
-    //                 // $('#idbayar').show();
-    //                 // $('#iddp').hide();
-    //                 // $('#ttamu-dp').val("");
-    //                 // $('#ttamu-sisa').val(0);
-    //                 // $('#tdokreferensi-judul_referensi').val("");
-    //                 // $('#tdokreferensi-vendor_referensi').val("");
-    //                 // $('#tdokreferensi-tgl_referensi').val("");
-    //                 // $('#tdokreferensi-deskripsi').val("");
-    //                 // $('#id_ref_type').val('').trigger("change");
-    //                 //
-    //                 // $('#tdokreferensi-nomor_referensi').prop('placeholder', 'Click Here ...');
-    //                 // $('#tdokreferensi-judul_referensi').prop('readonly', true);
-    //                 // $('#tdokreferensi-judul_referensi').prop('placeholder', 'Automatically filled');
-    //                 // $('#tdokreferensi-vendor_referensi').prop('readonly', true);
-    //                 // $('#tdokreferensi-vendor_referensi').prop('placeholder', 'Automatically filled');
-    //                 // $('#tdokreferensi-deskripsi').prop('readonly', true);
-    //                 // $('#tdokreferensi-deskripsi').prop('placeholder', 'Automatically filled');
-    //                 // $('#tdokreferensi-tgl_referensi').prop('readonly', true);
-    //                 // $('#tdokreferensi-tgl_referensi').prop('placeholder', 'Automatically filled');
-    //                 // $('#data_source_reference').prop('disabled', true);
-    //                 // $($('.uhuy').find('i.glyphicon-folder-open')).parent().removeClass('btn btn-primary btn-file').addClass('btn btn-default btn-file');
-    //                 //
-    //                 // $('#tdokreferensi-nomor_referensi').on('click', function() {
-    //                 //     var url = "<?//=\Yii::$app->getUrlManager()->createUrl(['kategoriaset/price/cekdokreferensi']);?>";
-    //                 //     var title = "List Dokumen Referensi";
-    //                 //     showModalPrice(url,title);
-    //                 // });
-    //             }
-    //         } else {
-    //             $('#idcekout').prop('disabled', true);
-    //             // $('#bayarpelunasan').prop('disabled', true);
-    //         }
-
-    //     });
-    //     // End check radio button
-    // }
-
     $(document).on('hidden.bs.modal', '.modal', function () {
         $('.modal:visible').length && $(document.body).addClass('modal-open');
     });
@@ -854,6 +807,7 @@ use yii\helpers\Url;
     function savecekout(idbiodata,tipe) {
         {
             var statuschecked = 0;
+            var statuscheckedbed = 0;
 
             $.each($('.cek_kamar'), function( index, value ) {
                if ($(this).prop('checked')) {
@@ -862,11 +816,26 @@ use yii\helpers\Url;
                     return false;
                 }
             });
-            if (statuschecked == 0){
+            $.each($('.clextrabed'), function( index, value ) {
+                if ($(this).prop('checked')) {
+                    statuscheckedbed = statuscheckedbed+1;
 
+                    return false;
+                }
+            });
+            if (statuschecked == 0){
                 swal({
                     title: 'Perhatian !',
                     text: 'Kamar Belum Ada Yang Di Ceklis !',
+                    icon: "info",
+                    dangerMode: true,
+                })
+             return false;
+            }
+            if (statuscheckedbed == 1){
+                swal({
+                    title: 'Perhatian !',
+                    text: 'Mohon klik tombol save terlebih dahulu jika anda akan menambahkan ExtraBed !',
                     icon: "info",
                     dangerMode: true,
                 })
@@ -925,4 +894,7 @@ use yii\helpers\Url;
             });
         }
     }
+    $(document).on('click','#idclose',function(){
+        window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+sessionidharga;
+    });
 </script>

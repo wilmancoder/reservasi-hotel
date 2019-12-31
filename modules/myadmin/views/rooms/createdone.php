@@ -15,7 +15,8 @@
         'tipe' => $tipe,
         'cektbed' => $cektbed,
         'resultbed' => $resultbed,
-        'model' => $model
+        'model' => $model,
+        'getsessionharga' => $getsessionharga
     ]) ?>
 
 </div>

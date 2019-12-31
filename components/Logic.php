@@ -315,7 +315,8 @@ class Logic extends Component
                     b.jml_uangmasuk AS pembayaran_tagihan,
                     ( (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) - b.jml_uangmasuk ) AS sisa_tagihan,
                     a.tgl_uangmasuk AS tgl_uang_diterima,
-                    IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima
+                    IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima,
+                    a.keterangan
                 FROM histori_summarytamu a
                 LEFT JOIN t_tamu ttl_kamar ON ttl_kamar.id_biodata_tamu = a.id_transaksi_tamu
                 LEFT JOIN (
@@ -356,7 +357,8 @@ class Logic extends Component
                     b.jml_uangmasuk AS pembayaran_tagihan,
                     ( (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) - b.jml_uangmasuk ) AS sisa_tagihan,
                     a.tgl_uangmasuk AS tgl_uang_diterima,
-                    IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima
+                    IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima,
+                    a.keterangan
                 FROM histori_summarytamu a
                 LEFT JOIN t_tamu ttl_kamar ON ttl_kamar.id_biodata_tamu = a.id_transaksi_tamu
                 LEFT JOIN (
@@ -391,7 +393,8 @@ class Logic extends Component
                 b.jml_uangmasuk AS pembayaran_tagihan,
                 ( (SUM(IFNULL(ttl_kamar.harga,0)) + IFNULL(e.harga_bed,0)) - b.jml_uangmasuk ) AS sisa_tagihan,
                 a.tgl_uangmasuk AS tgl_uang_diterima,
-                IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima
+                IFNULL(a.jml_uangmasuk,0) AS jml_uang_diterima,
+                a.keterangan
             FROM histori_summarytamu a
             LEFT JOIN t_tamu ttl_kamar ON ttl_kamar.id_biodata_tamu = a.id_transaksi_tamu
             LEFT JOIN (
@@ -427,7 +430,7 @@ class Logic extends Component
             if(empty($param3)) {
                 // echo"masuk1";exit;
                 $model = (new \yii\db\Query())
-                ->select(['a.pembayaran', 'a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'i.sisa', 'a.jml_uangmasuk'])
+                ->select(['a.keterangan', 'a.pembayaran', 'a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'i.sisa', 'a.jml_uangmasuk'])
                 ->from('histori_summarytamu a')
                 ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
                 ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')
@@ -457,7 +460,7 @@ class Logic extends Component
                 $impshift = implode(",",$result);
                 // var_dump($impshift);exit;
                 $model = (new \yii\db\Query())
-                ->select(['a.pembayaran', 'a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'i.sisa', 'a.jml_uangmasuk'])
+                ->select(['a.keterangan', 'a.pembayaran', 'a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'i.sisa', 'a.jml_uangmasuk'])
                 ->from('histori_summarytamu a')
                 ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
                 ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')
@@ -483,7 +486,7 @@ class Logic extends Component
 
         } else {
             $model = (new \yii\db\Query())
-            ->select(['a.pembayaran', 'a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'i.sisa', 'a.jml_uangmasuk'])
+            ->select(['a.keterangan', 'a.pembayaran', 'a.status_pembayaran', 'a.tgl_uangmasuk', 'l.nama as nama_user', 'm.nm_shift', 'c.nomor_kamar', 'j.nama as nama_tamu', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'i.total_harga as subtotal', 'i.sisa', 'a.jml_uangmasuk'])
             ->from('histori_summarytamu a')
             ->join('LEFT JOIN', 't_tamu b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
             ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')

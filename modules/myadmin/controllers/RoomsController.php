@@ -231,7 +231,8 @@ class RoomsController extends \yii\web\Controller
                     'status' => "success",
                     'header' => "Berhasil",
                     'message' => "Checkin Berhasil Diproses !",
-                    'setharga' => $getsessionharga
+                    'setharga' => $getsessionharga,
+                    'joinid' => $id
 
                 );
                 echo json_encode($hasil);
@@ -271,7 +272,7 @@ class RoomsController extends \yii\web\Controller
             'ambilharga' => $ambilharga,
             'nomorkamar' => $nomorkamar,
             'listkamar' => $listkamar,
-            'setharga' => $getsessionharga
+            'joinid' => $id
         ]);
     }
 
@@ -387,6 +388,8 @@ class RoomsController extends \yii\web\Controller
 
     public function actionCreatedone($idttamu){
         // var_dump($idttamu);exit;
+        $session = Yii::$app->session;
+        $getsessionharga = $session->get('idharga');
         $model = new HistoriSummarytamu();
         $exp = explode(",",$idttamu);
         $que1 = MMappingKamar::find()->where(['id'=>$exp[0]])->asArray()->one();
@@ -421,7 +424,8 @@ class RoomsController extends \yii\web\Controller
             'tipe' => $exp[1],
             'cektbed' => $cektbed,
             'resultbed' => $resultbed,
-            'model' => $model
+            'model' => $model,
+            'getsessionharga' => $getsessionharga
         ]);
     }
      public function actionSimpancekout($idbiodata,$tipe)
@@ -437,7 +441,7 @@ class RoomsController extends \yii\web\Controller
                  $hisKet = $postpelunasan['HistoriSummarytamu']['keterangan'];
 
                 $cekbiodatatamu =  TTamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->one();
-                $cektamu = Ttamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->all();
+                $cektamu = TTamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->all();
                 $cekhistoryTamu = HistoriSummarytamu::find()->where(['id_transaksi_tamu' => $idbiodata])->asArray()->one();
                 // var_dump($cekhistoryTamu);exit;
                 $ceksummaryTamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $idbiodata])->one();
@@ -445,7 +449,7 @@ class RoomsController extends \yii\web\Controller
                 // var_dump($resCeksummaryTamu);exit;
                 if(!empty($cektamu)) {
                     foreach ($cektamu as $value) {
-                        $modelTtamu = Ttamu::find()->where(['id' => $value['id']])->one();
+                        $modelTtamu = TTamu::find()->where(['id' => $value['id']])->one();
                         $modelTtamu->id_mapping_pembayaran = 1;
                         // $modelTtamu->created_date_cekout = date('Y-m-d H:i:s');
                         $modelTtamu->save(false);
@@ -647,73 +651,91 @@ class RoomsController extends \yii\web\Controller
 
     public function actionTambahdurasi($id,$tipe,$hari=0,$katharga='',$flag,$idkamar)
     {
-        // var_dump($hari);exit;
         $ambilDatatamu = Logic::dataTamuOne($id);
-        $cekjenispembayaran = TTamu::find()->where(['id' => $id])->asArray()->one();
-        $hasilcek = $cekjenispembayaran['id_mapping_pembayaran'];
+
+
+        // var_dump($hasilcek);exit;
 
         $idbio = $ambilDatatamu[0]['id_biodata_tamu'];
         $idttamu = $idkamar.",".$tipe;
         // $mapPembayaran = MMappingPembayaran::find()->where(['id_metode_pembayaran' => $tipe, 'id_jenis_pembayaran' => $hasilcek])->one();
         // var_dump($mapPembayaran);exit;
-        $model = TTamu::find()->where(['id' => $id])->one();
 
         $request = Yii::$app->request;
         if ($request->isAjax) {
             if($flag == 'normalhari') {
                 $harga_tambahan = $ambilDatatamu[0]['harga'] * $hari;
-                // $mapPembayaran = MMappingPembayaran::find()->where(['id_metode_pembayaran' => $tipe, 'id_jenis_pembayaran' => $hasilcek])->one();
-                $model->id_mapping_pembayaran = $hasilcek;
-                $model->checkout = date('Y-m-d', strtotime($model->checkout . ' +'.$hari.' day'));
-                $model->durasi = (string)($model->durasi + $hari);
-                $model->harga =  (string)($model->harga + $harga_tambahan);
-                // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
-                if($model->save()){
-                    $model2 = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
-                    if($ambilDatatamu[0]['jenis'] == 'lunas'){
-                        $model2->dp = $model2->total_harga;
-                        $model2->total_harga =  (string)($model2->total_harga + $harga_tambahan);
-                        $model2->sisa = (string)($model2->total_harga - $model2->dp);
+                $model2 = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
+                if($ambilDatatamu[0]['jenis'] == 'lunas'){
+                    $model2->dp = $model2->total_harga;
+                    $model2->total_harga =  (string)($model2->total_harga + $harga_tambahan);
+                    $model2->sisa = (string)($model2->total_harga - $model2->dp);
+                }
+                else{
+                    $model2->total_harga =  (string)($model2->total_harga + $harga_tambahan);
+                    $model2->sisa = (string)($model2->total_harga - $model2->dp);
+                }
+
+                if($model2->save()){
+                    $model = TTamu::find()->where(['id' => $id])->one();
+                    // Pengecekan ke sisa di tbl summary tamu
+                    $ceksummaryTamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
+                    $resCeksummaryTamu = $ceksummaryTamu['sisa'];
+                    if($resCeksummaryTamu == 0){
+                        $cekjenispembayaran = TTamu::find()->where(['id' => $id])->asArray()->one();
+                        $hasilcek = intval($cekjenispembayaran['id_mapping_pembayaran']);
+                    } else {
+                        $hasilcek = 3;
                     }
-                    else{
-                        $model2->total_harga =  (string)($model2->total_harga + $harga_tambahan);
-                        $model2->sisa = (string)($model2->total_harga - $model2->dp);
-                    }
-                    // $model2->total_bayar = $model2->total_harga;
-                    $model2->save();
+
+                    // $mapPembayaran = MMappingPembayaran::find()->where(['id_metode_pembayaran' => $tipe, 'id_jenis_pembayaran' => $hasilcek])->one();
+                    $model->id_mapping_pembayaran = $hasilcek;
+                    $model->checkout = date('Y-m-d', strtotime($model->checkout . ' +'.$hari.' day'));
+                    $model->durasi = (string)($model->durasi + $hari);
+                    $model->harga =  (string)($model->harga + $harga_tambahan);
+                    // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
+                    $model->save();
                 }
             } else if($flag == 'setengahhari') {
                 $hargasetengah = $katharga/2;
                 $durasisetengah = 0.5;
                 $model = TTamu::find()->where(['id' => $id])->one();
-                $model->id_mapping_pembayaran = $hasilcek;
-                $model->checkout = $model->checkout;
-                $model->durasi = (string)($model->durasi + $durasisetengah);
-                $model->harga =  (string)($model->harga + $hargasetengah);
-                // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
-                if($model->save()){
-                    $model2 = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
-                    if($ambilDatatamu[0]['jenis'] == 'lunas'){
-                        $model2->dp = $model2->total_harga;
-                        $model2->total_harga =  (string)($model2->total_harga + $hargasetengah);
-                        $model2->sisa = (string)($model2->total_harga - $model2->dp);
-                    }
-                    else{
-                        $model2->total_harga =  (string)($model2->total_harga + $hargasetengah);
-                        $model2->sisa = (string)($model2->total_harga - $model2->dp);
-                    }
-                    // $model2->total_bayar = $model2->total_harga;
-                    $model2->save();
-                    // if($model2->save()){
-                    //     $model3 = HistoriSummarytamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
-                    //     $model3->id_transaksi_tamu = $model->id_transaksi_tamu;
-                    //     $model3->id_petugas = Yii::$app->user->identity->id_petugas;
-                    //     $model3->pembayaran = 'TAMBAH DURASI';
-                    //     $model3->status_pembayaran = 'BELUM LUNAS';
-                    //     $model3->tgl_uangmasuk = date('Y-m-d');
-                    //     $model3->jml_uangmasuk = Logic::removeKoma($bayar);
-                    // }
+                $model2 = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
+                // $model2 = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
+                if($ambilDatatamu[0]['jenis'] == 'lunas'){
+                    $model2->dp = $model2->total_harga;
+                    $model2->total_harga =  (string)($model2->total_harga + $hargasetengah);
+                    $model2->sisa = (string)($model2->total_harga - $model2->dp);
                 }
+                else{
+                    $model2->total_harga =  (string)($model2->total_harga + $hargasetengah);
+                    $model2->sisa = (string)($model2->total_harga - $model2->dp);
+                }
+                // $model2->save();
+
+                if($model2->save()){
+                    $model = TTamu::find()->where(['id' => $id])->one();
+                    // Pengecekan ke sisa di tbl summary tamu
+                    $ceksummaryTamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $ambilDatatamu[0]['id_biodata_tamu']])->one();
+                    $resCeksummaryTamu = $ceksummaryTamu['sisa'];
+                    if($resCeksummaryTamu == 0){
+                        $cekjenispembayaran = TTamu::find()->where(['id' => $id])->asArray()->one();
+                        $hasilcek = intval($cekjenispembayaran['id_mapping_pembayaran']);
+                    } else {
+                        $hasilcek = 3;
+                    }
+
+                    $model->id_mapping_pembayaran = $hasilcek;
+                    $model->checkout = $model->checkout;
+                    $model->durasi = (string)($model->durasi + $durasisetengah);
+                    $model->harga =  (string)($model->harga + $hargasetengah);
+                    $model->save();
+                }
+
+                // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
+                // if($model->save()){
+                //
+                // }
             }
         }
         TTamu::updateAll(['id_mapping_pembayaran' => $hasilcek], ['id_biodata_tamu' => $ambilDatatamu[0]['id_biodata_tamu']]);
@@ -843,7 +865,7 @@ class RoomsController extends \yii\web\Controller
                 $ceksisa = $cekSummarytamu['sisa'];
                 $cekTotBayar = $cekSummarytamu['total_bayar'];
 
-                $cektamu = Ttamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->all();
+                $cektamu = TTamu::find()->where(['id_biodata_tamu' => $idbiodata])->asArray()->all();
 
                 if($hasilsisa != $ceksisa) {
                     $modelSummaryttamu = SummaryTtamu::find()->where(['id_transaksi_tamu' => $idbiodata])->one();
@@ -855,7 +877,7 @@ class RoomsController extends \yii\web\Controller
                     $modelSummaryttamu->save(false);
 
                     foreach ($cektamu as $value) {
-                        $modelTtamu = Ttamu::find()->where(['id' => $value['id']])->one();
+                        $modelTtamu = TTamu::find()->where(['id' => $value['id']])->one();
                         $modelTtamu->id_mapping_pembayaran = 3;
                         $modelTtamu->save(false);
                     }

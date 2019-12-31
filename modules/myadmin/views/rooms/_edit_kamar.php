@@ -407,7 +407,7 @@ use yii\helpers\Url;
                         $.ajax({
                             url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
                             beforeSend: function(data, v) {
-                                $('#modalRoomsId #modalRoomsTitle').html('Form Check');
+                                $('#modalRoomsId #modalRoomsTitle').html('Form Checkout');
                                 $('#modalRoomsId #modalRoomsBody').html('Loading ...');
                             },
                             error: function(data, v){
@@ -473,7 +473,7 @@ use yii\helpers\Url;
                         $.ajax({
                             url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
                             beforeSend: function(data, v) {
-                                $('#modalRoomsId #modalRoomsTitle').html('Form Check');
+                                $('#modalRoomsId #modalRoomsTitle').html('Form Checkout');
                                 $('#modalRoomsId #modalRoomsBody').html('Loading ...');
                             },
                             error: function(data, v){
@@ -762,99 +762,6 @@ use yii\helpers\Url;
     //     $('#ttamu-subtotalkamar"'+valueT+'"').val(setdefault);
     //     $('#ttamu-durasi"'+valueT+'"').val(setdefault);
     // }
-
-
-    function savecekin(id) {
-        {
-            if($('#ttamu-namatamu').val()==''){
-                swal({
-                    title: 'Perhatian !',
-                    text: 'Nama Tamu Wajib Diisi.',
-                    icon: "info",
-                    dangerMode: true,
-                }).then((ya) => {
-                    $('#ttamu-namatamu').focus();
-                });
-                return false;
-            } else if($('#ttamu-nomor_kontak').val()==''){
-                swal({
-                    title: 'Perhatian !',
-                    text: 'Nomor Handphone Tamu Wajib Diisi.',
-                    icon: "info",
-                    dangerMode: true,
-                }).then((ya) => {
-                    $('#ttamu-nomor_kontak').focus();
-                });
-                return false;
-            } else if($('#ttamu-nomor_identitas').val()==''){
-                swal({
-                    title: 'Perhatian !',
-                    text: 'Nomor Identitas Tamu Wajib Diisi.',
-                    icon: "info",
-                    dangerMode: true,
-                }).then((ya) => {
-                    $('#ttamu-nomor_identitas').focus();
-                });
-                return false;
-
-            } else {
-                // return false;
-
-
-                swal({
-                    title: "Konfirmasi",
-                    text: "Anda yakin akan memproses checkin?",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                }).then((ya) => {
-                    if (ya) {
-                        var _data = new FormData($("#form-rooms")[0]);
-                        $.ajax({
-                            type: "POST",
-                            data: _data,
-                            dataType: "json",
-                            contentType: false,
-                            processData: false,
-                            url: "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/create'])?>?id="+id,
-                            beforeSend: function () {
-                                swal({
-                                    title: 'Harap Tunggu',
-                                    text: "Sedang memproses check-in",
-                                    icon: 'info',
-                                    buttons: {
-                                        cancel: false,
-                                        confirm: false,
-                                    },
-                                    closeOnClickOutside: false,
-                                    onOpen: function () {
-                                        swal.showLoading()
-                                    },
-                                    closeOnEsc: false,
-                                });
-                            },
-                            complete: function () {
-                                swal.close()
-                            },
-                            success: function (result) {
-
-                                swal(result.header, result.message, result.status);
-
-                                if (result.status == "success") {
-                                    window.location = "<?=\Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/index'])?>?idharga="+result.setharga;
-                                }
-                            },
-                            error: function (xhr, ajaxOptions, thrownError) {
-                                swal("Error!", "Terdapat Kesalahan saat memproses check-in!", "error");
-                            }
-                        });
-                    } else {
-                        // swal("Informasi", "Dokumen Tidak Dihapus", "info");
-                    }
-                });
-            }
-        }
-    }
 
 
     // js hadi

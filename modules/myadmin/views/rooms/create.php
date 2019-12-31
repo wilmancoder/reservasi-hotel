@@ -13,7 +13,8 @@
         'id' => $id,
         'ambilharga' => $ambilharga,
         'nomorkamar' => $nomorkamar,
-        'listkamar' => $listkamar
+        'listkamar' => $listkamar,
+        'joinid' => $joinid
     ]) ?>
 
 </div>
