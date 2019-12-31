@@ -427,19 +427,25 @@ use yii\helpers\Url;
     }
 
     function formattingSecondDate(cekShift){
-        // alert(cekShift); return false;
-        var d = new Date();
 
-        var month = d.getMonth()+1;
-        if(cekShift == 3) {
-            var day = d.getDate();
+        var tt = document.getElementById('firstDate0').value;
+
+        var date = new Date(tt);
+        var newdate = new Date(date);
+
+        if(cekShift != 3) {
+            newdate.setDate(newdate.getDate() + 1);
         } else {
-            var day = d.getDate()+1;
+            newdate.setDate(newdate.getDate() + 0);
         }
 
-        var output = d.getFullYear() + '-' +
-            ((''+month).length<2 ? '0' : '') + month + '-' +
-            ((''+day).length<2 ? '0' : '') + day;
+        var dd = newdate.getDate();
+        var mm = newdate.getMonth() + 1;
+        var y = newdate.getFullYear();
+
+        var output = y + '-' +
+            ((''+mm).length<2 ? '0' : '') + mm + '-' +
+            ((''+dd).length<2 ? '0' : '') + dd;
 
         return output;
     }
