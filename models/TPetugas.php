@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int $id_user
  * @property int $id_shift
+ * @property int $id_kategori_harga
  * @property string $sign_in
  * @property string $sign_out
  */
@@ -29,7 +30,7 @@ class TPetugas extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_user', 'id_shift'], 'integer'],
+            [['id_user', 'id_shift', 'id_kategori_harga'], 'integer'],
             [['sign_in', 'sign_out'], 'safe'],
         ];
     }
@@ -43,6 +44,7 @@ class TPetugas extends \yii\db\ActiveRecord
             'id' => 'ID',
             'id_user' => 'Id User',
             'id_shift' => 'Id Shift',
+            'id_kategori_harga' => 'Id Kategori Harga',
             'sign_in' => 'Sign In',
             'sign_out' => 'Sign Out',
         ];

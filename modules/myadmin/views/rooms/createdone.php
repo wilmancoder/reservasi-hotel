@@ -16,7 +16,7 @@
         'cektbed' => $cektbed,
         'resultbed' => $resultbed,
         'model' => $model,
-        'getsessionharga' => $getsessionharga
+        // 'getsessionharga' => $getsessionharga
     ]) ?>
 
 </div>

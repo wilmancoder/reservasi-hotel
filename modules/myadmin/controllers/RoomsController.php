@@ -70,15 +70,20 @@ class RoomsController extends \yii\web\Controller
 
     public function actionIndex()
     {
-        $idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : 1;
-        $session = Yii::$app->session;
-        $session->set('idharga', $idharga);
-        $getsessionharga = $session->get('idharga');
-        // var_dump($getsessionharga);exit;
-
+        $kategoriHarga = \Yii::$app->user->identity->id_kategori_harga;
+        if($_GET['idharga'] == $kategoriHarga){
+            $idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : $kategoriHarga;
+        } else {
+            $idharga = !empty($_GET['idharga']) ? $kategoriHarga : $kategoriHarga;
+        }
         $status = "tersedia";
         $ambilDatakamar = Logic::dataKamar($idharga,$status);
-        // var_dump($ambilDatakamar);exit;
+        // $session = Yii::$app->session;
+        // $session->set('idharga', $idharga);
+        // $getsessionharga = $session->get('idharga');
+        // var_dump($getsessionharga);exit;
+
+
         return $this->render('index', [
             'model' => $ambilDatakamar,
             'idharga' => $idharga
@@ -87,8 +92,8 @@ class RoomsController extends \yii\web\Controller
 
     public function actionCreate($id) {
         $exp = explode(",",$id);
-        $session = Yii::$app->session;
-        $getsessionharga = $session->get('idharga');
+        // $session = Yii::$app->session;
+        // $getsessionharga = $session->get('idharga');
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $harga = (new \yii\db\Query())
@@ -231,7 +236,7 @@ class RoomsController extends \yii\web\Controller
                     'status' => "success",
                     'header' => "Berhasil",
                     'message' => "Checkin Berhasil Diproses !",
-                    'setharga' => $getsessionharga,
+                    // 'setharga' => $getsessionharga,
                     'joinid' => $id
 
                 );
@@ -388,8 +393,8 @@ class RoomsController extends \yii\web\Controller
 
     public function actionCreatedone($idttamu){
         // var_dump($idttamu);exit;
-        $session = Yii::$app->session;
-        $getsessionharga = $session->get('idharga');
+        // $session = Yii::$app->session;
+        // $getsessionharga = $session->get('idharga');
         $model = new HistoriSummarytamu();
         $exp = explode(",",$idttamu);
         $que1 = MMappingKamar::find()->where(['id'=>$exp[0]])->asArray()->one();
@@ -425,7 +430,7 @@ class RoomsController extends \yii\web\Controller
             'cektbed' => $cektbed,
             'resultbed' => $resultbed,
             'model' => $model,
-            'getsessionharga' => $getsessionharga
+            // 'getsessionharga' => $getsessionharga
         ]);
     }
      public function actionSimpancekout($idbiodata,$tipe)

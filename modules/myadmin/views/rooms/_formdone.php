@@ -425,7 +425,7 @@ use yii\helpers\Url;
   </div>
 </div>
 <script type="text/javascript">
-    var sessionidharga = <?= $getsessionharga ?>;
+    var sessionidharga = <?= $tipe ?>;
     function settingsList(id,idkamar,tipe){
         // var cektotsisa = $('#totsisa').val();
         // var subtotsisa = cektotsisa.substring(4);
@@ -763,28 +763,25 @@ use yii\helpers\Url;
                             swal(result.header, result.message, result.status);
 
                             if (result.status == "success") {
-                                // $('#modalPilihkamarId').on('hidden.bs.modal', function (e) {
-                                    $.ajax({
-                                        url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
-                                        beforeSend: function(data, v) {
-                                            $('#modalRoomsIdReview #modalRoomsTitleReview').html('Form Checkout');
-                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html('Loading ...');
-                                        },
-                                        error: function(data, v){
-                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html('Terjadi kesalahan..');
-                                        },
-                                        success: function(data, v){
-                                            $('#modalRoomsIdReview #modalRoomsBodyReview').html(data);
-                                        }
-                                    });
+                                $('#modalRoomsId').modal('hide');
+                                $.ajax({
+                                    url: "<?= Url::to(['/myadmin/rooms/createdone']) ?>?idttamu="+result.idttamu,
+                                    beforeSend: function(data, v) {
+                                        $('#modalRoomsIdReview #modalRoomsTitleReview').html('Form Checkout');
+                                        $('#modalRoomsIdReview #modalRoomsBodyReview').html('Loading ...');
+                                    },
+                                    error: function(data, v){
+                                        $('#modalRoomsIdReview #modalRoomsBodyReview').html('Terjadi kesalahan..');
+                                    },
+                                    success: function(data, v){
+                                        $('#modalRoomsIdReview #modalRoomsBodyReview').html(data);
+                                    }
+                                });
 
-                                    $('#modalRoomsIdReview').modal({
-                                        backdrop: 'static',
-                                        keyboard: false
-                                    });
-                                // });
-
-
+                                $('#modalRoomsIdReview').modal({
+                                    backdrop: 'static',
+                                    keyboard: false
+                                });
                                 // var url = "<?//= \Yii::$app->getUrlManager()->createUrl(['myadmin/rooms/createdone']);?>?idttamu="+result.idttamu;
                                 // var title = "Form Check-out";
                                 // showModalRooms(url,title);

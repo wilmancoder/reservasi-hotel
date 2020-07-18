@@ -25,6 +25,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     public $id_petugas;
     public $id_user;
     public $sign_in;
+    public $id_kategori_harga;
 
 
     // private static $users = [
@@ -72,6 +73,7 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         $identity->id_shift     = $shift['id'];
         $identity->nm_shift     = $shift['nm_shift'];
         $identity->id_petugas   = $petugas['id'];
+        $identity->id_kategori_harga = $petugas['id_kategori_harga'];
         $identity->sign_in   = $petugas['sign_in'];
 
 

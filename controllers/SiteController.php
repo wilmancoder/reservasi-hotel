@@ -108,20 +108,24 @@ class SiteController extends Controller
 
     public function actionGetsetharga($idharga)
     {
-        // var_dump($idharga);exit;
+        $idpetugas = \Yii::$app->user->identity->id_petugas;
+
         \Yii::$app->response->format = Response::FORMAT_JSON;
         if (Yii::$app->request->get()){
-            // $getharga = MMappingHarga::find()->where(['id_kategori_harga' => $idharga])->asArray()->one();
-            // $res_getharga = $getharga['id'];
-            // var_dump($getharga['id']);exit;
-            $hasil = [
-                'status' => "success",
-                'header' => "Berhasil",
-                'message' => "Harga Berhasil Di Setting !",
-                'idharga' => $idharga
-            ];
-            echo json_encode($hasil);
-            die();
+            $modelPetugas = $this->findModelLogout($idpetugas);
+            $modelPetugas->id_kategori_harga = $idharga;
+            if($modelPetugas->save(false)) {
+
+                $hasil = [
+                    'status' => "success",
+                    'header' => "Berhasil",
+                    'message' => "Harga Berhasil Di Setting !",
+                    'idharga' => $modelPetugas->id_kategori_harga
+                ];
+                echo json_encode($hasil);
+                die();
+            }
+
         }
     }
 

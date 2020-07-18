@@ -19,7 +19,7 @@ class Logic extends Component
 {
     public static function arrKamar($id=null)
     {
-        $model = (new \yii\db\Query())
+        $model = [(new \yii\db\Query())]
             ->select(['a.id', 'a.nomor_kamar', 'a.status', 'c.type', 'd.kategori_harga', 'b.harga'])
             ->from('m_mapping_kamar a')
             ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
@@ -700,7 +700,7 @@ class Logic extends Component
     public static function detailbookingtamu($idtranstamu)
     {
         $model = (new \yii\db\Query())
-        ->select(['c.nomor_kamar', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'a.total_harga as subtotal'])
+        ->select(['a.dp','a.sisa','a.total_bayar','c.nomor_kamar', 'a.id_transaksi_tamu', 'b.id_biodata_tamu', 'a.id_petugas', 'h.type', 'f.jenis as jenis_pembayaran', 'e.metode as metode_pembayaran', 'b.no_kartu_debit', 'b.checkin', 'b.checkout', 'b.durasi', 'g.harga as harga_kamar', 'b.harga as biaya_sewa_perkamar', 'a.total_harga as subtotal'])
         ->from('summary_booking a')
         ->join('LEFT JOIN', 't_booking b', 'b.id_biodata_tamu = a.id_transaksi_tamu')
         ->join('INNER JOIN', 'm_mapping_kamar c', 'c.id = b.id_mapping_kamar')

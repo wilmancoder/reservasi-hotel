@@ -332,7 +332,30 @@ class BookingController extends \yii\web\Controller
                 $row[$i]['durasi'] = $value['durasi'];
                 $row[$i]['type'] = $value['type'];
                 $row[$i]['harga_kamar'] = \app\components\Logic::formatNumber($value['harga_kamar'], 0);
-                $row[$i]['biaya_sewa_perkamar'] = \app\components\Logic::formatNumber($value['biaya_sewa_perkamar'], 0);;
+                $row[$i]['biaya_sewa_perkamar'] = \app\components\Logic::formatNumber($value['biaya_sewa_perkamar'], 0);
+                if($value['dp'] != null){
+                    if($value['total_bayar'] == null){
+                        $row[$i]['uangmasuk'] = $value['dp'];
+                    } else {
+                        $row[$i]['uangmasuk'] = '0';
+                    }
+                } else {
+                    if($value['total_bayar'] != null){
+                        $row[$i]['uangmasuk'] = $value['total_bayar'];
+                    } else {
+                        $row[$i]['uangmasuk'] = '0';
+                    }
+                }
+                // if($value['total_bayar'] != null){
+                //     $row[$i]['uangmasuk'] = $value['total_bayar'];
+                // } else {
+                //     $row[$i]['uangmasuk'] = '0';
+                // }
+                if($value['sisa'] != null) {
+                    $row[$i]['sisa'] = $value['sisa'];
+                } else {
+                    $row[$i]['sisa'] = '0';
+                }
 
 
                 $i++;

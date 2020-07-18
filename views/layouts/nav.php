@@ -3,10 +3,21 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 
-$idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : "";
-$session = Yii::$app->session;
-$session->set('idharga', $idharga);
-$getsessionharga = $session->get('idharga');
+// $idharga = !empty($_GET['idharga']) ? $_GET['idharga'] : "";
+// $session = Yii::$app->session;
+// $session->set('idharga', $idharga);
+// $getsessionharga = $session->get('idharga');
+
+$kategoriHarga = \Yii::$app->user->identity->id_kategori_harga;
+if(!empty($_GET['idharga'])) {
+    if($_GET['idharga'] == $kategoriHarga){
+        $getsessionharga = !empty($_GET['idharga']) ? $_GET['idharga'] : $kategoriHarga;
+    } else {
+        $getsessionharga = !empty($_GET['idharga']) ? $kategoriHarga : $kategoriHarga;
+    }
+} else {
+    $getsessionharga = '';
+}
 ?>
 <style type="text/css">
     /* .cbrand {
