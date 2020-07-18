@@ -45,8 +45,8 @@ class MMappingHarga extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'id_type' => 'Id Type',
-            'id_kategori_harga' => 'Id Kategori Harga',
+            'id_type' => 'Type',
+            'id_kategori_harga' => 'Kategori Harga',
             'harga' => 'Harga',
             'created_date' => 'Created Date',
             'created_by' => 'Created By',

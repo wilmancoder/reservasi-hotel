@@ -9,7 +9,14 @@
 
     <?= $this->render('_formdone', [
         'ambilDatatamu' => $ambilDatatamu,
-        'idbiodata' => $idbiodata
+        'ambilDatatamusatuan' => $ambilDatatamusatuan,
+        'idbiodata' => $idbiodata,
+        'idkamar' =>$idkamar,
+        'tipe' => $tipe,
+        'cektbed' => $cektbed,
+        'resultbed' => $resultbed,
+        'model' => $model,
+        // 'getsessionharga' => $getsessionharga
     ]) ?>
 
 </div>

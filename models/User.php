@@ -2,9 +2,11 @@
 
 namespace app\models;
 
+use Yii;
+use yii\db\ActiveRecord;
 // use app\models\MShift;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
     public $id;
     public $username;
@@ -23,6 +25,7 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     public $id_petugas;
     public $id_user;
     public $sign_in;
+    public $id_kategori_harga;
 
 
     // private static $users = [
@@ -59,12 +62,10 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     public static function findIdentity($id)
     {
         // return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
-
-
         $user = Users::find()->where(['username' => $id])->asArray()->one();
         $roles = MRoles::find()->where(['id' =>$user['role']])->asArray()->one();
-        $shift = MShift::find()->where(['id'=>$user['id_shift']])->asArray()->one();
         $petugas = TPetugas::find()->where(['id_user' => $user['id']])->orderBy(['id' => SORT_DESC])->asArray()->one();
+        $shift = MShift::find()->where(['id'=>$petugas['id_shift']])->asArray()->one();
         $identity = new User();
         $identity->id           = $id;
         $identity->id_user      = $user['id'];
@@ -72,11 +73,12 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
         $identity->id_shift     = $shift['id'];
         $identity->nm_shift     = $shift['nm_shift'];
         $identity->id_petugas   = $petugas['id'];
+        $identity->id_kategori_harga = $petugas['id_kategori_harga'];
         $identity->sign_in   = $petugas['sign_in'];
 
 
-        // $identity->start_date   = \app\components\Logic::ambilJamshift();
-        // $identity->end_date     = $shift['end_date'];
+        $identity->start_date   = $shift['start_date'];
+        $identity->end_date     = $shift['end_date'];
         $identity->range_date   = $shift['range_date'];
 
 

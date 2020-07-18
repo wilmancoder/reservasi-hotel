@@ -38,12 +38,12 @@ use yii\helpers\Html;
                         <div class="col-md-4">
 
                             <div class="form-group required">
-                                <?= $form->field($model, 'id_type')->dropDownList($listDatatype, ['class' => 'form-control select validate[required]']); ?>
+                                <?= $form->field($model, 'id_type')->dropDownList($listDatatype, ['class' => 'form-control select validate[required]', 'prompt' => 'Pilih Type Kamar ...']); ?>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group required">
-                                <?= $form->field($model, 'id_kategori_harga')->dropDownList($listDataharga, ['class' => 'form-control select validate[required]']); ?>
+                                <?= $form->field($model, 'id_kategori_harga')->dropDownList($listDataharga, ['class' => 'form-control select validate[required]', 'prompt' => 'Pilih Kategori Harga ...']); ?>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -67,7 +67,6 @@ use yii\helpers\Html;
 <?php ActiveForm::end(); ?>
 
 <script type="text/javascript">
-var getid = <?= $id;?>;
 $(document).ready(function () {
     $('.hargakamar').number( true );
     $(".select").select2();

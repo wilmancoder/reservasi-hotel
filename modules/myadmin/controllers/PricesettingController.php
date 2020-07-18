@@ -47,7 +47,7 @@ class PricesettingController extends \yii\web\Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['GET'],
                 ],
             ],
         ];
@@ -73,15 +73,20 @@ class PricesettingController extends \yii\web\Controller
                 $hasil = array(
                     'status' => "success",
                     'header' => "Berhasil",
-                    'message' => "Kategori Harga Berhasil Di input !",
+                    'message' => "Setting Harga Berhasil Di input !",
                 );
                 echo json_encode($hasil);
                 die();
             }
         }
-
+        $kategoriharga=MKategoriHarga::find()->all();
+        $listDataharga=ArrayHelper::map($kategoriharga,'id','kategori_harga');
+        $typekamar=MType::find()->all();
+        $listDatatype=ArrayHelper::map($typekamar,'id','type');
         return $this->renderPartial('create', [
             'model' => $model,
+            'listDataharga' => $listDataharga,
+            'listDatatype' => $listDatatype
         ]);
     }
 
@@ -91,6 +96,7 @@ class PricesettingController extends \yii\web\Controller
         if ($model->load(Yii::$app->request->post())) {
             $model->id_type = $_POST['MMappingHarga']['id_type'];
             $model->id_kategori_harga = $_POST['MMappingHarga']['id_kategori_harga'];
+            $model->harga = Logic::removeKoma($_POST['MMappingHarga']['harga']);
             $model->created_date = date('Y-m-d H:i:s');
             $model->created_by = Yii::$app->user->identity->nama;
             if ($model->save()) {
@@ -115,6 +121,19 @@ class PricesettingController extends \yii\web\Controller
         ]);
     }
 
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+        $hasil = array(
+            'status' => "success",
+            'header' => "Berhasil",
+            'message' => "Kategori Harga Berhasil Di Hapus !",
+        );
+        echo json_encode($hasil);
+        die();
+        // return $this->redirect(['adm/artikel']);
+    }
+
     public function actionGetdatapricesetting()
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
@@ -132,12 +151,13 @@ class PricesettingController extends \yii\web\Controller
 
             $row[$i]['kategoriharga'] = $value['kategori_harga'];
             $row[$i]['type'] = $value['type'];
+            $row[$i]['harga'] = "Rp. " . \app\components\Logic::formatNumber($value['harga'], 0);
             $row[$i]['created_date'] = $value['created_date'];
             $row[$i]['created_by'] = $value['created_by'];
 
             $row[$i]['fungsi'] = "
-            <button onclick='updatepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Edit Room' class='btn btn-sm btn-warning btn-flat'><i class='fa fa-edit'></i></button>
-            <button onclick='deletepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Hapus Room' class='btn btn-sm btn-danger btn-flat'><i class='fa fa-trash'></i></button>
+            <button onclick='updatepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Edit Harga' class='btn btn-sm btn-warning btn-flat'><i class='fa fa-edit'></i></button>
+            <button onclick='deletepricesetting(\"" . $value['id'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Hapus Harga' class='btn btn-sm btn-danger btn-flat'><i class='fa fa-trash'></i></button>
             ";
 
             $i++;

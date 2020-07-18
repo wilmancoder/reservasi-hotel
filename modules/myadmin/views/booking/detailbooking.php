@@ -30,6 +30,8 @@ $this->params['breadcrumbs'][] = $this->title;
                          <th>Type</th>
                          <th>Harga Kamar</th>
                          <th>Total Sewa PerKamar</th>
+                         <th>Uang Masuk</th>
+                         <th>Sisa Pembayaran</th>
                      </tr>
                      </thead>
                     </table>
@@ -93,7 +95,9 @@ $this->params['breadcrumbs'][] = $this->title;
                  {"data": "durasi"},
                  {"data": "type"},
                  {"data": "harga_kamar"},
-                 {"data": "biaya_sewa_perkamar"}
+                 {"data": "biaya_sewa_perkamar"},
+                 {"data": "uangmasuk"},
+                 {"data": "sisa"},
 
              ],
         });

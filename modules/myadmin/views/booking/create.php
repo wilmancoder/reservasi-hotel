@@ -9,7 +9,10 @@
 
     <?= $this->render('_form', [
         'model' => $model,
-        'model2' => $model2
+        'model2' => $model2,
+        'id' => $id,
+        'listkamar' => $listkamar,
+        'joinid' => $joinid
     ]) ?>
 
 </div>

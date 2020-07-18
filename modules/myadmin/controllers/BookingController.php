@@ -17,6 +17,8 @@ use app\models\MMetodePembayaran;
 use app\models\MJenisPembayaran;
 use app\models\MMappingPembayaran;
 use app\models\SummaryBooking;
+use app\models\MMappingHarga;
+use app\models\HistoriSummarytamu;
 
 class BookingController extends \yii\web\Controller
 {
@@ -56,11 +58,20 @@ class BookingController extends \yii\web\Controller
             ],
         ];
     }
-    public function actionIndex()
+    public function actionIndex($idharga)
     {
+        if($idharga == 1) {
+            $idhargabooking = $idharga + 2;
+        } else if($idharga == 2){
+            $idhargabooking = $idharga + 1;
+        } else {
+            $idhargabooking = $idharga;
+        }
         $petugas = Yii::$app->user->identity->id_petugas;
         return $this->render('index', [
-            'idpetugas' => $petugas
+            'idpetugas' => $petugas,
+            'idhargabooking' => $idhargabooking,
+            'idharga' => $idharga
         ]);
     }
 
@@ -87,7 +98,7 @@ class BookingController extends \yii\web\Controller
                 $row[$i]['subtotal'] = \app\components\Logic::formatNumber($value['subtotal'], 0);
 
                 $row[$i]['fungsi'] = "
-                <button onclick='detailBooking(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail Subtotal' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
+                <button onclick='detailBooking(\"" . $value['id_transaksi_tamu'] . "\")' type='button' rel='tooltip' data-toggle='tooltip' title='Detail' class='btn btn-sm btn-primary'><i class='fa fa-list'></i></button>
                 ";
 
                 $i++;
@@ -99,28 +110,16 @@ class BookingController extends \yii\web\Controller
         }
     }
 
-    public function actionCreate() {
+    public function actionCreate($joinid) {
+        $exp = explode(",",$joinid);
+
+        // var_dump($exp);exit;
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            // $harga = (new \yii\db\Query())
-            //     ->select(['a.id', 'a.nomor_kamar', 'a.status', 'b.harga'])
-            //     ->from('m_mapping_kamar a')
-            //     ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
-            //     ->one();
-            // $ambilharga = $harga['harga'];
-            // $nomorkamar = $harga['nomor_kamar'];
+
             $model = new TBooking();
             $model2 = new SummaryBooking();
-            if ($model->load(Yii::$app->request->post())) {
-                $postkamar = $_POST['kamarterpilih'];
-                $expPostkamar = explode(",",$postkamar);
-
-                $postharga = $_POST['hargaterpilih'];
-                $expPostharga = explode(",",$postharga);
-
-
-                // echo"<pre>";
-                // print_r($expPostkamar);exit;
+            if (Yii::$app->request->post()) {
                 $jenisPembayaran = $_POST['TBooking']['radio'];
                 if($jenisPembayaran == "belumbayar"){
                     $metodePembayaran = "unknown";
@@ -131,7 +130,7 @@ class BookingController extends \yii\web\Controller
                 $dp = $_POST['SummaryBooking']['dp'];
                 $sisa = $_POST['SummaryBooking']['sisa'];
                 $totalharga = $_POST['SummaryBooking']['total_harga'];
-                $durasi = $_POST['TBooking']['durasi'];
+                // $durasi = $_POST['TBooking']['durasi'];
                 $nokartudebit = $_POST['TBooking']['no_kartu_debit'];
 
                 $modelJenisPembayaran = MJenisPembayaran::find()->where(['jenis' => $jenisPembayaran])->one();
@@ -166,54 +165,106 @@ class BookingController extends \yii\web\Controller
                     $modelSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
                     $modelSummaryttamu->total_harga = Logic::removeKoma($totalharga);
                     $modelSummaryttamu->save(false);
-                }
 
-
-                // simpan ke tabel mapping kamar
-                foreach ($expPostkamar as $key => $value) {
-                    // $jumlahkamar = $value;
-
-                    // $modelStatuskamar =  MMappingKamar::find()->where(['id' => $value])->one();
-                    // $modelStatuskamar->status = "terisi";
-                    // if($modelStatuskamar->save(false)) {
-                        $modelPengunjung = new TBooking();
-                        $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
-                        $modelPengunjung->id_mapping_kamar = $value;
-                        $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran['id'];
-                        $modelPengunjung->checkin = $_POST['TBooking']['checkin'];
-                        $modelPengunjung->checkout = $_POST['TBooking']['checkout'];
-                        $modelPengunjung->harga = $expPostharga[$key];
-                        $modelPengunjung->status = 1;
-                        $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
-                        $modelPengunjung->no_kartu_debit = $nokartudebit;
-                        $modelPengunjung->created_date = date('Y-m-d H:i:s');
-                        $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
-                        // if($jenisPembayaran == "lunas") {
-                        //     $modelPengunjung->bayar = Logic::removeKoma($bayar);
-                        // } else {
-                        //     $modelPengunjung->bayar = null;
-                        // }
-
-                        if($modelPengunjung->save(false)) {
-                            $hasil = array(
-                                'status' => "success",
-                                'header' => "Berhasil",
-                                'message' => "Checkin Berhasil Diproses !",
-                            );
+                    $modelHistoriSummaryttamu = new HistoriSummarytamu();
+                    $modelHistoriSummaryttamu->id_transaksi_tamu = $modelBiodatatamu->id;
+                    $modelHistoriSummaryttamu->id_petugas = Yii::$app->user->identity->id_petugas;
+                    if($jenisPembayaran == "sebagian") {
+                        if($dp != 0 && $sisa != 0){
+                            $modelHistoriSummaryttamu->pembayaran = "DP (BOOKING)";
+                            $modelHistoriSummaryttamu->status_pembayaran = "BELUM LUNAS";
+                            $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeKoma($dp);
                         }
-                    // }
+                    } else if($jenisPembayaran == "lunas") {
+                        if($sisa == 0){
+                            $modelHistoriSummaryttamu->pembayaran = "PENUH (BOOKING)";
+                            $modelHistoriSummaryttamu->status_pembayaran = "LUNAS";
+                            $modelHistoriSummaryttamu->jml_uangmasuk = Logic::removeKoma($bayar);
+                        }
+                    }
+                    $modelHistoriSummaryttamu->tgl_uangmasuk = date('Y-m-d');
+                    $modelHistoriSummaryttamu->save(false);
                 }
-                echo json_encode($hasil);
-                die();
+
+                    // $modelPengunjung = new TBooking();
+                    // $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
+                    // $modelPengunjung->id_mapping_kamar = $_POST['TBooking']['list_kamar'];
+                    // $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
+                    // $modelPengunjung->checkin = $_POST['TBooking']['checkin'];
+                    // $modelPengunjung->checkout = $_POST['TBooking']['checkout'];
+                    // $modelPengunjung->harga = $_POST['TBooking']['subtotalkamar'];
+                    // $modelPengunjung->status = 1;
+                    // $modelPengunjung->durasi = str_replace('Hari', '',$durasi);
+                    // $modelPengunjung->no_kartu_debit = $_POST['TBooking']['no_kartu_debit'];
+                    // $modelPengunjung->created_date = date('Y-m-d H:i:s');
+                    // $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
+
+                    if(!empty($_POST['kamar'])){
+                        // var_dump($_POST['kamar']);exit;
+                        foreach ($_POST['kamar'] as $key => $value) {
+                            $modelPengunjung = new TBooking();
+                            $modelPengunjung->id_biodata_tamu = $modelBiodatatamu->id;
+                            $modelPengunjung->id_mapping_kamar = $value['list_kamar'];
+                            $modelPengunjung->id_mapping_pembayaran = $modelMappingPembayaran->id;
+                            $modelPengunjung->checkin = $value['checkin'];
+                            $modelPengunjung->checkout = $value['checkout'];
+                            $modelPengunjung->harga = $value['subtotalkamar'];
+                            $modelPengunjung->status = 1;
+                            $modelPengunjung->durasi = str_replace('Hari', '',$value['durasi']);
+                            $modelPengunjung->no_kartu_debit = $_POST['TBooking']['no_kartu_debit'];
+                            $modelPengunjung->created_date = date('Y-m-d H:i:s');
+                            $modelPengunjung->created_by = \Yii::$app->user->identity->nama;
+                            $modelPengunjung->save(false);
+                            // if($modelPengunjung->save(false)) {
+                            //     $hasil = array(
+                            //         'status' => "success",
+                            //         'header' => "Berhasil",
+                            //         'message' => "Booking Berhasil Diproses !",
+                            //         'idharga' => $exp[1]
+                            //     );
+                            // }
+                        }
+                    }
+                    $hasil = array(
+                        'status' => "success",
+                        'header' => "Berhasil",
+                        'message' => "Booking Berhasil Diproses !",
+                        'idharga' => $exp[1]
+                    );
+                    echo json_encode($hasil);
+                    die();
             }
         $transaction->commit();
         } catch (Exception $e) {
             $transaction->rollBack();
             echo 'Message: ' . $e->getMessage();
         }
+
+        $getkategorikamar = MMappingHarga::find()->where(['id_kategori_harga' => $exp[0]])->asArray()->all();
+        // $que1 = MMappingKamar::find()->where(['id'=>$idttamu])->asArray()->one();
+        foreach ($getkategorikamar as $key => $valueKategori) {
+            $resultKategori[] = $valueKategori['id'];
+        }
+        $imp = implode(",",$resultKategori);
+        // var_dump($imp);exit;
+
+        $listkamar = (new \yii\db\Query())
+            ->select(['a.id', 'a.nomor_kamar', 'a.status', 'c.type', 'd.kategori_harga', 'b.harga'])
+            ->from('m_mapping_kamar a')
+            ->join('INNER JOIN', 'm_mapping_harga b', 'b.id=a.id_mapping_harga')
+            ->join('INNER JOIN', 'm_type c', 'c.id = b.id_type')
+            ->join('INNER JOIN', 'm_kategori_harga d', 'd.id = b.id_kategori_harga')
+            ->where('a.id_mapping_harga IN('.$imp.')')
+            // ->andWhere(['<>', 'a.status', 'terisi'])
+            ->groupBy('a.nomor_kamar')
+            ->orderBy(['a.nomor_kamar' => SORT_ASC])
+            ->all();
         return $this->renderPartial('create', [
             'model' => $model,
-            'model2' => $model2
+            'model2' => $model2,
+            'id' => $exp[1],
+            'listkamar' => $listkamar,
+            'joinid' => $joinid
         ]);
     }
 
@@ -262,6 +313,7 @@ class BookingController extends \yii\web\Controller
         ]);
     }
 
+
     public function actionGeneratedetailbooking($idtranstamu) {
         if(Yii::$app->request->isAjax)
         {
@@ -280,7 +332,30 @@ class BookingController extends \yii\web\Controller
                 $row[$i]['durasi'] = $value['durasi'];
                 $row[$i]['type'] = $value['type'];
                 $row[$i]['harga_kamar'] = \app\components\Logic::formatNumber($value['harga_kamar'], 0);
-                $row[$i]['biaya_sewa_perkamar'] = \app\components\Logic::formatNumber($value['biaya_sewa_perkamar'], 0);;
+                $row[$i]['biaya_sewa_perkamar'] = \app\components\Logic::formatNumber($value['biaya_sewa_perkamar'], 0);
+                if($value['dp'] != null){
+                    if($value['total_bayar'] == null){
+                        $row[$i]['uangmasuk'] = $value['dp'];
+                    } else {
+                        $row[$i]['uangmasuk'] = '0';
+                    }
+                } else {
+                    if($value['total_bayar'] != null){
+                        $row[$i]['uangmasuk'] = $value['total_bayar'];
+                    } else {
+                        $row[$i]['uangmasuk'] = '0';
+                    }
+                }
+                // if($value['total_bayar'] != null){
+                //     $row[$i]['uangmasuk'] = $value['total_bayar'];
+                // } else {
+                //     $row[$i]['uangmasuk'] = '0';
+                // }
+                if($value['sisa'] != null) {
+                    $row[$i]['sisa'] = $value['sisa'];
+                } else {
+                    $row[$i]['sisa'] = '0';
+                }
 
 
                 $i++;

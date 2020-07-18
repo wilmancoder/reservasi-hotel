@@ -3,11 +3,13 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 // use yii\grid\GridView;
 use yii\bootstrap\ActiveForm;
+use app\components\Logic;
 
 $this->title = 'Rooms';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <style type="text/css">
+.modal { overflow-y: scroll; }
 .media {
 display: inline-block;
 position: relative;
@@ -92,6 +94,7 @@ opacity: 1;
     <div class="row">
         <?php
         foreach ($model as $key => $value) {
+            $joinid = $value['id'].",".$idharga;
             if($value['status'] == "tersedia"){
 
 
@@ -106,7 +109,7 @@ opacity: 1;
                     <div class='icon'>
                     <i class='ion ion-home'></i>
                     </div>
-                    ".Html::a('<i class="fa fa-check-circle"></i> '.ucfirst($value['status']).'', 'javascript:manage_rooms("'.$value['id'].'")', ['class' => 'small-box-footer labelcekin'])."
+                    ".Html::a('<i class="fa fa-check-circle"></i> '.ucfirst($value['status']).'', 'javascript:manage_rooms("'.$joinid.'")', ['class' => 'small-box-footer labelcekin'])."
 
                     </div>
 
@@ -116,7 +119,8 @@ opacity: 1;
                     ";
 
             } else {
-
+                $waktu =Logic::durasikamar($value['created_date_cekin'],$value['checkout']);
+                // var_dump($waktu);exit;
 
                 echo"
                 <div class='col-lg-3 col-xs-6'>
@@ -124,11 +128,13 @@ opacity: 1;
                         <div class='inner'>
                             <h3>".$value['nomor_kamar']."</h3>
                             <p>".ucfirst($value['type'])."</p>
+
+
                         </div>
                         <div class='icon'>
                             <i class='ion ion-home'></i>
                         </div>
-                        ".Html::a('<i class="fa fa-minus-circle"></i> '.ucfirst($value['status']).'', 'javascript:manage_done("'.$value['id'].'")', ['class' => 'small-box-footer labelcekin'])."
+                        ".Html::a('<i class="fa fa-minus-circle"></i> '.ucfirst($value['status']).'', 'javascript:manage_done("'.$joinid.'")', ['class' => 'small-box-footer labelcekin'])."
                     </div>
                 </div>
                 ";
@@ -155,6 +161,31 @@ opacity: 1;
 
             <!-- Modal body -->
             <div class="modal-body" id="modalRoomsBody">
+              Loading ...
+            </div>
+
+            <!-- Modal footer -->
+            <!-- <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div> -->
+
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="modalRoomsIdReview">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title" id="modalRoomsTitleReview"></h4>
+              <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body" id="modalRoomsBodyReview">
               Loading ...
             </div>
 

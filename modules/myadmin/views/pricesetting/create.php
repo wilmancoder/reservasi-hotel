@@ -9,6 +9,8 @@
 
     <?= $this->render('_form', [
         'model' => $model,
+        'listDataharga' => $listDataharga,
+        'listDatatype' => $listDatatype
     ]) ?>
 
 </div>
